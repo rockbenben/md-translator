@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { Flex, Card, Button, Typography, Input, Upload, Form, Space, message, Select, Modal, Checkbox, Progress, Tooltip, Switch, Spin } from "antd";
-import { CopyOutlined, DownloadOutlined, InboxOutlined } from "@ant-design/icons";
+import { CopyOutlined, DownloadOutlined, InboxOutlined, UploadOutlined } from "@ant-design/icons";
 import { getTextStats, downloadFile } from "@/app/utils";
 import { placeholderPattern, filterMarkdownLines } from "@/app/utils/markdownUtils";
 import { categorizedOptions, findMethodLabel } from "@/app/components/translateAPI";
@@ -11,6 +11,7 @@ import { useCopyToClipboard } from "@/app/hooks/useCopyToClipboard";
 import useFileUpload from "@/app/hooks/useFileUpload";
 import useTranslateData from "@/app/hooks/useTranslateData";
 import { useTranslations } from "next-intl";
+import { getLangDir } from "rtl-detect";
 
 const { TextArea } = Input;
 const { Dragger } = Upload;
@@ -38,6 +39,8 @@ const MDTranslator = () => {
     resetUpload,
   } = useFileUpload();
   const {
+    exportSettings,
+    importSettings,
     translationMethod,
     setTranslationMethod,
     translateContent,
@@ -427,6 +430,24 @@ const MDTranslator = () => {
         <Button type="primary" block onClick={() => (uploadMode === "single" ? handleTranslate(performTranslation, sourceText) : handleMultipleTranslate())} disabled={translateInProgress}>
           {multiLanguageMode ? `${t("translate")} | ${t("totalLanguages")}${target_langs.length || 0}` : t("translate")}
         </Button>
+        <Tooltip title={t("exportSettingTooltip")}>
+          <Button
+            icon={<DownloadOutlined />}
+            onClick={async () => {
+              await exportSettings();
+            }}>
+            {t("exportSetting")}
+          </Button>
+        </Tooltip>
+        <Tooltip title={t("importSettingTooltip")}>
+          <Button
+            icon={<UploadOutlined />}
+            onClick={async () => {
+              await importSettings();
+            }}>
+            {t("importSetting")}
+          </Button>
+        </Tooltip>
         <Tooltip title={t("resetUploadTooltip")}>
           <Button
             onClick={() => {
@@ -460,7 +481,7 @@ const MDTranslator = () => {
                   </Button>
                 </Space>
               }>
-              <TextArea value={resultStats.displayText} rows={10} readOnly />
+              <TextArea value={resultStats.displayText} dir={getLangDir(targetLanguage)} rows={10} readOnly />
               <Paragraph type="secondary" className="-mb-2">
                 {t("outputStatsTitle")}: {resultStats.charCount} {t("charLabel")}, {resultStats.lineCount} {t("lineLabel")}
               </Paragraph>
