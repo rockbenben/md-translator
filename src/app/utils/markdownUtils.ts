@@ -1,3 +1,4 @@
+import { splitTextIntoLines } from "@/app/utils";
 /**
  * 解析文本，将前置区域、代码块、链接、标题、列表、引用、加粗等内容替换为占位符，
  * 返回处理后的行数组及各类占位符字典
@@ -61,7 +62,7 @@ export const filterMarkdownLines = (lines: string[], mdOption) => {
   }
 
   // 按行处理
-  const processedLines = fullText.split("\n");
+  const processedLines = splitTextIntoLines(fullText);
 
   processedLines.forEach((line, index) => {
     let modifiedLine = line;

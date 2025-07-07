@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Flex, Card, Button, Typography, Input, Upload, Form, Space, message, Select, Modal, Checkbox, Progress, Tooltip, Switch, Spin } from "antd";
 import { CopyOutlined, DownloadOutlined, InboxOutlined, UploadOutlined } from "@ant-design/icons";
-import { getTextStats, downloadFile } from "@/app/utils";
+import { splitTextIntoLines, getTextStats, downloadFile } from "@/app/utils";
 import { placeholderPattern, filterMarkdownLines } from "@/app/utils/markdownUtils";
 import { categorizedOptions, findMethodLabel } from "@/app/components/translateAPI";
 import { useLanguageOptions, filterLanguageOption } from "@/app/components/languages";
@@ -100,7 +100,7 @@ const MDTranslator = () => {
       messageApi.error(t("noTargetLanguage"));
       return;
     }
-    const lines = sourceText.split("\n");
+    const lines = splitTextIntoLines(sourceText);
 
     const {
       contentLines,
@@ -259,7 +259,7 @@ const MDTranslator = () => {
       messageApi.error(t("noSourceText"));
       return;
     }
-    const lines = sourceText.split("\n");
+    const lines = splitTextIntoLines(sourceText);
     const { contentLines } = filterMarkdownLines(lines, mdOption);
     let extractedText = contentLines.join("\n");
     setTaggedText(extractedText);
