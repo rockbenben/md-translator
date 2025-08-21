@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Flex, Card, Button, Typography, Input, Upload, Form, Space, message, Select, Modal, Checkbox, Progress, Tooltip, Switch, Spin } from "antd";
 import { CopyOutlined, DownloadOutlined, InboxOutlined, UploadOutlined } from "@ant-design/icons";
 import { splitTextIntoLines, getTextStats, downloadFile } from "@/app/utils";
-import { placeholderPattern, filterMarkdownLines } from "@/app/utils/markdownUtils";
+import { placeholderPattern, filterMarkdownLines } from "./markdownUtils";
 import { categorizedOptions, findMethodLabel } from "@/app/components/translateAPI";
 import { useLanguageOptions, filterLanguageOption } from "@/app/components/languages";
 import { useCopyToClipboard } from "@/app/hooks/useCopyToClipboard";
@@ -84,7 +84,7 @@ const MDTranslator = () => {
   useEffect(() => {
     setExtractedText("");
     setTranslatedText("");
-  }, [sourceText]);
+  }, [sourceText, setExtractedText, setTranslatedText]);
 
   /**
    * 翻译函数：

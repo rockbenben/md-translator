@@ -60,7 +60,7 @@ const ClientPage = () => {
         items={items}
         type="card"
         className="w-full"
-        destroyInactiveTabPane={true} // 销毁不活动的标签页
+        destroyOnHidden={true} // 销毁不活动的标签页
         animated={{ inkBar: true, tabPane: true }}
       />
     </>
