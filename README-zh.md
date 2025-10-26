@@ -18,16 +18,16 @@ MD Translator 正是为了解决这一痛点而设计的一款智能翻译工具
 
 md-translator 针对 Markdown 文档进行了深度优化，支持识别并还原以下常见语法元素：
 
-- FrontMatter 元数据（---）  
-- 标题（#）  
-- 引用块（> 引用）  
-- 链接（\[text](url)）  
-- 无序列表（- / * / +）  
-- 有序列表（1. 2. 3.）  
-- 加重字体（**加粗**，_斜体_）  
-- 代码块（```）  
+- FrontMatter 元数据（---）
+- 标题（#）
+- 引用块（> 引用）
+- 链接（\[text](url)）
+- 无序列表（- / \* / +）
+- 有序列表（1. 2. 3.）
+- 加重字体（**加粗**，_斜体_）
+- 代码块（```）
 - 内联代码（\`code`）
-- 行内 LaTeX 公式（$公式$）  
+- 行内 LaTeX 公式（$公式$）
 - 块级 LaTeX 公式（$$公式$$）
 
 其中，FrontMatter、代码块和 LaTeX 公式均支持可选翻译，你可以根据实际需求决定是否进行处理。
@@ -42,19 +42,19 @@ md-translator 针对 Markdown 文档进行了深度优化，支持识别并还�
 
 md-translator 还具备将 Markdown 内容转换为纯文本的能力，方便你进行二次处理或语义分析：
 
-- 自动去除所有 Markdown 标记符号  
-- 隐藏代码块、链接等技术内容  
+- 自动去除所有 Markdown 标记符号
+- 隐藏代码块、链接等技术内容
 - 输出适合摘要提取、搜索索引或 NLP 处理的纯文本数据
 
 该功能非常适用于技术内容的摘要提取、语义分析、知识图谱构建等自动化应用场景。
 
 ## 适用场景
 
-- 多语言技术文档的批量翻译  
-- 开源项目说明文档的国际化  
-- Markdown 博客内容的中英双语同步  
-- 代码注释、公式说明等混合文档的格式保留翻译  
-- 任何结构化/非结构化文本的语义翻译与提取  
+- 多语言技术文档的批量翻译
+- 开源项目说明文档的国际化
+- Markdown 博客内容的中英双语同步
+- 代码注释、公式说明等混合文档的格式保留翻译
+- 任何结构化/非结构化文本的语义翻译与提取
 
 更多使用文档查看[官方说明](https://docs.newzone.top/guide/translation/md-translator/index.html)。
 
@@ -75,7 +75,7 @@ yarn
 yarn dev
 
 # build and start (构建并启动)
-yarn build && yarn start
+yarn build && npx serve@latest out
 
 # Deploy for a single language（单一语言部署）
 yarn build:lang en

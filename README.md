@@ -18,17 +18,17 @@ In fields like technical documentation, open-source projects, and blog writing, 
 
 **md-translator** is deeply optimized for Markdown documents and can recognize and preserve the following common syntax elements:
 
-* FrontMatter metadata (`---`)
-* Headings (`#`)
-* Blockquotes (`> quote`)
-* Links (`[text](url)`)
-* Unordered lists (`-` / `*` / `+`)
-* Ordered lists (`1. 2. 3.`)
-* Emphasis (`**bold**`, `_italic_`)
-* Code blocks (` ``` `)
-* Inline code (`` `code` ``)
-* Inline LaTeX formulas (`$formula$`)
-* Block-level LaTeX formulas (`$$formula$$`)
+- FrontMatter metadata (`---`)
+- Headings (`#`)
+- Blockquotes (`> quote`)
+- Links (`[text](url)`)
+- Unordered lists (`-` / `*` / `+`)
+- Ordered lists (`1. 2. 3.`)
+- Emphasis (`**bold**`, `_italic_`)
+- Code blocks (` ``` `)
+- Inline code (`` `code` ``)
+- Inline LaTeX formulas (`$formula$`)
+- Block-level LaTeX formulas (`$$formula$$`)
 
 Translation for FrontMatter, code blocks, and LaTeX formulas is optional—you can choose whether to process them based on your specific needs.
 
@@ -42,19 +42,19 @@ Additionally, users can customize AI prompts to further improve terminology cons
 
 **md-translator** can also convert Markdown content into plain text for secondary processing or semantic analysis:
 
-* Automatically removes all Markdown syntax
-* Hides technical content like code blocks and links
-* Outputs plain text suitable for summarization, search indexing, or NLP processing
+- Automatically removes all Markdown syntax
+- Hides technical content like code blocks and links
+- Outputs plain text suitable for summarization, search indexing, or NLP processing
 
 This feature is ideal for automation scenarios such as technical content summarization, semantic analysis, and knowledge graph construction.
 
 ## Use Cases
 
-* Batch translation of multilingual technical documents
-* Localization of open-source project documentation
-* Bilingual (English-Chinese) synchronization of Markdown blog content
-* Format-preserving translation of mixed documents (e.g., code comments, formula annotations)
-* Semantic translation and extraction for any structured/unstructured text
+- Batch translation of multilingual technical documents
+- Localization of open-source project documentation
+- Bilingual (English-Chinese) synchronization of Markdown blog content
+- Format-preserving translation of mixed documents (e.g., code comments, formula annotations)
+- Semantic translation and extraction for any structured/unstructured text
 
 For more documentation, see the [official guide](https://docs.newzone.top/guide/translation/md-translator/index.html).
 
@@ -64,8 +64,8 @@ For more documentation, see the [official guide](https://docs.newzone.top/guide/
 
 **System Requirements:**
 
-* [Node.js 18.18](https://nodejs.org/) or later
-* Supports macOS, Windows (including WSL), and Linux
+- [Node.js 18.18](https://nodejs.org/) or later
+- Supports macOS, Windows (including WSL), and Linux
 
 ```shell
 # Installation
@@ -75,7 +75,7 @@ yarn
 yarn dev
 
 # Build and Start
-yarn build && yarn start
+yarn build && npx serve@latest out
 
 # Deploy for a Single Language
 yarn build:lang en
