@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Flex, Card, Button, Typography, Input, Upload, Form, Space, message, Select, Modal, Checkbox, Progress, Tooltip, Switch, Spin } from "antd";
 import { CopyOutlined, DownloadOutlined, InboxOutlined, UploadOutlined } from "@ant-design/icons";
-import { splitTextIntoLines, getTextStats, downloadFile } from "@/app/utils";
+import { splitTextIntoLines, getTextStats, downloadFile, splitBySpaces } from "@/app/utils";
 import { placeholderPattern, filterMarkdownLines } from "./markdownUtils";
 import { categorizedOptions, findMethodLabel } from "@/app/components/translateAPI";
 import { useLanguageOptions, filterLanguageOption } from "@/app/components/languages";
@@ -53,6 +53,8 @@ const MDTranslator = () => {
     setTarget_langs,
     useCache,
     setUseCache,
+    removeChars,
+    setRemoveChars,
     multiLanguageMode,
     setMultiLanguageMode,
     translatedText,
@@ -178,6 +180,14 @@ const MDTranslator = () => {
 
           const translatedLines = await Promise.all(lines.map((line) => translateRawLine(line)));
           translatedTextWithPlaceholders = translatedLines.join("\n");
+        }
+
+        // Remove specified characters from the final translated text (after all formatting is done)
+        if (removeChars.trim()) {
+          const charsToRemove = splitBySpaces(removeChars);
+          charsToRemove.forEach((char) => {
+            translatedTextWithPlaceholders = translatedTextWithPlaceholders.replaceAll(char, "");
+          });
         }
 
         // Create language-specific file name for download
@@ -424,6 +434,11 @@ const MDTranslator = () => {
               <Switch checked={multiLanguageMode} onChange={(checked) => setMultiLanguageMode(checked)} checkedChildren={t("multiLanguageMode")} unCheckedChildren={t("singleLanguageMode")} />
             </Tooltip>
           </Space>
+        </Form.Item>
+        <Form.Item label={t("removeCharsAfterTranslation")}>
+          <Tooltip title={t("removeCharsAfterTranslationTooltip")}>
+            <Input placeholder={`${t("example")}: ♪ <i> </i>`} value={removeChars} onChange={(e) => setRemoveChars(e.target.value)} style={{ minWidth: 200 }} allowClear />
+          </Tooltip>
         </Form.Item>
       </Form>
       <Flex gap="small">
