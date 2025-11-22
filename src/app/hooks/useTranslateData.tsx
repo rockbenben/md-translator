@@ -420,32 +420,26 @@ const useTranslateData = () => {
           },
         };
 
-      case "openai":
-      case "deepseek":
-      case "gemini":
-      case "azureopenai":
-      case "siliconflow":
-      case "groq":
-      case "llm":
-        return {
-          ...baseConfig,
-          retries: 3,
-          minTimeout: 1000,
-          maxTimeout: 20000,
-          shouldRetry: ({ error }) => {
-            const message = error?.message?.toLowerCase() || "";
-            const status = error?.status || error?.response?.status;
-
-            // LLM 服务的特殊处理
-            if (message.includes("context length") || message.includes("token limit")) {
-              return false; // 不要重试上下文长度错误
-            }
-
-            return !status || status >= 500 || status === 429;
-          },
-        };
-
       default:
+        if (LLM_MODELS.includes(translationMethod)) {
+          return {
+            ...baseConfig,
+            retries: 3,
+            minTimeout: 1000,
+            maxTimeout: 20000,
+            shouldRetry: ({ error }) => {
+              const message = error?.message?.toLowerCase() || "";
+              const status = error?.status || error?.response?.status;
+
+              // LLM 服务的特殊处理
+              if (message.includes("context length") || message.includes("token limit")) {
+                return false; // 不要重试上下文长度错误
+              }
+
+              return !status || status >= 500 || status === 429;
+            },
+          };
+        }
         return baseConfig;
     }
   }, []);
@@ -586,16 +580,19 @@ const useTranslateData = () => {
     }
   };
 
+  const MAX_CONTEXT_PADDING = 25; // 限制纯上下文行数，避免过大
+
   // 新增：带上下文的翻译函数
   const translateWithContext = async (contentLines: string[], translationConfig: any, cacheSuffix: string, updateProgress: (current: number, total: number) => void) => {
     const contextWindow = Math.min(translationConfig.limit || 20, contentLines.length); // 上下文窗口大小，使用配置中的 limit 值，不超过总行数
+    const contextPadding = Math.min(MAX_CONTEXT_PADDING, Math.max(1, Math.floor(contextWindow / 2))); // 额外上下文行数单侧封顶
     const translatedLines = new Array(contentLines.length);
 
     // 分批处理，每批包含一定的上下文
     for (let i = 0; i < contentLines.length; i += contextWindow) {
       const batchEnd = Math.min(i + contextWindow, contentLines.length);
-      const contextStart = Math.max(0, i - Math.floor(contextWindow / 2));
-      const contextEnd = Math.min(contentLines.length, batchEnd + Math.floor(contextWindow / 2));
+      const contextStart = Math.max(0, i - contextPadding);
+      const contextEnd = Math.min(contentLines.length, batchEnd + contextPadding);
 
       // 构建包含上下文的内容
       const contextLines = contentLines.slice(contextStart, contextEnd);
