@@ -1,88 +1,91 @@
 <h1 align="center">
-⚡️Markdown Translator
+⚡️ Markdown Translator
 </h1>
 <p align="center">
     English | <a href="./README-zh.md">中文</a>
 </p>
 <p align="center">
-    <em>Translate Markdown effortlessly—fast, accurate, and multilingual!</em>
+    <em>Translate Markdown & preserve every format — headings, code, formulas, all intact</em>
 </p>
 
-In fields like technical documentation, open-source projects, and blog writing, **Markdown** has become the most widely used markup language. However, most existing translation tools tend to disrupt the original format when handling Markdown content—especially when it comes to code blocks, LaTeX formulas, or structured metadata—leading to formatting errors and semantic loss.
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+  <a href="https://tools.newzone.top/en/md-translator"><img src="https://img.shields.io/badge/Live%20Demo-md--translator-blue" alt="Live Demo"></a>
+</p>
 
-**MD Translator** is an intelligent translation tool specifically designed to solve this pain point. It not only delivers high-quality translations while preserving the Markdown structure, but also offers a **"plain text translation mode"** that supports translating any type of text document—achieving both format preservation and flexible translation.
+**MD Translator** is an intelligent translation tool designed to solve the common problem of broken formatting when translating Markdown content. It delivers **high-quality translations** while **accurately preserving Markdown structure**, including code blocks, LaTeX formulas, and metadata.
 
-👉 **Try it online**: [https://tools.newzone.top/zh/md-translator](https://tools.newzone.top/zh/md-translator)
+👉 **Try it online**: <https://tools.newzone.top/en/md-translator>
 
-## Core Feature 1: Native Markdown Element Support
+## Key Features
 
-**md-translator** is deeply optimized for Markdown documents and can recognize and preserve the following common syntax elements:
+- **Native Markdown Support**: Preserves headings, lists, code blocks, links, emphasis, and LaTeX formulas.
+- **High-Performance Caching (IndexedDB)**: Stores translation results with **unlimited capacity**—no browser storage limits.
+- **Context-Aware Translation** (AI models only): Translates with surrounding context for better paragraph coherence.
+- **Plain Text Mode**: Skip format parsing for direct translation of any text document (TXT, HTML, logs, etc.).
+- **Multi-language Output**: Translate into **50+ languages** simultaneously.
+- **Text Extraction**: Convert Markdown to clean plain text for summarization, NLP, or search indexing.
+
+## Supported Markdown Elements
 
 - FrontMatter metadata (`---`)
 - Headings (`#`)
 - Blockquotes (`> quote`)
-- Links (`[text](url)`)
-- Unordered lists (`-` / `*` / `+`)
-- Ordered lists (`1. 2. 3.`)
+- Links (`[text](URL)`)
+- Unordered/Ordered lists
 - Emphasis (`**bold**`, `_italic_`)
-- Code blocks (` ``` `)
-- Inline code (`` `code` ``)
-- Inline LaTeX formulas (`$formula$`)
-- Block-level LaTeX formulas (`$$formula$$`)
+- Code blocks (` ``` `) and inline code
+- Inline/Block LaTeX formulas (`$formula$`, `$$formula$$`)
 
-Translation for FrontMatter, code blocks, and LaTeX formulas is optional—you can choose whether to process them based on your specific needs.
+Translation for FrontMatter, code blocks, and LaTeX formulas is **optional** and configurable.
 
-## Core Feature 2: Plain Text Translation for Any Document
+## Translation APIs
 
-Beyond structured Markdown support, **md-translator** also offers a **"plain text translation mode"**, which skips format recognition and directly translates any text content. Whether it’s Markdown, TXT, HTML, log files, or unformatted technical notes, this mode provides accurate and efficient language conversion.
+Supports **5 translation APIs** and **9 AI LLM models**:
 
-Additionally, users can customize AI prompts to further improve terminology consistency, contextual coherence, and translation style.
+### Traditional APIs
 
-## Extended Feature: Extract Clean Plain Text
+| API                  | Quality | Stability | Free Tier                        |
+| -------------------- | ------- | --------- | -------------------------------- |
+| **DeepL (X)**        | ★★★★★   | ★★★★☆     | 500K chars/month                 |
+| **Google Translate** | ★★★★☆   | ★★★★★     | 500K chars/month                 |
+| **Azure Translate**  | ★★★★☆   | ★★★★★     | 2M chars/month (first 12 months) |
+| **GTX API (Free)**   | ★★★☆☆   | ★★★☆☆     | Free (rate-limited)              |
+| **GTX Web (Free)**   | ★★★☆☆   | ★★☆☆☆     | Free                             |
 
-**md-translator** can also convert Markdown content into plain text for secondary processing or semantic analysis:
+### LLM Models
 
-- Automatically removes all Markdown syntax
-- Hides technical content like code blocks and links
-- Outputs plain text suitable for summarization, search indexing, or NLP processing
+Supports **DeepSeek**, **OpenAI**, **Gemini**, **Azure OpenAI**, **Siliconflow**, **Groq**, **OpenRouter**, **Perplexity**, and **Custom LLM**.
 
-This feature is ideal for automation scenarios such as technical content summarization, semantic analysis, and knowledge graph construction.
+## Context-Aware Translation
+
+_Context-Aware Translation_ (AI models only) slices documents into segments and sends them to the LLM with surrounding context, improving paragraph coherence and terminology consistency.
+
+Two key parameters:
+
+- **Concurrent Lines**: Maximum lines translated simultaneously (default: 20).
+- **Context Lines**: Lines included per batch for context (default: 50).
+
+⚠️ **Warning**: Due to Markdown complexity, enabling context mode may increase the risk of formatting errors (e.g., unclosed code blocks, list indentation issues). Monitor output carefully.
 
 ## Use Cases
 
-- Batch translation of multilingual technical documents
-- Localization of open-source project documentation
-- Bilingual (English-Chinese) synchronization of Markdown blog content
-- Format-preserving translation of mixed documents (e.g., code comments, formula annotations)
-- Semantic translation and extraction for any structured/unstructured text
+- Bulk translation of multilingual technical documents
+- Internationalization of open-source project documentation
+- Bilingual synchronization of Markdown blog content
+- Format-preserving translation of mixed content (code, formulas)
+- Semantic translation and extraction for any text
 
-For more documentation, see the [official guide](https://docs.newzone.top/guide/translation/md-translator/index.html).
+## Documentation & Deployment
 
-## Project Deployment
+For detailed configuration, API setup, and self-hosting instructions, see the **[Official Documentation](https://docs.newzone.top/en/guide/translation/md-translator/)**.
 
-**MD Translator** can be deployed to CloudFlare, Vercel, or any server environment.
+**Quick Deployment**: [Deploy Guide](https://docs.newzone.top/en/guide/translation/md-translator/deploy.html)
 
-**System Requirements:**
+## Contributing
 
-- [Node.js 18.18](https://nodejs.org/) or later
-- Supports macOS, Windows (including WSL), and Linux
+Contributions are welcome! Feel free to open issues and pull requests.
 
-```shell
-# Installation
-yarn
+## License
 
-# Local Development
-yarn dev
-
-# Build and Start
-yarn build && npx serve@latest out
-
-# Deploy for a Single Language
-yarn build:lang en
-yarn build:lang zh
-yarn build:lang zh-hant
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser to view the result.
-
-You can start editing the page by modifying `src/app/[locale]/page.tsx`. The page updates automatically as you edit the file.
+MIT © 2025 [rockbenben](https://github.com/rockbenben). See [LICENSE](./LICENSE).
