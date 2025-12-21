@@ -1,10 +1,16 @@
 import { splitTextIntoLines } from "@/app/utils";
+
+interface MarkdownOptions {
+  translateFrontmatter: boolean;
+  translateMultilineCode: boolean;
+  translateLatex: boolean;
+}
 /**
  * 解析文本，将前置区域、代码块、链接、标题、列表、引用、加粗等内容替换为占位符，
  * 返回处理后的行数组及各类占位符字典
  */
 export const placeholderPattern = "FRONTMATTER_\\d+|MULTILINE_CODE_\\d+|LATEX_BLOCK_\\d+|CODE_\\d+|LATEX_INLINE_\\d+|LINK_\\d+|HEADING_\\d+|LIST_\\d+|BLOCKQUOTE_\\d+|STRONG_\\d+";
-export const filterMarkdownLines = (lines: string[], mdOption) => {
+export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) => {
   const contentLines: string[] = [];
   const contentIndices: number[] = [];
 
@@ -24,7 +30,7 @@ export const filterMarkdownLines = (lines: string[], mdOption) => {
   let headingCounter = 100;
   let listCounter = 100;
   let blockquoteCounter = 100;
-  let strongCounter = 100;
+  // let strongCounter = 100;
   let latexBlockCounter = 100;
   let latexInlineCounter = 100;
 
