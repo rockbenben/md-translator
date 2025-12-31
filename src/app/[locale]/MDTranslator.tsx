@@ -1,12 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Flex, Card, Button, Typography, Input, Upload, Form, Space, App, Checkbox, Tooltip, Spin, Row, Col, Divider } from "antd";
+import { Flex, Card, Button, Typography, Input, InputNumber, Upload, Form, Space, App, Checkbox, Tooltip, Spin, Row, Col, Divider } from "antd";
 import {
   CopyOutlined,
-  DownloadOutlined,
   InboxOutlined,
-  UploadOutlined,
   SettingOutlined,
   DownOutlined,
   UpOutlined,
@@ -14,6 +12,8 @@ import {
   ClearOutlined,
   FormatPainterOutlined,
   GlobalOutlined,
+  ImportOutlined,
+  SaveOutlined,
 } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import { getLangDir } from "rtl-detect";
@@ -30,6 +30,8 @@ import TranslationAPISelector from "@/app/components/TranslationAPISelector";
 import { useTranslationContext } from "@/app/components/TranslationContext";
 import ResultCard from "@/app/components/ResultCard";
 import TranslationProgressModal from "@/app/components/TranslationProgressModal";
+
+import MultiLanguageSettingsModal from "@/app/components/MultiLanguageSettingsModal";
 
 const { TextArea } = Input;
 const { Dragger } = Upload;
@@ -86,6 +88,10 @@ const MDTranslator = () => {
     handleLanguageChange,
     delay,
     validateTranslate,
+    retryCount,
+    setRetryCount,
+    retryTimeout,
+    setRetryTimeout,
   } = useTranslationContext();
   const { message } = App.useApp();
 
@@ -98,10 +104,12 @@ const MDTranslator = () => {
     translateFrontmatter: false,
     translateMultilineCode: false,
     translateLatex: false,
+    translateLinkText: true,
   });
   const [rawTranslationMode, setRawTranslationMode] = useLocalStorage("mdTranslatorRawMode", false);
   const [contextTranslation, setContextTranslation] = useLocalStorage("mdTranslatorContextMode", false);
   const [showAdvancedPanel, setShowAdvancedPanel] = useState(true);
+  const [multiLangModalOpen, setMultiLangModalOpen] = useState(false);
 
   useEffect(() => {
     setExtractedText("");
@@ -156,8 +164,16 @@ const MDTranslator = () => {
                   return segment;
                 } else {
                   // 仅翻译普通文本部分
-                  const [translated] = await translateContent([segment], translationMethod, currentTargetLang, fileIndex, totalFiles);
-                  return translated;
+                  const leadingSpace = segment.match(/^\s*/)?.[0] || "";
+                  const trailingSpace = segment.match(/\s*$/)?.[0] || "";
+                  const trimmedSegment = segment.trim();
+
+                  if (!trimmedSegment) {
+                    return segment;
+                  }
+
+                  const [translated] = await translateContent([trimmedSegment], translationMethod, currentTargetLang, fileIndex, totalFiles);
+                  return leadingSpace + translated + trailingSpace;
                 }
               })
             );
@@ -405,10 +421,22 @@ const MDTranslator = () => {
               className="shadow-sm"
               extra={
                 <Space>
+                  <Tooltip title={t("exportSettingTooltip")}>
+                    <Button
+                      type="text"
+                      icon={<SaveOutlined />}
+                      size="small"
+                      disabled={translateInProgress}
+                      onClick={async () => {
+                        await exportSettings();
+                      }}
+                      aria-label={t("exportSettingTooltip")}
+                    />
+                  </Tooltip>
                   <Tooltip title={t("importSettingTooltip")}>
                     <Button
                       type="text"
-                      icon={<UploadOutlined />}
+                      icon={<ImportOutlined />}
                       size="small"
                       disabled={translateInProgress}
                       onClick={async () => {
@@ -417,17 +445,8 @@ const MDTranslator = () => {
                       aria-label={t("importSettingTooltip")}
                     />
                   </Tooltip>
-                  <Tooltip title={t("exportSettingTooltip")}>
-                    <Button
-                      type="text"
-                      icon={<DownloadOutlined />}
-                      size="small"
-                      disabled={translateInProgress}
-                      onClick={async () => {
-                        await exportSettings();
-                      }}
-                      aria-label={t("exportSettingTooltip")}
-                    />
+                  <Tooltip title={t("batchEditMultiLangTooltip")}>
+                    <Button type="text" icon={<GlobalOutlined />} size="small" disabled={translateInProgress} onClick={() => setMultiLangModalOpen(true)} />
                   </Tooltip>
                 </Space>
               }>
@@ -468,7 +487,7 @@ const MDTranslator = () => {
                 <Space orientation="vertical" size={10} className="w-full">
                   <Text strong>{tMarkdown("translationOptions")}:</Text>
                   <Row gutter={[16, 8]}>
-                    <Col span={24}>
+                    <Col span={12}>
                       <Tooltip title={tMarkdown("tFrontmatterTooltip")}>
                         <Checkbox
                           checked={mdOption.translateFrontmatter}
@@ -482,7 +501,7 @@ const MDTranslator = () => {
                         </Checkbox>
                       </Tooltip>
                     </Col>
-                    <Col span={24}>
+                    <Col span={12}>
                       <Tooltip title={tMarkdown("tCodeBlocksTooltip")}>
                         <Checkbox
                           checked={mdOption.translateMultilineCode}
@@ -496,7 +515,7 @@ const MDTranslator = () => {
                         </Checkbox>
                       </Tooltip>
                     </Col>
-                    <Col span={24}>
+                    <Col span={12}>
                       <Tooltip title={tMarkdown("tLatexTooltip")}>
                         <Checkbox
                           checked={mdOption.translateLatex}
@@ -507,6 +526,20 @@ const MDTranslator = () => {
                             }))
                           }>
                           {tMarkdown("tLatex")}
+                        </Checkbox>
+                      </Tooltip>
+                    </Col>
+                    <Col span={12}>
+                      <Tooltip title={tMarkdown("tLinkText")}>
+                        <Checkbox
+                          checked={mdOption.translateLinkText}
+                          onChange={(e) =>
+                            setMdOption((prev) => ({
+                              ...prev,
+                              translateLinkText: e.target.checked,
+                            }))
+                          }>
+                          {tMarkdown("tLinkText")}
                         </Checkbox>
                       </Tooltip>
                     </Col>
@@ -560,6 +593,20 @@ const MDTranslator = () => {
                           aria-label={t("removeCharsAfterTranslation")}
                         />
                       </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Tooltip title={t("retryCountTooltip")}>
+                        <Form.Item label={t("retryCount")} style={{ marginBottom: 0 }}>
+                          <InputNumber min={1} max={10} value={retryCount} onChange={(value) => setRetryCount(value ?? 3)} style={{ width: "100%" }} />
+                        </Form.Item>
+                      </Tooltip>
+                    </Col>
+                    <Col span={12}>
+                      <Tooltip title={t("retryTimeoutTooltip")}>
+                        <Form.Item label={t("retryTimeout")} style={{ marginBottom: 0 }}>
+                          <InputNumber min={5} max={120} value={retryTimeout} onChange={(value) => setRetryTimeout(value ?? 30)} addonAfter="s" style={{ width: "100%" }} />
+                        </Form.Item>
+                      </Tooltip>
                     </Col>
                   </Row>
                 </Space>
@@ -617,6 +664,14 @@ const MDTranslator = () => {
       )}
 
       <TranslationProgressModal open={translateInProgress} percent={progressPercent} multiLanguageMode={multiLanguageMode} targetLanguageCount={target_langs.length} />
+
+      <MultiLanguageSettingsModal
+        open={multiLangModalOpen}
+        onClose={() => setMultiLangModalOpen(false)}
+        target_langs={target_langs}
+        setTarget_langs={setTarget_langs}
+        setMultiLanguageMode={setMultiLanguageMode}
+      />
     </Spin>
   );
 };

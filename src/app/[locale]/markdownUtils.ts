@@ -4,12 +4,14 @@ interface MarkdownOptions {
   translateFrontmatter: boolean;
   translateMultilineCode: boolean;
   translateLatex: boolean;
+  translateLinkText: boolean;
 }
 /**
  * 解析文本，将前置区域、代码块、链接、标题、列表、引用、加粗等内容替换为占位符，
  * 返回处理后的行数组及各类占位符字典
  */
-export const placeholderPattern = "FRONTMATTER_\\d+|MULTILINE_CODE_\\d+|LATEX_BLOCK_\\d+|CODE_\\d+|LATEX_INLINE_\\d+|LINK_\\d+|HEADING_\\d+|LIST_\\d+|BLOCKQUOTE_\\d+|STRONG_\\d+";
+export const placeholderPattern =
+  "FRONTMATTER_\\d+|MULTILINE_CODE_\\d+|LATEX_BLOCK_\\d+|CODE_\\d+|LATEX_INLINE_\\d+|LINK_PRE_\\d+|LINK_SUF_\\d+|LINK_\\d+|HEADING_\\d+|LIST_\\d+|BLOCKQUOTE_\\d+|STRONG_\\d+";
 export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) => {
   const contentLines: string[] = [];
   const contentIndices: number[] = [];
@@ -98,6 +100,24 @@ export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) 
 
     // 链接和图片
     modifiedLine = modifiedLine.replace(/(!?\[.*?\]\(.*?\))/g, (match) => {
+      // 如果需要翻译链接文本且不是图片（!开头），则只将前后部分替换为占位符
+      if (mdOption.translateLinkText && !match.startsWith("!")) {
+        const linkMatch = match.match(/^(\[)(.*?)(\]\(.*?\))$/);
+        if (linkMatch) {
+          const prefix = linkMatch[1]; // [
+          const content = linkMatch[2]; // text
+          const suffix = linkMatch[3]; // ](url)
+
+          const prefixPlaceholder = `<<<LINK_PRE_${linkCounter}>>>`;
+          const suffixPlaceholder = `<<<LINK_SUF_${linkCounter}>>>`;
+          linkPlaceholders[prefixPlaceholder] = prefix;
+          linkPlaceholders[suffixPlaceholder] = suffix;
+          linkCounter++;
+
+          return `${prefixPlaceholder}${content}${suffixPlaceholder}`;
+        }
+      }
+
       const placeholder = `<<<LINK_${linkCounter}>>>`;
       linkPlaceholders[placeholder] = match;
       linkCounter++;
