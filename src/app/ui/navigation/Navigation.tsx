@@ -109,8 +109,8 @@ export function Navigation() {
   const themeIcon = mounted && resolvedTheme === "light" ? <SunOutlined style={iconStyle} /> : <MoonOutlined style={iconStyle} />;
 
   return (
-    <Header style={{ padding: 4 }}>
-      <Flex justify="space-between" align="center" style={{ padding: "0 24px" }}>
+    <Header style={{ padding: 0, background: "transparent", height: 48, lineHeight: "48px" }}>
+      <Flex justify="space-between" align="center" style={{ padding: "0 16px", borderBottom: "1px solid rgba(128, 128, 128, 0.25)" }}>
         <Menu onClick={handleMenuClick} selectedKeys={[current]} mode="horizontal" items={menuItems} style={{ flex: 1, minWidth: 0, border: "none", background: "transparent" }} />
 
         <Space size="middle">
