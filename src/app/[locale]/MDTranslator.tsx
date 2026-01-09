@@ -1,19 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Flex, Card, Button, Typography, Input, InputNumber, Upload, Form, Space, App, Checkbox, Tooltip, Spin, Row, Col, Divider } from "antd";
+import { Flex, Card, Button, Typography, Input, InputNumber, Upload, Form, Space, App, Tooltip, Spin, Row, Col, Divider, Switch, Collapse } from "antd";
 import {
   CopyOutlined,
   InboxOutlined,
   SettingOutlined,
-  DownOutlined,
-  UpOutlined,
   FileTextOutlined,
   ClearOutlined,
   FormatPainterOutlined,
   GlobalOutlined,
   ImportOutlined,
   SaveOutlined,
+  FileMarkdownOutlined,
+  ControlOutlined,
 } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import { getLangDir } from "rtl-detect";
@@ -24,6 +24,7 @@ import { useTextStats } from "@/app/hooks/useTextStats";
 
 import { splitTextIntoLines, downloadFile, splitBySpaces, getErrorMessage } from "@/app/utils";
 import { placeholderPattern, filterMarkdownLines } from "./markdownUtils";
+import { LLM_MODELS } from "@/app/lib/translation";
 import { useLanguageOptions } from "@/app/components/languages";
 import LanguageSelector from "@/app/components/LanguageSelector";
 import TranslationAPISelector from "@/app/components/TranslationAPISelector";
@@ -108,7 +109,7 @@ const MDTranslator = () => {
   });
   const [rawTranslationMode, setRawTranslationMode] = useLocalStorage("mdTranslatorRawMode", false);
   const [contextTranslation, setContextTranslation] = useLocalStorage("mdTranslatorContextMode", false);
-  const [showAdvancedPanel, setShowAdvancedPanel] = useState(true);
+  const [activeCollapseKeys, setActiveCollapseKeys] = useLocalStorage<string[]>("mdTranslatorCollapseKeys", ["markdown"]);
   const [multiLangModalOpen, setMultiLangModalOpen] = useState(false);
 
   useEffect(() => {
@@ -410,217 +411,256 @@ const MDTranslator = () => {
 
         {/* Right Column: Settings and Configuration */}
         <Col xs={24} lg={10} xl={9}>
-          <Flex vertical gap="middle">
-            {/* Translation Configuration */}
-            <Card
-              title={
-                <Space>
-                  <SettingOutlined /> {t("configuration")}
-                </Space>
-              }
-              className="shadow-sm"
-              extra={
-                <Space>
-                  <Tooltip title={t("exportSettingTooltip")}>
-                    <Button
-                      type="text"
-                      icon={<SaveOutlined />}
-                      size="small"
-                      disabled={translateInProgress}
-                      onClick={async () => {
-                        await exportSettings();
-                      }}
-                      aria-label={t("exportSettingTooltip")}
-                    />
-                  </Tooltip>
-                  <Tooltip title={t("importSettingTooltip")}>
-                    <Button
-                      type="text"
-                      icon={<ImportOutlined />}
-                      size="small"
-                      disabled={translateInProgress}
-                      onClick={async () => {
-                        await importSettings();
-                      }}
-                      aria-label={t("importSettingTooltip")}
-                    />
-                  </Tooltip>
-                  <Tooltip title={t("batchEditMultiLangTooltip")}>
-                    <Button type="text" icon={<GlobalOutlined />} size="small" disabled={translateInProgress} onClick={() => setMultiLangModalOpen(true)} />
-                  </Tooltip>
-                </Space>
-              }>
-              <Form layout="vertical" className="w-full">
-                {/* Language Selection */}
-                <LanguageSelector
-                  sourceLanguage={sourceLanguage}
-                  targetLanguage={targetLanguage}
-                  target_langs={target_langs}
-                  multiLanguageMode={multiLanguageMode}
-                  handleLanguageChange={handleLanguageChange}
-                  setTarget_langs={setTarget_langs}
-                  setMultiLanguageMode={setMultiLanguageMode}
-                />
+          <Card
+            title={
+              <Space>
+                <SettingOutlined /> {t("configuration")}
+              </Space>
+            }
+            className="shadow-sm"
+            extra={
+              <Space>
+                <Tooltip title={t("exportSettingTooltip")}>
+                  <Button
+                    type="text"
+                    icon={<SaveOutlined />}
+                    size="small"
+                    disabled={translateInProgress}
+                    onClick={async () => {
+                      await exportSettings();
+                    }}
+                    aria-label={t("exportSettingTooltip")}
+                  />
+                </Tooltip>
+                <Tooltip title={t("importSettingTooltip")}>
+                  <Button
+                    type="text"
+                    icon={<ImportOutlined />}
+                    size="small"
+                    disabled={translateInProgress}
+                    onClick={async () => {
+                      await importSettings();
+                    }}
+                    aria-label={t("importSettingTooltip")}
+                  />
+                </Tooltip>
+                <Tooltip title={t("batchEditMultiLangTooltip")}>
+                  <Button type="text" icon={<GlobalOutlined />} size="small" disabled={translateInProgress} onClick={() => setMultiLangModalOpen(true)} aria-label={t("batchEditMultiLangTooltip")} />
+                </Tooltip>
+              </Space>
+            }>
+            <Form layout="vertical" className="w-full">
+              {/* Language Selection - Always Visible */}
+              <LanguageSelector
+                sourceLanguage={sourceLanguage}
+                targetLanguage={targetLanguage}
+                target_langs={target_langs}
+                multiLanguageMode={multiLanguageMode}
+                handleLanguageChange={handleLanguageChange}
+                setTarget_langs={setTarget_langs}
+                setMultiLanguageMode={setMultiLanguageMode}
+              />
 
-                {/* API Settings */}
-                <TranslationAPISelector translationMethod={translationMethod} setTranslationMethod={setTranslationMethod} config={config} handleConfigChange={handleConfigChange} />
-              </Form>
-            </Card>
+              {/* API Settings - Always Visible */}
+              <TranslationAPISelector translationMethod={translationMethod} setTranslationMethod={setTranslationMethod} config={config} handleConfigChange={handleConfigChange} />
+            </Form>
 
-            {/* Advanced Settings */}
-            <Card
-              title={
-                <div className="cursor-pointer flex items-center justify-between w-full" onClick={() => setShowAdvancedPanel(!showAdvancedPanel)}>
-                  <Space>
-                    <SettingOutlined /> {t("advancedSettings")}
-                  </Space>
-                  {showAdvancedPanel ? <UpOutlined style={{ fontSize: "12px" }} /> : <DownOutlined style={{ fontSize: "12px" }} />}
-                </div>
-              }
-              className="shadow-sm"
-              styles={{
-                body: {
-                  display: showAdvancedPanel ? "block" : "none",
-                },
-              }}>
-              <Form layout="vertical">
-                <Space orientation="vertical" size={10} className="w-full">
-                  <Text strong>{tMarkdown("translationOptions")}:</Text>
-                  <Row gutter={[16, 8]}>
-                    <Col span={12}>
-                      <Tooltip title={tMarkdown("tFrontmatterTooltip")}>
-                        <Checkbox
+            <Divider style={{ margin: "12px 0" }} />
+
+            <Collapse
+              ghost
+              activeKey={activeCollapseKeys}
+              onChange={(keys) => setActiveCollapseKeys(typeof keys === "string" ? [keys] : keys)}
+              expandIconPlacement="end"
+              items={[
+                {
+                  key: "markdown",
+                  label: (
+                    <Space>
+                      <FileMarkdownOutlined />
+                      <Text strong>{tMarkdown("translationOptions")}</Text>
+                    </Space>
+                  ),
+                  children: (
+                    <Flex vertical gap="small">
+                      <Flex justify="space-between" align="center">
+                        <Tooltip title={tMarkdown("tFrontmatterTooltip")}>
+                          <span>Frontmatter</span>
+                        </Tooltip>
+                        <Switch
+                          size="small"
                           checked={mdOption.translateFrontmatter}
-                          onChange={(e) =>
+                          onChange={(checked) =>
                             setMdOption((prev) => ({
                               ...prev,
-                              translateFrontmatter: e.target.checked,
+                              translateFrontmatter: checked,
                             }))
-                          }>
-                          {tMarkdown("tFrontmatter")}
-                        </Checkbox>
-                      </Tooltip>
-                    </Col>
-                    <Col span={12}>
-                      <Tooltip title={tMarkdown("tCodeBlocksTooltip")}>
-                        <Checkbox
-                          checked={mdOption.translateMultilineCode}
-                          onChange={(e) =>
-                            setMdOption((prev) => ({
-                              ...prev,
-                              translateMultilineCode: e.target.checked,
-                            }))
-                          }>
-                          {tMarkdown("tCodeBlocks")}
-                        </Checkbox>
-                      </Tooltip>
-                    </Col>
-                    <Col span={12}>
-                      <Tooltip title={tMarkdown("tLatexTooltip")}>
-                        <Checkbox
-                          checked={mdOption.translateLatex}
-                          onChange={(e) =>
-                            setMdOption((prev) => ({
-                              ...prev,
-                              translateLatex: e.target.checked,
-                            }))
-                          }>
-                          {tMarkdown("tLatex")}
-                        </Checkbox>
-                      </Tooltip>
-                    </Col>
-                    <Col span={12}>
-                      <Tooltip title={tMarkdown("tLinkText")}>
-                        <Checkbox
-                          checked={mdOption.translateLinkText}
-                          onChange={(e) =>
-                            setMdOption((prev) => ({
-                              ...prev,
-                              translateLinkText: e.target.checked,
-                            }))
-                          }>
-                          {tMarkdown("tLinkText")}
-                        </Checkbox>
-                      </Tooltip>
-                    </Col>
-                  </Row>
-
-                  <Divider style={{ margin: "12px 0" }} />
-
-                  <Row gutter={[16, 16]}>
-                    <Col span={12}>
-                      <Tooltip title={tMarkdown("rawTranslationModeTooltip")}>
-                        <Checkbox checked={rawTranslationMode} onChange={(e) => setRawTranslationMode(e.target.checked)}>
-                          {tMarkdown("rawTranslationMode")}
-                        </Checkbox>
-                      </Tooltip>
-                    </Col>
-                    <Col span={12}>
-                      <Tooltip title={t("contextAwareTranslationTooltip")}>
-                        <Checkbox
-                          checked={contextTranslation}
-                          onChange={(e) => {
-                            setContextTranslation(e.target.checked);
-                            if (e.target.checked) {
-                              setRawTranslationMode(true);
-                            }
-                          }}>
-                          {t("contextAwareTranslation")}
-                        </Checkbox>
-                      </Tooltip>
-                    </Col>
-                    <Col span={12}>
-                      <Tooltip title={t("singleFileModeTooltip")}>
-                        <Checkbox checked={singleFileMode} onChange={(e) => setSingleFileMode(e.target.checked)}>
-                          {t("singleFileMode")}
-                        </Checkbox>
-                      </Tooltip>
-                    </Col>
-                    <Col span={12}>
-                      <Tooltip title={t("useCacheTooltip")}>
-                        <Checkbox checked={useCache} onChange={(e) => setUseCache(e.target.checked)}>
-                          {t("useCache")}
-                        </Checkbox>
-                      </Tooltip>
-                    </Col>
-                    <Col span={24}>
-                      <Form.Item label={t("removeCharsAfterTranslation")}>
-                        <Input
-                          placeholder={`${t("example")}: ♪ <i> </i>`}
-                          value={removeChars}
-                          onChange={(e) => setRemoveChars(e.target.value)}
-                          allowClear
-                          aria-label={t("removeCharsAfterTranslation")}
+                          }
+                          aria-label="Frontmatter"
                         />
-                      </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                      <Tooltip title={t("retryCountTooltip")}>
-                        <Form.Item label={t("retryCount")} style={{ marginBottom: 0 }}>
-                          <InputNumber min={1} max={10} value={retryCount} onChange={(value) => setRetryCount(value ?? 3)} style={{ width: "100%" }} aria-label={t("retryCount")} />
-                        </Form.Item>
-                      </Tooltip>
-                    </Col>
-                    <Col span={12}>
-                      <Tooltip title={t("retryTimeoutTooltip")}>
-                        <Form.Item label={t("retryTimeout")} style={{ marginBottom: 0 }}>
-                          <InputNumber
-                            min={5}
-                            max={1200}
-                            value={retryTimeout}
-                            onChange={(value) => setRetryTimeout(value ?? 30)}
-                            addonAfter="s"
-                            style={{ width: "100%" }}
-                            aria-label={t("retryTimeout")}
-                          />
-                        </Form.Item>
-                      </Tooltip>
-                    </Col>
-                  </Row>
-                </Space>
-              </Form>
-            </Card>
-          </Flex>
+                      </Flex>
+                      <Flex justify="space-between" align="center">
+                        <Tooltip title={tMarkdown("tCodeBlocksTooltip")}>
+                          <span>{tMarkdown("tCodeBlocks")}</span>
+                        </Tooltip>
+                        <Switch
+                          size="small"
+                          checked={mdOption.translateMultilineCode}
+                          onChange={(checked) =>
+                            setMdOption((prev) => ({
+                              ...prev,
+                              translateMultilineCode: checked,
+                            }))
+                          }
+                          aria-label={tMarkdown("tCodeBlocks")}
+                        />
+                      </Flex>
+                      <Flex justify="space-between" align="center">
+                        <Tooltip title={tMarkdown("tLatexTooltip")}>
+                          <span>{tMarkdown("tLatex")}</span>
+                        </Tooltip>
+                        <Switch
+                          size="small"
+                          checked={mdOption.translateLatex}
+                          onChange={(checked) =>
+                            setMdOption((prev) => ({
+                              ...prev,
+                              translateLatex: checked,
+                            }))
+                          }
+                          aria-label={tMarkdown("tLatex")}
+                        />
+                      </Flex>
+                      <Flex justify="space-between" align="center">
+                        <Tooltip title={tMarkdown("tLinkText")}>
+                          <span>{tMarkdown("tLinkText")}</span>
+                        </Tooltip>
+                        <Switch
+                          size="small"
+                          checked={mdOption.translateLinkText}
+                          onChange={(checked) =>
+                            setMdOption((prev) => ({
+                              ...prev,
+                              translateLinkText: checked,
+                            }))
+                          }
+                          aria-label={tMarkdown("tLinkText")}
+                        />
+                      </Flex>
+                    </Flex>
+                  ),
+                },
+                {
+                  key: "advanced",
+                  label: (
+                    <Space>
+                      <ControlOutlined />
+                      <Text strong>{t("advancedSettings")}</Text>
+                    </Space>
+                  ),
+                  children: (
+                    <Flex vertical gap="small">
+                      {/* Mode Settings */}
+                      <div style={{ marginBottom: 8 }}>
+                        <Flex vertical gap="small">
+                          <Flex justify="space-between" align="center">
+                            <Tooltip title={tMarkdown("rawTranslationModeTooltip")}>
+                              <span>{tMarkdown("rawTranslationMode")}</span>
+                            </Tooltip>
+                            <Switch size="small" checked={rawTranslationMode} onChange={setRawTranslationMode} aria-label={tMarkdown("rawTranslationMode")} />
+                          </Flex>
+
+                          {LLM_MODELS.includes(translationMethod) && (
+                            <Flex justify="space-between" align="center">
+                              <Tooltip title={t("contextAwareTranslationTooltip")}>
+                                <span>{t("contextAwareTranslation")}</span>
+                              </Tooltip>
+                              <Switch
+                                size="small"
+                                checked={contextTranslation}
+                                onChange={(checked) => {
+                                  setContextTranslation(checked);
+                                  if (checked) {
+                                    setRawTranslationMode(true);
+                                  }
+                                }}
+                                aria-label={t("contextAwareTranslation")}
+                              />
+                            </Flex>
+                          )}
+                        </Flex>
+                      </div>
+
+                      <Divider style={{ margin: "4px 0" }} />
+
+                      {/* System Settings */}
+                      <div style={{ marginBottom: 8 }}>
+                        <Flex vertical gap="small">
+                          <Flex justify="space-between" align="center">
+                            <Tooltip title={t("singleFileModeTooltip")}>
+                              <span>{t("singleFileMode")}</span>
+                            </Tooltip>
+                            <Switch size="small" checked={singleFileMode} onChange={setSingleFileMode} aria-label={t("singleFileMode")} />
+                          </Flex>
+                          <Flex justify="space-between" align="center">
+                            <Tooltip title={t("useCacheTooltip")}>
+                              <span>{t("useCache")}</span>
+                            </Tooltip>
+                            <Switch size="small" checked={useCache} onChange={setUseCache} aria-label={t("useCache")} />
+                          </Flex>
+                        </Flex>
+                      </div>
+
+                      <Divider style={{ margin: "4px 0" }} />
+
+                      {/* Post Processing */}
+                      <div>
+                        <Flex vertical gap={8}>
+                          <Flex vertical gap={4}>
+                            <span style={{ fontSize: "13px" }}>{t("removeCharsAfterTranslation")}</span>
+                            <Input
+                              placeholder={`${t("example")}: ♪ <i> </i>`}
+                              value={removeChars}
+                              onChange={(e) => setRemoveChars(e.target.value)}
+                              allowClear
+                              aria-label={t("removeCharsAfterTranslation")}
+                            />
+                          </Flex>
+
+                          <Row gutter={[12, 12]}>
+                            <Col span={12}>
+                              <Tooltip title={t("retryCountTooltip")}>
+                                <Flex vertical gap={4}>
+                                  <span style={{ fontSize: "13px" }}>{t("retryCount")}</span>
+                                  <InputNumber min={1} max={10} value={retryCount} onChange={(value) => setRetryCount(value ?? 3)} style={{ width: "100%" }} aria-label={t("retryCount")} />
+                                </Flex>
+                              </Tooltip>
+                            </Col>
+                            <Col span={12}>
+                              <Tooltip title={t("retryTimeoutTooltip")}>
+                                <Flex vertical gap={4}>
+                                  <span style={{ fontSize: "13px" }}>{t("retryTimeout")}</span>
+                                  <InputNumber
+                                    min={5}
+                                    max={1200}
+                                    value={retryTimeout}
+                                    onChange={(value) => setRetryTimeout(value ?? 30)}
+                                    addonAfter="s"
+                                    style={{ width: "100%" }}
+                                    aria-label={t("retryTimeout")}
+                                  />
+                                </Flex>
+                              </Tooltip>
+                            </Col>
+                          </Row>
+                        </Flex>
+                      </div>
+                    </Flex>
+                  ),
+                },
+              ]}
+            />
+          </Card>
         </Col>
       </Row>
 

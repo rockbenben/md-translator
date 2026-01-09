@@ -7,6 +7,7 @@ import { FileMarkdownOutlined, QuestionCircleOutlined } from "@ant-design/icons"
 import MDTranslator from "./MDTranslator";
 import { useTranslations, useLocale } from "next-intl";
 import { TranslationProvider } from "@/app/components/TranslationContext";
+import { getUserGuideUrl } from "@/app/utils";
 
 const TranslationSettings = dynamic(() => import("@/app/components/TranslationSettings"), {
   loading: () => (
@@ -22,9 +23,7 @@ const ClientPage = () => {
   const tMarkdown = useTranslations("markdown");
   const t = useTranslations("common");
   const locale = useLocale();
-  const isChineseLocale = locale === "zh" || locale === "zh-hant";
-
-  const userGuideUrl = isChineseLocale ? "https://docs.newzone.top/guide/translation/md-translator/index.html" : "https://docs.newzone.top/en/guide/translation/md-translator/index.html";
+  const userGuideUrl = getUserGuideUrl("md-translator", locale);
   // 使用时间戳来强制重新渲染
   const [activeKey, setActiveKey] = useState("basic");
 
