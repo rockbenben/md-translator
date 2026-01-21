@@ -1,17 +1,52 @@
 import { splitTextIntoLines } from "@/app/utils";
 
-interface MarkdownOptions {
+/**
+ * Markdown 翻译选项配置
+ */
+export interface MarkdownOptions {
+  /** 是否翻译 YAML frontmatter */
   translateFrontmatter: boolean;
+  /** 是否翻译多行代码块 */
   translateMultilineCode: boolean;
+  /** 是否翻译 LaTeX 公式 */
   translateLatex: boolean;
+  /** 是否翻译链接文本 */
   translateLinkText: boolean;
 }
+
 /**
- * 解析文本，将前置区域、代码块、链接、标题、列表、引用、加粗等内容替换为占位符，
- * 返回处理后的行数组及各类占位符字典
+ * 占位符类型模式（单一来源，修改此处即可更新所有正则）
  */
-export const placeholderPattern =
-  "FRONTMATTER_\\d+|MULTILINE_CODE_\\d+|LATEX_BLOCK_\\d+|CODE_\\d+|LATEX_INLINE_\\d+|LINK_PRE_\\d+|LINK_SUF_\\d+|LINK_\\d+|HEADING_\\d+|LIST_\\d+|BLOCKQUOTE_\\d+|STRONG_\\d+";
+const placeholderPattern =
+  "FRONTMATTER_\\d+|MULTILINE_CODE_\\d+|LATEX_BLOCK_\\d+|CODE_\\d+|LATEX_INLINE_\\d+|LINK_PRE_\\d+|LINK_SUF_\\d+|LINK_\\d+|HEADING_\\d+|LIST_\\d+|BLOCKQUOTE_\\d+|STRONG_\\d+|HTML_\\d+";
+
+/**
+ * 预编译的正则表达式（基于 placeholderPattern 创建，模块加载时初始化一次）
+ */
+/** 分割文本与占位符（保留分隔符） */
+export const PLACEHOLDER_SPLIT_REGEX = new RegExp(`(<<<(?:${placeholderPattern})>>>)`);
+/** 完全匹配占位符 */
+export const PLACEHOLDER_TEST_REGEX = new RegExp(`^<<<(?:${placeholderPattern})>>>$`);
+/** 全局替换占位符 */
+export const PLACEHOLDER_REPLACE_REGEX = new RegExp(`<<<(?:${placeholderPattern})>>>`, "g");
+
+/**
+ * 解析 Markdown 文本，将特殊元素替换为占位符以保护其不被翻译
+ *
+ * 处理的元素包括：
+ * - Frontmatter (YAML)
+ * - 多行代码块 (```)
+ * - 内联代码 (`)
+ * - LaTeX 公式 ($ 和 $$)
+ * - 链接和图片
+ * - 标题 (#)
+ * - 列表 (- * 1.)
+ * - 引用 (>)
+ *
+ * @param lines - 源文本的行数组
+ * @param mdOption - Markdown 翻译选项
+ * @returns 包含处理后的行和各类占位符映射的对象
+ */
 export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) => {
   const contentLines: string[] = [];
   const contentIndices: number[] = [];
@@ -25,6 +60,7 @@ export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) 
   const strongPlaceholders: { [key: string]: string } = {};
   const latexBlockPlaceholders: { [key: string]: string } = {};
   const latexInlinePlaceholders: { [key: string]: string } = {};
+  const htmlPlaceholders: { [key: string]: string } = {};
 
   let frontmatterCounter = 100;
   let codeCounter = 100;
@@ -35,6 +71,7 @@ export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) 
   // let strongCounter = 100;
   let latexBlockCounter = 100;
   let latexInlineCounter = 100;
+  let htmlCounter = 100;
 
   // 合并所有行，处理多行 frontmatter 和代码块
   let fullText = lines.join("\n");
@@ -98,24 +135,65 @@ export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) 
       });
     }
 
-    // 链接和图片
-    modifiedLine = modifiedLine.replace(/(!?\[.*?\]\(.*?\))/g, (match) => {
-      // 如果需要翻译链接文本且不是图片（!开头），则只将前后部分替换为占位符
-      if (mdOption.translateLinkText && !match.startsWith("!")) {
-        const linkMatch = match.match(/^(\[)(.*?)(\]\(.*?\))$/);
-        if (linkMatch) {
-          const prefix = linkMatch[1]; // [
-          const content = linkMatch[2]; // text
-          const suffix = linkMatch[3]; // ](url)
+    // HTML 标签（开始标签、结束标签、自闭合标签、注释）
+    // 匹配 HTML 注释 <!-- ... -->
+    modifiedLine = modifiedLine.replace(/<!--[\s\S]*?-->/g, (match) => {
+      const placeholder = `<<<HTML_${htmlCounter}>>>`;
+      htmlPlaceholders[placeholder] = match;
+      htmlCounter++;
+      return placeholder;
+    });
+    // 匹配自闭合标签 <tag ... /> 或 <tag/>
+    modifiedLine = modifiedLine.replace(/<([a-zA-Z][a-zA-Z0-9-]*)\s*[^>]*\/>/g, (match) => {
+      const placeholder = `<<<HTML_${htmlCounter}>>>`;
+      htmlPlaceholders[placeholder] = match;
+      htmlCounter++;
+      return placeholder;
+    });
+    // 匹配结束标签 </tag>
+    modifiedLine = modifiedLine.replace(/<\/([a-zA-Z][a-zA-Z0-9-]*)>/g, (match) => {
+      const placeholder = `<<<HTML_${htmlCounter}>>>`;
+      htmlPlaceholders[placeholder] = match;
+      htmlCounter++;
+      return placeholder;
+    });
+    // 匹配开始标签 <tag ...> 或 <tag>
+    modifiedLine = modifiedLine.replace(/<([a-zA-Z][a-zA-Z0-9-]*)(?:\s+[^>]*)?>/g, (match) => {
+      const placeholder = `<<<HTML_${htmlCounter}>>>`;
+      htmlPlaceholders[placeholder] = match;
+      htmlCounter++;
+      return placeholder;
+    });
 
-          const prefixPlaceholder = `<<<LINK_PRE_${linkCounter}>>>`;
-          const suffixPlaceholder = `<<<LINK_SUF_${linkCounter}>>>`;
-          linkPlaceholders[prefixPlaceholder] = prefix;
-          linkPlaceholders[suffixPlaceholder] = suffix;
-          linkCounter++;
+    // 图片 - 始终翻译 alt 文本
+    modifiedLine = modifiedLine.replace(/(!\[)(.*?)(\]\(.*?\))/g, (match, prefix, content, suffix) => {
+      // 如果 alt 为空，整个替换为占位符
+      if (!content.trim()) {
+        const placeholder = `<<<LINK_${linkCounter}>>>`;
+        linkPlaceholders[placeholder] = match;
+        linkCounter++;
+        return placeholder;
+      }
 
-          return `${prefixPlaceholder}${content}${suffixPlaceholder}`;
-        }
+      const prefixPlaceholder = `<<<LINK_PRE_${linkCounter}>>>`;
+      const suffixPlaceholder = `<<<LINK_SUF_${linkCounter}>>>`;
+      linkPlaceholders[prefixPlaceholder] = prefix;
+      linkPlaceholders[suffixPlaceholder] = suffix;
+      linkCounter++;
+
+      return `${prefixPlaceholder}${content}${suffixPlaceholder}`;
+    });
+
+    // 链接（非图片）- 根据选项决定是否翻译链接文本
+    modifiedLine = modifiedLine.replace(/(\[)(.*?)(\]\(.*?\))/g, (match, prefix, content, suffix) => {
+      if (mdOption.translateLinkText) {
+        const prefixPlaceholder = `<<<LINK_PRE_${linkCounter}>>>`;
+        const suffixPlaceholder = `<<<LINK_SUF_${linkCounter}>>>`;
+        linkPlaceholders[prefixPlaceholder] = prefix;
+        linkPlaceholders[suffixPlaceholder] = suffix;
+        linkCounter++;
+
+        return `${prefixPlaceholder}${content}${suffixPlaceholder}`;
       }
 
       const placeholder = `<<<LINK_${linkCounter}>>>`;
@@ -172,5 +250,6 @@ export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) 
     strongPlaceholders,
     latexBlockPlaceholders,
     latexInlinePlaceholders,
+    htmlPlaceholders,
   };
 };

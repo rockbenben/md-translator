@@ -21,9 +21,10 @@ import { useCopyToClipboard } from "@/app/hooks/useCopyToClipboard";
 import useFileUpload from "@/app/hooks/useFileUpload";
 import { useLocalStorage } from "@/app/hooks/useLocalStorage";
 import { useTextStats } from "@/app/hooks/useTextStats";
+import { useExportFilename } from "@/app/hooks/useExportFilename";
 
 import { splitTextIntoLines, downloadFile, splitBySpaces, getErrorMessage } from "@/app/utils";
-import { placeholderPattern, filterMarkdownLines } from "./markdownUtils";
+import { filterMarkdownLines, PLACEHOLDER_SPLIT_REGEX, PLACEHOLDER_TEST_REGEX, PLACEHOLDER_REPLACE_REGEX } from "./markdownUtils";
 import { LLM_MODELS } from "@/app/lib/translation";
 import { useLanguageOptions } from "@/app/components/languages";
 import LanguageSelector from "@/app/components/LanguageSelector";
@@ -31,6 +32,7 @@ import TranslationAPISelector from "@/app/components/TranslationAPISelector";
 import { useTranslationContext } from "@/app/components/TranslationContext";
 import ResultCard from "@/app/components/ResultCard";
 import TranslationProgressModal from "@/app/components/TranslationProgressModal";
+import AdvancedTranslationSettings from "@/app/components/AdvancedTranslationSettings";
 
 import MultiLanguageSettingsModal from "@/app/components/MultiLanguageSettingsModal";
 
@@ -111,6 +113,7 @@ const MDTranslator = () => {
   const [contextTranslation, setContextTranslation] = useLocalStorage("mdTranslatorContextMode", false);
   const [activeCollapseKeys, setActiveCollapseKeys] = useLocalStorage<string[]>("mdTranslatorCollapseKeys", ["markdown"]);
   const [multiLangModalOpen, setMultiLangModalOpen] = useState(false);
+  const { customFileName, setCustomFileName, generateFileName } = useExportFilename("md");
 
   useEffect(() => {
     setExtractedText("");
@@ -144,11 +147,8 @@ const MDTranslator = () => {
       strongPlaceholders,
       latexBlockPlaceholders,
       latexInlinePlaceholders,
+      htmlPlaceholders,
     } = filterMarkdownLines(lines, mdOption);
-
-    // 占位符正则，匹配形如 <<<TYPE_x>>> 的占位符
-    const placeholderRegex = new RegExp(`^<<<(${placeholderPattern})>>>$`);
-    const splitRegex = new RegExp(`(<<<(?:${placeholderPattern})>>>)`);
 
     // For each target language, perform translation
     for (const currentTargetLang of targetLanguagesToUse) {
@@ -157,10 +157,10 @@ const MDTranslator = () => {
         if (!rawTranslationMode) {
           // 对每一行进行处理，分割占位符与普通文本，仅翻译普通文本部分。不处理加粗文本格式，否则对语义伤害较大。
           const translateLine = async (line: string): Promise<string> => {
-            const segments = line.split(splitRegex);
+            const segments = line.split(PLACEHOLDER_SPLIT_REGEX);
             const translatedSegments = await Promise.all(
               segments.map(async (segment) => {
-                if (placeholderRegex.test(segment)) {
+                if (PLACEHOLDER_TEST_REGEX.test(segment)) {
                   // 占位符保持原样
                   return segment;
                 } else {
@@ -195,19 +195,19 @@ const MDTranslator = () => {
             ...Object.entries(blockquotePlaceholders),
             ...Object.entries(latexInlinePlaceholders),
             ...Object.entries(strongPlaceholders),
+            ...Object.entries(htmlPlaceholders),
           ]);
 
           // 按占位符长度降序排序，防止部分匹配替换
           const sortedPlaceholders = Array.from(allPlaceholders.entries()).sort((a, b) => b[0].length - a[0].length);
 
           for (const [placeholder, content] of sortedPlaceholders) {
-            const escapedPlaceholder = placeholder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
             let replacementContent = content;
             if (placeholder.includes("LATEX_")) {
-              // Replace $ with $$ (in regex replacement context, $ needs special handling)
+              // replaceAll 的第二个参数中，$ 需要用 $$ 转义
               replacementContent = content.replace(/\$/g, "$$$$");
             }
-            translatedTextWithPlaceholders = translatedTextWithPlaceholders.replace(new RegExp(escapedPlaceholder, "g"), replacementContent);
+            translatedTextWithPlaceholders = translatedTextWithPlaceholders.replaceAll(placeholder, replacementContent);
           }
         } else {
           // Raw text mode: translate all lines
@@ -226,24 +226,8 @@ const MDTranslator = () => {
 
         // Create language-specific file name for download
         const langLabel = currentTargetLang;
-        let downloadFileName;
-        const fileName = fileNameSet || multipleFiles[0]?.name;
-
-        if (fileName) {
-          // For batch mode with a filename provided
-          const lastDotIndex = fileName.lastIndexOf(".");
-          if (lastDotIndex !== -1) {
-            const fileExtension = fileName.slice(lastDotIndex + 1).toLowerCase();
-            const fileNameWithoutExt = fileName.slice(0, lastDotIndex);
-            downloadFileName = `${fileNameWithoutExt}_${langLabel}.${fileExtension}`;
-          } else {
-            downloadFileName = `${fileName}_${langLabel}.md`;
-          }
-        } else {
-          // For single file mode without a filename
-          const fileExtension = ".md";
-          downloadFileName = `markdown_${langLabel}${fileExtension}`;
-        }
+        const fileName = fileNameSet || multipleFiles[0]?.name || "markdown.md";
+        const downloadFileName = generateFileName(fileName, langLabel);
 
         if (multiLanguageMode || multipleFiles.length > 1) {
           await downloadFile(translatedTextWithPlaceholders, downloadFileName);
@@ -293,8 +277,8 @@ const MDTranslator = () => {
   };
 
   const handleExportFile = () => {
-    const uploadFileName = multipleFiles[0]?.name;
-    const fileName = uploadFileName || "mdtranslated.md";
+    const uploadFileName = multipleFiles[0]?.name || "markdown.md";
+    const fileName = generateFileName(uploadFileName, targetLanguage);
     downloadFile(translatedText, fileName);
     return fileName;
   };
@@ -308,9 +292,7 @@ const MDTranslator = () => {
     const { contentLines } = filterMarkdownLines(lines, mdOption);
     let extractedText = contentLines.join("\n");
     setTaggedText(extractedText);
-    // 使用正则表达式匹配所有格式为 <<<...>>> 的占位符，并替换为空字符串
-    const replaceRegex = new RegExp(`<<<(?:${placeholderPattern})>>>`, "g");
-    extractedText = extractedText.replace(replaceRegex, "");
+    extractedText = extractedText.replace(PLACEHOLDER_REPLACE_REGEX, "");
     // 移除 Markdown 加粗符号，保留加粗文本内容
     extractedText = extractedText.replace(/\*\*(.*?)\*\*/g, "$1");
     setExtractedText(extractedText);
@@ -320,7 +302,7 @@ const MDTranslator = () => {
   const config = getCurrentConfig();
 
   return (
-    <Spin spinning={isFileProcessing} size="large">
+    <Spin spinning={isFileProcessing} tip="Please wait..." size="large">
       <Row gutter={[24, 24]}>
         {/* Left Column: Upload and Main Actions */}
         <Col xs={24} lg={14} xl={15}>
@@ -377,10 +359,10 @@ const MDTranslator = () => {
                   aria-label={t("sourceArea")}
                 />
                 {sourceText && (
-                  <Flex justify="end">
-                    <Paragraph type="secondary">
-                      {t("inputStatsTitle")}: {sourceStats.charCount} {t("charLabel")}, {sourceStats.lineCount} {t("lineLabel")}
-                    </Paragraph>
+                  <Flex justify="end" className="mt-2">
+                    <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                      {sourceStats.charCount} {t("charLabel")} / {sourceStats.lineCount} {t("lineLabel")}
+                    </Typography.Text>
                   </Flex>
                 )}
               </>
@@ -463,6 +445,25 @@ const MDTranslator = () => {
 
               {/* API Settings - Always Visible */}
               <TranslationAPISelector translationMethod={translationMethod} setTranslationMethod={setTranslationMethod} config={config} handleConfigChange={handleConfigChange} />
+
+              {LLM_MODELS.includes(translationMethod) && (
+                <Flex justify="space-between" align="center">
+                  <Tooltip title={t("contextAwareTranslationTooltip")}>
+                    <span>{t("contextAwareTranslation")}</span>
+                  </Tooltip>
+                  <Switch
+                    size="small"
+                    checked={contextTranslation}
+                    onChange={(checked) => {
+                      setContextTranslation(checked);
+                      if (checked) {
+                        setRawTranslationMode(true);
+                      }
+                    }}
+                    aria-label={t("contextAwareTranslation")}
+                  />
+                </Flex>
+              )}
             </Form>
 
             <Divider style={{ margin: "12px 0" }} />
@@ -485,7 +486,7 @@ const MDTranslator = () => {
                     <Flex vertical gap="small">
                       <Flex justify="space-between" align="center">
                         <Tooltip title={tMarkdown("tFrontmatterTooltip")}>
-                          <span>Frontmatter</span>
+                          <span>{tMarkdown("tFrontmatter")}</span>
                         </Tooltip>
                         <Switch
                           size="small"
@@ -547,6 +548,15 @@ const MDTranslator = () => {
                           aria-label={tMarkdown("tLinkText")}
                         />
                       </Flex>
+
+                      <Divider style={{ margin: "4px 0" }} />
+
+                      <Flex justify="space-between" align="center">
+                        <Tooltip title={tMarkdown("rawTranslationModeTooltip")}>
+                          <span>{tMarkdown("rawTranslationMode")}</span>
+                        </Tooltip>
+                        <Switch size="small" checked={rawTranslationMode} onChange={setRawTranslationMode} disabled={contextTranslation} aria-label={tMarkdown("rawTranslationMode")} />
+                      </Flex>
                     </Flex>
                   ),
                 },
@@ -559,103 +569,20 @@ const MDTranslator = () => {
                     </Space>
                   ),
                   children: (
-                    <Flex vertical gap="small">
-                      {/* Mode Settings */}
-                      <div style={{ marginBottom: 8 }}>
-                        <Flex vertical gap="small">
-                          <Flex justify="space-between" align="center">
-                            <Tooltip title={tMarkdown("rawTranslationModeTooltip")}>
-                              <span>{tMarkdown("rawTranslationMode")}</span>
-                            </Tooltip>
-                            <Switch size="small" checked={rawTranslationMode} onChange={setRawTranslationMode} aria-label={tMarkdown("rawTranslationMode")} />
-                          </Flex>
-
-                          {LLM_MODELS.includes(translationMethod) && (
-                            <Flex justify="space-between" align="center">
-                              <Tooltip title={t("contextAwareTranslationTooltip")}>
-                                <span>{t("contextAwareTranslation")}</span>
-                              </Tooltip>
-                              <Switch
-                                size="small"
-                                checked={contextTranslation}
-                                onChange={(checked) => {
-                                  setContextTranslation(checked);
-                                  if (checked) {
-                                    setRawTranslationMode(true);
-                                  }
-                                }}
-                                aria-label={t("contextAwareTranslation")}
-                              />
-                            </Flex>
-                          )}
-                        </Flex>
-                      </div>
-
-                      <Divider style={{ margin: "4px 0" }} />
-
-                      {/* System Settings */}
-                      <div style={{ marginBottom: 8 }}>
-                        <Flex vertical gap="small">
-                          <Flex justify="space-between" align="center">
-                            <Tooltip title={t("singleFileModeTooltip")}>
-                              <span>{t("singleFileMode")}</span>
-                            </Tooltip>
-                            <Switch size="small" checked={singleFileMode} onChange={setSingleFileMode} aria-label={t("singleFileMode")} />
-                          </Flex>
-                          <Flex justify="space-between" align="center">
-                            <Tooltip title={t("useCacheTooltip")}>
-                              <span>{t("useCache")}</span>
-                            </Tooltip>
-                            <Switch size="small" checked={useCache} onChange={setUseCache} aria-label={t("useCache")} />
-                          </Flex>
-                        </Flex>
-                      </div>
-
-                      <Divider style={{ margin: "4px 0" }} />
-
-                      {/* Post Processing */}
-                      <div>
-                        <Flex vertical gap={8}>
-                          <Flex vertical gap={4}>
-                            <span style={{ fontSize: "13px" }}>{t("removeCharsAfterTranslation")}</span>
-                            <Input
-                              placeholder={`${t("example")}: ♪ <i> </i>`}
-                              value={removeChars}
-                              onChange={(e) => setRemoveChars(e.target.value)}
-                              allowClear
-                              aria-label={t("removeCharsAfterTranslation")}
-                            />
-                          </Flex>
-
-                          <Row gutter={[12, 12]}>
-                            <Col span={12}>
-                              <Tooltip title={t("retryCountTooltip")}>
-                                <Flex vertical gap={4}>
-                                  <span style={{ fontSize: "13px" }}>{t("retryCount")}</span>
-                                  <InputNumber min={1} max={10} value={retryCount} onChange={(value) => setRetryCount(value ?? 3)} style={{ width: "100%" }} aria-label={t("retryCount")} />
-                                </Flex>
-                              </Tooltip>
-                            </Col>
-                            <Col span={12}>
-                              <Tooltip title={t("retryTimeoutTooltip")}>
-                                <Flex vertical gap={4}>
-                                  <span style={{ fontSize: "13px" }}>{t("retryTimeout")}</span>
-                                  <InputNumber
-                                    min={5}
-                                    max={1200}
-                                    value={retryTimeout}
-                                    onChange={(value) => setRetryTimeout(value ?? 30)}
-                                    addonAfter="s"
-                                    style={{ width: "100%" }}
-                                    aria-label={t("retryTimeout")}
-                                  />
-                                </Flex>
-                              </Tooltip>
-                            </Col>
-                          </Row>
-                        </Flex>
-                      </div>
-                    </Flex>
+                    <AdvancedTranslationSettings
+                      customFileName={customFileName}
+                      setCustomFileName={setCustomFileName}
+                      removeChars={removeChars}
+                      setRemoveChars={setRemoveChars}
+                      retryCount={retryCount}
+                      setRetryCount={setRetryCount}
+                      retryTimeout={retryTimeout}
+                      setRetryTimeout={setRetryTimeout}
+                      useCache={useCache}
+                      setUseCache={setUseCache}
+                      singleFileMode={singleFileMode}
+                      setSingleFileMode={setSingleFileMode}
+                    />
                   ),
                 },
               ]}
