@@ -4,7 +4,7 @@ import type { TranslationService } from "../types";
 import { DEFAULT_SYS_PROMPT, DEFAULT_USER_PROMPT, defaultConfigs } from "../config";
 import { getAIModelPrompt } from "../utils";
 
-import { getErrorMessage, normalizeNumber, requireApiKey, requireUrl } from "./shared";
+import { getErrorMessage, normalizeNumber, requireApiKey, requireUrl, PROXY_ENDPOINTS, THIRD_PARTY_ENDPOINTS } from "./shared";
 
 const normalizePrompt = (value: string | undefined, fallback: string) => (typeof value === "string" && value.trim() ? value : fallback);
 
@@ -25,7 +25,7 @@ export const deepseek: TranslationService = async (params) => {
   const key = requireApiKey("DeepSeek", apiKey);
 
   // 根据 useRelay 选择直连或中转 API
-  const apiUrl = useRelay ? "https://llm-proxy.aishort.top/api/deepseek" : "https://api.deepseek.com/chat/completions";
+  const apiUrl = useRelay ? THIRD_PARTY_ENDPOINTS.deepseekRelay : "https://api.deepseek.com/chat/completions";
 
   try {
     const response = await fetch(apiUrl, {
@@ -305,6 +305,98 @@ export const openrouter: TranslationService = async (params) => {
     throw new Error(getErrorMessage(data, response.status));
   }
   return getOpenAICompatContent(data, "OpenRouter");
+};
+
+// Helper function to build thinking parameters based on model
+// Matches exact model names: glm4.7, kimi-k2.5, deepseek-v3.*, gpt-oss-*
+const buildNvidiaThinkingParams = (model: string, enableThinking: boolean): Record<string, unknown> => {
+  // GLM4.7: use enable_thinking and clear_thinking
+  // Matches: glm4.7, z-ai/glm4.7
+  if (/(?:^|\/)glm4\.7$/i.test(model)) {
+    return enableThinking ? { chat_template_kwargs: { enable_thinking: true, clear_thinking: false } } : { chat_template_kwargs: { enable_thinking: false } };
+  }
+
+  // Kimi-k2.5: use thinking, and force temperature=1.0, top_p=1.0
+  // Matches: kimi-k2.5, moonshotai/kimi-k2.5
+  if (/(?:^|\/)kimi-k2\.5$/i.test(model)) {
+    return enableThinking ? { chat_template_kwargs: { thinking: true }, temperature: 1.0, top_p: 1.0 } : { chat_template_kwargs: { thinking: false }, temperature: 1.0, top_p: 1.0 };
+  }
+
+  // DeepSeek-v3.*: use thinking
+  // Matches: deepseek-v3.1, deepseek-v3.1-terminus, deepseek-v3.2, deepseek-ai/deepseek-v3.1, etc.
+  if (/(?:^|\/)deepseek-v3\./i.test(model)) {
+    return enableThinking ? { chat_template_kwargs: { thinking: true } } : { chat_template_kwargs: { thinking: false } };
+  }
+
+  // GPT-OSS-*: use reasoning_effort
+  // Matches: gpt-oss-120b, gpt-oss-20b, openai/gpt-oss-120b, etc.
+  if (/(?:^|\/)gpt-oss-/i.test(model)) {
+    return { reasoning_effort: enableThinking ? "high" : "low" };
+  }
+
+  return {};
+};
+
+export const nvidia: TranslationService = async (params) => {
+  const { text, targetLanguage, sourceLanguage, apiKey, url, model, temperature, sysPrompt, userPrompt, enableThinking } = params;
+  const effectiveSysPrompt = normalizePrompt(sysPrompt, DEFAULT_SYS_PROMPT);
+  const effectiveUserPrompt = normalizePrompt(userPrompt, DEFAULT_USER_PROMPT);
+  const prompt = getAIModelPrompt(text, effectiveUserPrompt, targetLanguage, sourceLanguage, params.fullText);
+
+  const effectiveModel = model || defaultConfigs.nvidia.model;
+
+  // Build thinking parameters based on model
+  const thinkingParams = buildNvidiaThinkingParams(effectiveModel, enableThinking ?? false);
+
+  // Prepare request body
+  const requestBody: Record<string, unknown> = {
+    messages: [
+      { role: "system", content: effectiveSysPrompt },
+      { role: "user", content: prompt },
+    ],
+    model: effectiveModel,
+    temperature: normalizeNumber(temperature, defaultConfigs.nvidia.temperature),
+    ...thinkingParams,
+  };
+
+  // If user provided a custom URL, call it directly (no proxy)
+  // Otherwise, use proxy to call the default Nvidia API
+  if (url) {
+    // Direct call to user's custom URL (e.g., private deployment)
+    const key = requireApiKey("Nvidia", apiKey);
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${key}`,
+      },
+      body: JSON.stringify(requestBody),
+      signal: params.signal,
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(getErrorMessage(data, response.status));
+    }
+    return getOpenAICompatContent(data, "Nvidia");
+  } else {
+    // Proxy call to default Nvidia API (avoids CORS in browser)
+    const response = await fetch(PROXY_ENDPOINTS.nvidia, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        apiKey,
+        ...requestBody,
+      }),
+      signal: params.signal,
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(getErrorMessage(data, response.status));
+    }
+    return getOpenAICompatContent(data, "Nvidia");
+  }
 };
 
 export const llm: TranslationService = async (params) => {
