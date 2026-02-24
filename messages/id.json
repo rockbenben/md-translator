@@ -146,7 +146,9 @@
     "delayTime": "Penundaan",
     "CurrentTransConfig": "Konfigurasi Saat Ini",
     "useRelay": "Relay API",
-    "useRelayTooltip": "Aktifkan relay API untuk DeepSeek jika terjadi kesalahan CORS atau 403"
+    "useRelayTooltip": "Aktifkan relay API untuk DeepSeek jika terjadi kesalahan CORS atau 403",
+    "enableThinking": "Aktifkan Mode Berpikir",
+    "enableThinkingTooltip": "Aktifkan mode berpikir untuk model yang didukung (Kimi, DeepSeek, GLM, GPT-OSS)"
   },
   "tools": {
     "subtitleTranslator": {
@@ -296,6 +298,7 @@
     "mt": "Bahasa Malta",
     "ca": "Bahasa Katalan",
     "ml": "Bahasa Malayalam",
+    "si": "Bahasa Sinhala",
     "pa": "Bahasa Punjabi",
     "ne": "Bahasa Nepal",
     "my": "Bahasa Burma",

@@ -146,7 +146,9 @@
     "delayTime": "Độ trễ",
     "CurrentTransConfig": "Cấu hình hiện tại",
     "useRelay": "Chuyển tiếp API",
-    "useRelayTooltip": "Bật chuyển tiếp API cho DeepSeek khi gặp lỗi CORS hoặc 403"
+    "useRelayTooltip": "Bật chuyển tiếp API cho DeepSeek khi gặp lỗi CORS hoặc 403",
+    "enableThinking": "Bật chế độ suy nghĩ",
+    "enableThinkingTooltip": "Bật chế độ suy nghĩ cho các mô hình được hỗ trợ (Kimi, DeepSeek, GLM, GPT-OSS)"
   },
   "tools": {
     "subtitleTranslator": {
@@ -296,6 +298,7 @@
     "mt": "Tiếng Malta",
     "ca": "Tiếng Catalan",
     "ml": "Tiếng Malayalam",
+    "si": "Tiếng Sinhala",
     "pa": "Tiếng Punjabi",
     "ne": "Tiếng Nepal",
     "my": "Tiếng Miến Điện",

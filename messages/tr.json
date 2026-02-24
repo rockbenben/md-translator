@@ -146,7 +146,9 @@
     "delayTime": "Gecikme",
     "CurrentTransConfig": "Mevcut Yapılandırma",
     "useRelay": "API Aktarıcı",
-    "useRelayTooltip": "CORS veya 403 hatalarında DeepSeek için API aktarıcıyı etkinleştirin"
+    "useRelayTooltip": "CORS veya 403 hatalarında DeepSeek için API aktarıcıyı etkinleştirin",
+    "enableThinking": "Düşünme Modunu Etkinleştir",
+    "enableThinkingTooltip": "Desteklenen modeller için düşünme modunu etkinleştir (Kimi, DeepSeek, GLM, GPT-OSS)"
   },
   "tools": {
     "subtitleTranslator": {
@@ -296,6 +298,7 @@
     "mt": "Maltaca",
     "ca": "Katalanca",
     "ml": "Malayalamca",
+    "si": "Sinhala dili",
     "pa": "Pencapça",
     "ne": "Nepalce",
     "my": "Birmanca",

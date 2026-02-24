@@ -146,7 +146,9 @@
     "delayTime": "Delay Time",
     "CurrentTransConfig": "Current Config",
     "useRelay": "API Relay",
-    "useRelayTooltip": "Enable API relay for DeepSeek if you encounter CORS or 403 errors"
+    "useRelayTooltip": "Enable API relay for DeepSeek if you encounter CORS or 403 errors",
+    "enableThinking": "Enable Thinking",
+    "enableThinkingTooltip": "Enable thinking mode for supported models (Kimi, DeepSeek, GLM, GPT-OSS)"
   },
   "tools": {
     "subtitleTranslator": {
@@ -296,6 +298,7 @@
     "mt": "Maltese",
     "ca": "Catalan",
     "ml": "Malayalam",
+    "si": "Sinhala",
     "pa": "Punjabi",
     "ne": "Nepali",
     "my": "Burmese",
