@@ -6,7 +6,6 @@ import { CopyOutlined, DownloadOutlined, SwapOutlined, ClearOutlined, InfoCircle
 import { useTextStats } from "@/app/hooks/useTextStats";
 
 const { TextArea } = Input;
-const { Paragraph } = Typography;
 
 interface ZhResultCardProps {
   /** 结果文本（直接绑定状态） */
@@ -83,7 +82,7 @@ const ZhResultCard = ({ value, onChange, onCopy, onExport, onFormat, onMoveToSou
       }>
       <TextArea value={displayValue} onChange={isEditable ? (e) => onChange(e.target.value) : undefined} rows={rows} readOnly={!isEditable} aria-label={title} />
       <Flex justify="space-between" align="center" className="mt-2">
-        <div style={{ fontSize: 12 }}>
+        <div className="!text-xs">
           {!isEditable && onChange && (
             <Tooltip title="文本过长，为保证页面性能已自动切换为只读模式">
               <Typography.Text type="warning">
@@ -92,7 +91,7 @@ const ZhResultCard = ({ value, onChange, onCopy, onExport, onFormat, onMoveToSou
             </Tooltip>
           )}
         </div>
-        <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+        <Typography.Text type="secondary" className="!text-xs">
           {stats.charCount} 字符 / {stats.lineCount} 行
         </Typography.Text>
       </Flex>

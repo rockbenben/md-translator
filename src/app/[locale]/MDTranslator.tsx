@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Flex, Card, Button, Typography, Input, InputNumber, Upload, Form, Space, App, Tooltip, Spin, Row, Col, Divider, Switch, Collapse } from "antd";
+import { Flex, Card, Button, Typography, Input, Upload, Form, Space, App, Tooltip, Spin, Row, Col, Divider, Switch, Collapse } from "antd";
 import {
   CopyOutlined,
   InboxOutlined,
@@ -38,7 +38,7 @@ import MultiLanguageSettingsModal from "@/app/components/MultiLanguageSettingsMo
 
 const { TextArea } = Input;
 const { Dragger } = Upload;
-const { Paragraph, Text } = Typography;
+const { Text } = Typography;
 
 const MDTranslator = () => {
   const tMarkdown = useTranslations("markdown");
@@ -176,7 +176,7 @@ const MDTranslator = () => {
                   const [translated] = await translateContent([trimmedSegment], translationMethod, currentTargetLang, fileIndex, totalFiles);
                   return leadingSpace + translated + trailingSpace;
                 }
-              })
+              }),
             );
             return translatedSegments.join("");
           };
@@ -329,7 +329,7 @@ const MDTranslator = () => {
                 </Button>
               </Tooltip>
             }
-            className="h-full shadow-sm">
+            className="shadow-md border-transparent hover:shadow-lg transition-shadow duration-300">
             <Dragger
               customRequest={({ file }) => handleFileUpload(file as File)}
               accept=".txt,.md,.markdown"
@@ -360,7 +360,7 @@ const MDTranslator = () => {
                 />
                 {sourceText && (
                   <Flex justify="end" className="mt-2">
-                    <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                    <Typography.Text type="secondary" className="!text-xs">
                       {sourceStats.charCount} {t("charLabel")} / {sourceStats.lineCount} {t("lineLabel")}
                     </Typography.Text>
                   </Flex>
@@ -399,7 +399,7 @@ const MDTranslator = () => {
                 <SettingOutlined /> {t("configuration")}
               </Space>
             }
-            className="shadow-sm"
+            className="shadow-md border-transparent hover:shadow-lg transition-shadow duration-300"
             extra={
               <Space>
                 <Tooltip title={t("exportSettingTooltip")}>
@@ -466,13 +466,13 @@ const MDTranslator = () => {
               )}
             </Form>
 
-            <Divider style={{ margin: "12px 0" }} />
+            <Divider className="!my-3" />
 
             <Collapse
               ghost
+              size="small"
               activeKey={activeCollapseKeys}
               onChange={(keys) => setActiveCollapseKeys(typeof keys === "string" ? [keys] : keys)}
-              expandIconPlacement="end"
               items={[
                 {
                   key: "markdown",
@@ -549,7 +549,7 @@ const MDTranslator = () => {
                         />
                       </Flex>
 
-                      <Divider style={{ margin: "4px 0" }} />
+                      <Divider className="!my-1" />
 
                       <Flex justify="space-between" align="center">
                         <Tooltip title={tMarkdown("rawTranslationModeTooltip")}>
@@ -607,6 +607,7 @@ const MDTranslator = () => {
                     message.success(`${t("exportedFile")}: ${fileName}`);
                   }}
                   textDirection={getLangDir(targetLanguage)}
+                  className="shadow-md border-transparent hover:shadow-lg transition-shadow duration-300"
                 />
               </Col>
             )}
@@ -619,7 +620,7 @@ const MDTranslator = () => {
                       <FileTextOutlined /> {t("extractedText")}
                     </Space>
                   }
-                  className="shadow-sm h-full"
+                  className="shadow-md border-transparent hover:shadow-lg transition-shadow duration-300 h-full"
                   extra={
                     <Space wrap>
                       <Button type="text" icon={<CopyOutlined />} onClick={() => copyToClipboard(extractedText)}>

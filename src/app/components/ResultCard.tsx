@@ -5,7 +5,6 @@ import { CopyOutlined, DownloadOutlined } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 
 const { TextArea } = Input;
-const { Paragraph } = Typography;
 
 interface ResultCardProps {
   /** Card title - defaults to "translationResult" translation key */
@@ -71,7 +70,7 @@ const ResultCard = ({ title, content, onChange, charCount, lineCount, showStats 
       />
       {showStats && charCount && lineCount && (
         <Flex justify="end" className="mt-2">
-          <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+          <Typography.Text type="secondary" className="!text-xs">
             {charCount} {t("charLabel")} / {lineCount} {t("lineLabel")}
           </Typography.Text>
         </Flex>

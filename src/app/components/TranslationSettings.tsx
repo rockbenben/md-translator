@@ -112,7 +112,7 @@ const TranslationSettings = () => {
           <Form layout="vertical">
             {config?.url !== undefined && (
               <Form.Item
-                label={`API ${t("url")}`}
+                label={`${t("url")}`}
                 extra={service === "llm" ? t("urlExtra") : service === "azureopenai" ? undefined : t("deeplxUrlExtra")}
                 required={service === "llm" || service === "azureopenai"}>
                 <Input
@@ -159,6 +159,12 @@ const TranslationSettings = () => {
               </Form.Item>
             )}
 
+            {service === "nvidia" && (
+              <Form.Item label={t("enableThinking")} extra={t("enableThinkingTooltip")}>
+                <Switch checked={config?.enableThinking as boolean | undefined} onChange={(checked) => handleConfigChange(service, "enableThinking", checked)} aria-label={t("enableThinking")} />
+              </Form.Item>
+            )}
+
             {config?.region !== undefined && (
               <Form.Item label="Azure Region" required>
                 <Input
@@ -189,7 +195,7 @@ const TranslationSettings = () => {
                   step={0.1}
                   value={config.temperature as number | undefined}
                   onChange={(value) => handleConfigChange(service, "temperature", value ?? 0)}
-                  style={{ width: "100%" }}
+                  className="w-full"
                   aria-label="Temperature"
                 />
               </Form.Item>
@@ -202,7 +208,7 @@ const TranslationSettings = () => {
                 <Form.Item
                   label={t("userPrompt")}
                   extra={`${t("userPromptExtra")}: \${sourceLanguage} ${t("for")} ${tCommon("sourceLanguage")}, \${targetLanguage} ${t("for")} ${tCommon("targetLanguage")}, \${content} ${t(
-                    "for"
+                    "for",
                   )} ${t("textToTranslate")}, \${fullText} ${t("for")} full text`}>
                   <TextArea value={userPrompt} onChange={(e) => setUserPrompt(e.target.value)} autoSize={{ minRows: 2, maxRows: 6 }} aria-label={t("userPrompt")} />
                 </Form.Item>
