@@ -53,7 +53,8 @@ const ClientPage = () => {
         <Link href={userGuideUrl} target="_blank" rel="noopener noreferrer">
           <QuestionCircleOutlined /> {t("userGuide")}
         </Link>{" "}
-        {tMarkdown("clientDescription")} {t("privacyNotice")}
+        {tMarkdown("clientDescription")}
+        {t("privacyNotice")}
       </Paragraph>
       <Tabs activeKey={activeKey} onChange={handleTabChange} items={items} type="card" className="w-full" animated={{ inkBar: true, tabPane: true }} />
     </TranslationProvider>
