@@ -156,32 +156,43 @@ const MDTranslator = () => {
       try {
         if (!rawTranslationMode) {
           // 对每一行进行处理，分割占位符与普通文本，仅翻译普通文本部分。不处理加粗文本格式，否则对语义伤害较大。
-          const translateLine = async (line: string): Promise<string> => {
+          // 第一步：收集所有待翻译片段及其位置信息
+          const textsToTranslate: string[] = [];
+          const lineSegments: { segments: string[]; mapping: ({ type: "placeholder" | "empty"; value: string } | { type: "text"; index: number; leading: string; trailing: string })[] }[] = [];
+
+          for (const line of contentLines) {
             const segments = line.split(PLACEHOLDER_SPLIT_REGEX);
-            const translatedSegments = await Promise.all(
-              segments.map(async (segment) => {
-                if (PLACEHOLDER_TEST_REGEX.test(segment)) {
-                  // 占位符保持原样
-                  return segment;
+            const mapping: (typeof lineSegments)[number]["mapping"] = [];
+            for (const segment of segments) {
+              if (PLACEHOLDER_TEST_REGEX.test(segment)) {
+                mapping.push({ type: "placeholder", value: segment });
+              } else {
+                const leadingSpace = segment.match(/^\s*/)?.[0] || "";
+                const trailingSpace = segment.match(/\s*$/)?.[0] || "";
+                const trimmedSegment = segment.trim();
+                if (!trimmedSegment) {
+                  mapping.push({ type: "empty", value: segment });
                 } else {
-                  // 仅翻译普通文本部分
-                  const leadingSpace = segment.match(/^\s*/)?.[0] || "";
-                  const trailingSpace = segment.match(/\s*$/)?.[0] || "";
-                  const trimmedSegment = segment.trim();
-
-                  if (!trimmedSegment) {
-                    return segment;
-                  }
-
-                  const [translated] = await translateContent([trimmedSegment], translationMethod, currentTargetLang, fileIndex, totalFiles);
-                  return leadingSpace + translated + trailingSpace;
+                  mapping.push({ type: "text", index: textsToTranslate.length, leading: leadingSpace, trailing: trailingSpace });
+                  textsToTranslate.push(trimmedSegment);
                 }
-              }),
-            );
-            return translatedSegments.join("");
-          };
+              }
+            }
+            lineSegments.push({ segments, mapping });
+          }
 
-          const finalTranslatedLines = await Promise.all(contentLines.map((line) => translateLine(line)));
+          // 第二步：一次性翻译所有片段（translateContent 内部已有 pLimit 并发控制）
+          const translatedTexts = await translateContent(textsToTranslate, translationMethod, currentTargetLang, fileIndex, totalFiles);
+
+          // 第三步：回填翻译结果
+          const finalTranslatedLines = lineSegments.map(({ mapping }) =>
+            mapping
+              .map((entry) => {
+                if (entry.type === "text") return entry.leading + translatedTexts[entry.index] + entry.trailing;
+                return entry.value;
+              })
+              .join(""),
+          );
           translatedTextWithPlaceholders = finalTranslatedLines.join("\n");
 
           // 合并所有占位符映射
