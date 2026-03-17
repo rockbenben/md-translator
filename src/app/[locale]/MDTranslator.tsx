@@ -255,7 +255,7 @@ const MDTranslator = () => {
         }
       } catch (error: unknown) {
         const messageText = [getErrorMessage(error), sourceOptions.find((o) => o.value === currentTargetLang)?.label || currentTargetLang, t("translationError")].join(" ");
-        message.error(messageText, 5);
+        message.error(messageText, 60);
       }
     }
   };
