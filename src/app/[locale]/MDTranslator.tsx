@@ -274,19 +274,22 @@ const MDTranslator = () => {
     setTranslateInProgress(true);
     setProgressPercent(0);
 
-    for (let i = 0; i < multipleFiles.length; i++) {
-      const currentFile = multipleFiles[i];
-      await new Promise<void>((resolve) => {
-        readFile(currentFile, async (text) => {
-          await performTranslation(text, currentFile.name, i, multipleFiles.length);
-          await delay(1500);
-          resolve();
+    try {
+      for (let i = 0; i < multipleFiles.length; i++) {
+        const currentFile = multipleFiles[i];
+        await new Promise<void>((resolve) => {
+          readFile(currentFile, async (text) => {
+            await performTranslation(text, currentFile.name, i, multipleFiles.length);
+            await delay(1500);
+            resolve();
+          });
         });
-      });
-    }
+      }
 
-    setTranslateInProgress(false);
-    message.success(t("translationExported"), 10);
+      message.success(t("translationExported"), 10);
+    } finally {
+      setTranslateInProgress(false);
+    }
   };
 
   const handleExportFile = () => {

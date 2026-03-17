@@ -670,8 +670,11 @@ const useTranslateData = () => {
 
     setTranslateInProgress(true);
     setProgressPercent(0);
-    await performTranslation(sourceText, undefined, undefined, undefined, documentType);
-    setTranslateInProgress(false);
+    try {
+      await performTranslation(sourceText, undefined, undefined, undefined, documentType);
+    } finally {
+      setTranslateInProgress(false);
+    }
   };
 
   return {
