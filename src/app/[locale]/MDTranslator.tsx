@@ -23,7 +23,7 @@ import { useLocalStorage } from "@/app/hooks/useLocalStorage";
 import { useTextStats } from "@/app/hooks/useTextStats";
 import { useExportFilename } from "@/app/hooks/useExportFilename";
 
-import { splitTextIntoLines, downloadFile, splitBySpaces, getErrorMessage } from "@/app/utils";
+import { splitTextIntoLines, downloadFile, splitBySpaces, getErrorMessage, getFileTypePresetConfig } from "@/app/utils";
 import { filterMarkdownLines, PLACEHOLDER_SPLIT_REGEX, PLACEHOLDER_TEST_REGEX, PLACEHOLDER_REPLACE_REGEX } from "./markdownUtils";
 import { LLM_MODELS } from "@/app/lib/translation";
 import { useLanguageOptions } from "@/app/components/languages";
@@ -39,6 +39,8 @@ import MultiLanguageSettingsModal from "@/app/components/MultiLanguageSettingsMo
 const { TextArea } = Input;
 const { Dragger } = Upload;
 const { Text } = Typography;
+
+const uploadFileTypes = getFileTypePresetConfig("markdownText");
 
 const MDTranslator = () => {
   const tMarkdown = useTranslations("markdown");
@@ -343,7 +345,7 @@ const MDTranslator = () => {
             className="shadow-md border-transparent hover:shadow-lg transition-shadow duration-300">
             <Dragger
               customRequest={({ file }) => handleFileUpload(file as File)}
-              accept=".txt,.md,.markdown"
+              accept={uploadFileTypes.accept}
               multiple={!singleFileMode}
               showUploadList
               beforeUpload={singleFileMode ? resetUpload : undefined}
@@ -354,7 +356,9 @@ const MDTranslator = () => {
                 <InboxOutlined />
               </p>
               <p className="ant-upload-text">{t("dragAndDropText")}</p>
-              <p className="ant-upload-hint">{t("supportedFormats")} .txt, .md, .markdown</p>
+              <p className="ant-upload-hint">
+                {t("supportedFormats")} {uploadFileTypes.fullLabel}
+              </p>
             </Dragger>
 
             {uploadMode === "single" && (
