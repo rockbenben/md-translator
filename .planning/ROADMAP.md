@@ -30,7 +30,7 @@
 
 **Plans:**
 1/2 plans executed
-- [ ] 01-02-PLAN.md — SplitPaneView + Tab 集成
+- [x] 01-02-PLAN.md — SplitPaneView + Tab 集成
 
 ---
 
