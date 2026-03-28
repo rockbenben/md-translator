@@ -51,6 +51,9 @@ Plan: Not started
 | 预览切换方式 | 全局图标按钮，切换左右面板为渲染模式 | Phase 2 Decided |
 | 预览内容 | 预览模式下左=渲染原文，右=渲染译文 | Phase 2 Decided |
 | Markdown 范围 | 基础 + GFM + LaTeX | Phase 2 Decided |
+| 同步方向 | 双向同步 — 滚动任一面板，另一面板同步 | Phase 3 Decided |
+| 同步默认状态 | 默认开启 | Phase 3 Decided |
+| 同步生效模式 | 文本模式和预览模式都启用 | Phase 3 Decided |
 
 - [Phase 01]: SplitPaneContainer 组件创建完成：react-split + useLocalStorage 持久化
 - [Phase 01]: SplitPaneView maintains independent source text state (D-03: independent source input)
@@ -84,12 +87,18 @@ None yet.
   - Summary: `.planning/phases/02-panels-preview/02-02-SUMMARY.md`
   - Added preview mode toggle to SplitPaneView
 
+- **2026-03-28**: Phase 3 context gathered
+  - Phase: 3-scroll-sync
+  - Context file: `.planning/phases/03-scroll-sync/03-CONTEXT.md`
+  - Decisions: Bidirectional sync, default enabled, all modes synced
+
 ### Notes
 
 - Phase 1 discuss-phase completed with clear layout architecture decision
 - New "分屏预览" tab coexists with existing "翻译区" tab
 - Phase 2: Global preview toggle (icon button), both panels render in preview mode
 - Phase 2 Plan 02 complete: SplitPaneView preview mode toggle with content switching
+- Phase 3: Bidirectional scroll sync, enabled by default, works in all modes
 
 ---
 
