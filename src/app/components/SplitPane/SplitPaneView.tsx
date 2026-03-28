@@ -2,11 +2,13 @@
 
 import React, { useState, useCallback } from "react";
 import { Card, Button, Typography, Input, Flex, App } from "antd";
-import { GlobalOutlined, EyeOutlined, EyeInvisibleOutlined, FileTextOutlined } from "@ant-design/icons";
+import { GlobalOutlined, EyeOutlined, EyeInvisibleOutlined, FileTextOutlined, SyncOutlined } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import { useTranslationContext } from "@/app/components/TranslationContext";
 import { SplitPaneContainer } from "./index";
 import MarkdownPreview from "./MarkdownPreview";
+import { useScrollSync } from "./useScrollSync";
+import { useLocalStorage } from "@/app/hooks/useLocalStorage";
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -32,6 +34,12 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
   // 预览模式状态
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [previewContent, setPreviewContent] = useState<'source' | 'translation'>('source');
+
+  // 滚动同步状态 (默认开启，持久化到 localStorage)
+  const [scrollSyncEnabled, setScrollSyncEnabled] = useLocalStorage("splitPaneScrollSync", true);
+
+  // 滚动同步 hook
+  const { leftScrollRef, rightScrollRef } = useScrollSync({ enabled: scrollSyncEnabled });
 
   // 从 useTranslationContext 获取翻译结果 (只读显示)
   // 注意: 这里实际上需要使用 translationContext 的 translatedText
@@ -74,18 +82,20 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
   const leftPanel = (
     <Card className="h-full" title={t("sourceArea")}>
       <Flex vertical className="h-full" gap="small">
-        {isPreviewMode ? (
-          <MarkdownPreview content={sourceText} className="flex-1 overflow-auto" />
-        ) : (
-          <TextArea
-            value={sourceText}
-            onChange={(e) => setSourceText(e.target.value)}
-            placeholder={t("pasteUploadContent")}
-            rows={12}
-            className="flex-1"
-            aria-label={t("sourceArea")}
-          />
-        )}
+        <div ref={leftScrollRef as React.RefObject<HTMLDivElement>} className="flex-1 overflow-auto">
+          {isPreviewMode ? (
+            <MarkdownPreview content={sourceText} className="h-full" />
+          ) : (
+            <TextArea
+              value={sourceText}
+              onChange={(e) => setSourceText(e.target.value)}
+              placeholder={t("pasteUploadContent")}
+              rows={12}
+              className="h-full"
+              aria-label={t("sourceArea")}
+            />
+          )}
+        </div>
         <Flex justify="end">
           <Text type="secondary" className="!text-xs">
             {sourceText.length} {t("charLabel")} / {sourceText.split("\n").length} {t("lineLabel")}
@@ -116,21 +126,23 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
       }
     >
       <Flex vertical className="h-full" gap="small">
-        {isPreviewMode ? (
-          <MarkdownPreview
-            content={previewContent === 'source' ? sourceText : translatedText}
-            className="flex-1 overflow-auto"
-          />
-        ) : (
-          <TextArea
-            value={translatedText}
-            readOnly
-            placeholder={t("translationResult")}
-            rows={12}
-            className="flex-1"
-            aria-label={t("translationResult")}
-          />
-        )}
+        <div ref={rightScrollRef as React.RefObject<HTMLDivElement>} className="flex-1 overflow-auto">
+          {isPreviewMode ? (
+            <MarkdownPreview
+              content={previewContent === 'source' ? sourceText : translatedText}
+              className="h-full"
+            />
+          ) : (
+            <TextArea
+              value={translatedText}
+              readOnly
+              placeholder={t("translationResult")}
+              rows={12}
+              className="h-full"
+              aria-label={t("translationResult")}
+            />
+          )}
+        </div>
         <Flex justify="end">
           <Text type="secondary" className="!text-xs">
             {translatedText.length} {t("charLabel")} / {translatedText.split("\n").length} {t("lineLabel")}
@@ -148,6 +160,14 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
           {t("sourceArea")}: {sourceLanguage} → {targetLanguage}
         </Text>
         <Flex gap="small">
+          <Button
+            icon={<SyncOutlined spin={scrollSyncEnabled} />}
+            onClick={() => setScrollSyncEnabled(!scrollSyncEnabled)}
+            type={scrollSyncEnabled ? "primary" : "default"}
+            title={t("scrollSync")}
+          >
+            {t("scrollSync")}
+          </Button>
           <Button
             icon={isPreviewMode ? <EyeInvisibleOutlined /> : <EyeOutlined />}
             onClick={() => setIsPreviewMode(!isPreviewMode)}

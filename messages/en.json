@@ -25,6 +25,7 @@
     "lineLabel": "Lines",
     "previewMode": "Preview",
     "textMode": "Text",
+    "scrollSync": "Sync Scroll",
     "advancedSettings": "Advanced Settings",
     "singleFileModeTooltip": "Keep only one file; new uploads replace the current file",
     "singleFileMode": "Single File Mode",
