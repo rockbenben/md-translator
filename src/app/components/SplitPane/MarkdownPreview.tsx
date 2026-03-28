@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -23,14 +23,71 @@ interface MarkdownPreviewProps {
  * - GFM (表格、任务列表、删除线)
  * - LaTeX 数学公式 ($x$ 和 $$x$$)
  * - Prism 语法高亮 (oneDark 主题)
+ * - data-index 属性用于滚动同步
  */
 const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content, className }) => {
+  // 使用 ref 追踪每个元素类型的索引计数器
+  // 使用 ref 而非 state 避免不必要的重渲染
+  const countersRef = useRef({
+    h: 0,
+    p: 0,
+    li: 0,
+    tr: 0,
+    pre: 0,
+  });
+
+  // 生成 data-index
+  const getDataIndex = (type: keyof typeof countersRef.current): string => {
+    const index = countersRef.current[type]++;
+    return `${type}-${index}`;
+  };
+
+  // 当 content 改变时，重置计数器以确保索引重新开始
+  useEffect(() => {
+    countersRef.current = { h: 0, p: 0, li: 0, tr: 0, pre: 0 };
+  }, [content]);
+
   return (
     <div className={className}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex]}
         components={{
+          // 标题添加 data-index (h1-h6 共用逻辑)
+          h1({ children, ...props }) {
+            return <h1 data-index={getDataIndex("h")} {...props}>{children}</h1>;
+          },
+          h2({ children, ...props }) {
+            return <h2 data-index={getDataIndex("h")} {...props}>{children}</h2>;
+          },
+          h3({ children, ...props }) {
+            return <h3 data-index={getDataIndex("h")} {...props}>{children}</h3>;
+          },
+          h4({ children, ...props }) {
+            return <h4 data-index={getDataIndex("h")} {...props}>{children}</h4>;
+          },
+          h5({ children, ...props }) {
+            return <h5 data-index={getDataIndex("h")} {...props}>{children}</h5>;
+          },
+          h6({ children, ...props }) {
+            return <h6 data-index={getDataIndex("h")} {...props}>{children}</h6>;
+          },
+          // 段落添加 data-index
+          p({ children, ...props }) {
+            return <p data-index={getDataIndex("p")} {...props}>{children}</p>;
+          },
+          // 列表项添加 data-index
+          li({ children, ...props }) {
+            return <li data-index={getDataIndex("li")} {...props}>{children}</li>;
+          },
+          // 表格行添加 data-index
+          tr({ children, ...props }) {
+            return <tr data-index={getDataIndex("tr")} {...props}>{children}</tr>;
+          },
+          // 预格式化代码块添加 data-index
+          pre({ children, ...props }) {
+            return <pre data-index={getDataIndex("pre")} {...props}>{children}</pre>;
+          },
           // 代码块语法高亮
           code({ className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || "");
