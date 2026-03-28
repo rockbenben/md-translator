@@ -70,7 +70,7 @@
 4. 代码块、LaTeX 等高度不同的元素正确同步
 5. 表格、列表等嵌套元素正确同步
 
-**Plans:** TBD
+**Plans:** 1/2 plans executed
 
 ---
 
@@ -96,7 +96,7 @@
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/2 | In Progress|  |
 | 2. Panels + Preview | 0/2 | Not started | - |
-| 3. Scroll Sync | 0/5 | Not started | - |
+| 3. Scroll Sync | 2/2 | Completed | 2026-03-29 |
 | 4. Polish | 0/2 | Not started | - |
 
 ---

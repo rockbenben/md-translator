@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to plan
-last_updated: "2026-03-28T15:16:30.287Z"
+status: Ready to execute
+last_updated: "2026-03-28T15:56:34.232Z"
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 6
+  completed_plans: 5
 ---
 
 # State: MD Translator — Side-by-Side Editor
@@ -18,8 +18,8 @@ progress:
 
 ## Current Position
 
-Phase: 3
-Plan: Not started
+Phase: 03 (Scroll Sync) — COMPLETE
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -33,6 +33,8 @@ Plan: Not started
 | Phase 01 P02 | 3 | 3 tasks | 5 files |
 | Phase 02 P01 | 5 | 1 task | 3 files |
 | Phase 02 P02 | 3 | 1 task | 3 files |
+| Phase 03-scroll-sync P01 | 15 | 2 tasks | 2 files |
+| Phase 03-scroll-sync P02 | 43ced5d | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -57,6 +59,7 @@ Plan: Not started
 
 - [Phase 01]: SplitPaneContainer 组件创建完成：react-split + useLocalStorage 持久化
 - [Phase 01]: SplitPaneView maintains independent source text state (D-03: independent source input)
+- [Phase 03-scroll-sync]: Bidirectional scroll sync via isScrolling flag prevents infinite loops
 
 ### Key Dependencies
 
@@ -91,6 +94,12 @@ None yet.
   - Phase: 3-scroll-sync
   - Context file: `.planning/phases/03-scroll-sync/03-CONTEXT.md`
   - Decisions: Bidirectional sync, default enabled, all modes synced
+
+- **2026-03-29**: Phase 3 Plan 02 executed
+  - Commit: 43ced5d
+  - Summary: `.planning/phases/03-scroll-sync/03-02-SUMMARY.md`
+  - Added scroll sync toggle button with localStorage persistence
+  - Wired up scroll container refs to left/right panels
 
 ### Notes
 
