@@ -28,13 +28,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Scroll Sync
 
-- [ ] **SBS-11**: 基于行索引的同步滚动算法
-- [ ] **SBS-12**: 防止双向滚动死循环（isScrolling 标志）
+- [x] **SBS-11**: 基于行索引的同步滚动算法
+- [x] **SBS-12**: 防止双向滚动死循环（isScrolling 标志）
 - [ ] **SBS-13**: 支持关闭/开启同步滚动
 
 ### Edge Cases
 
-- [ ] **SBS-14**: 处理代码块、LaTeX 等高度不同的元素
+- [x] **SBS-14**: 处理代码块、LaTeX 等高度不同的元素
 - [ ] **SBS-15**: 处理表格、列表等嵌套元素
 - [ ] **SBS-16**: 移动端响应式降级
 
@@ -75,10 +75,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SBS-08 | Phase 2 | Pending |
 | SBS-09 | Phase 2 | Pending |
 | SBS-10 | Phase 2 | Pending |
-| SBS-11 | Phase 3 | Pending |
-| SBS-12 | Phase 3 | Pending |
+| SBS-11 | Phase 3 | Complete |
+| SBS-12 | Phase 3 | Complete |
 | SBS-13 | Phase 3 | Pending |
-| SBS-14 | Phase 3 | Pending |
+| SBS-14 | Phase 3 | Complete |
 | SBS-15 | Phase 3 | Pending |
 | SBS-16 | Phase 4 | Pending |
 
