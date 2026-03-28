@@ -6,11 +6,11 @@
 ## Current Position
 
 **Milestone:** v1.0
-**Phase:** Not started
-**Plan:** None
-**Status:** Planning
+**Phase:** 1 (Foundation) - Context gathered
+**Plan:** None yet
+**Status:** Ready for planning
 
-**Progress Bar:** [░░░░░░░░░] 0/4 phases
+**Progress Bar:** [▓░░░░░░░░] 1/4 phases (context)
 
 ## Performance Metrics
 
@@ -31,6 +31,10 @@
 | 同步滚动 | 翻译时保持位置对照是核心体验 | Pending |
 | 切换式预览 | 节省屏幕空间，避免固定三分屏 | Pending |
 | 4阶段结构 | Phase 1→2→3→4 依赖链清晰 | Pending |
+| 分屏预览标签页 | 新增标签页，保留翻译区不变 | Phase 1 Decided |
+| 设置面板位置 | 分屏区使用翻译区的设置，无独立设置 | Phase 1 Decided |
+| 默认分屏比例 | 50:50 均等分割 | Phase 1 Decided |
+| 拖拽手柄 | 细线分隔线，hover高亮 | Phase 1 Decided |
 
 ### Key Dependencies
 
@@ -46,11 +50,15 @@ None yet.
 
 ### Previous Sessions
 
-None yet.
+- **2026-03-28**: Phase 1 context gathered
+  - Phase: 1-foundation
+  - Context file: `.planning/phases/01-foundation/01-CONTEXT.md`
+  - Decisions: Tab-based layout, settings from translation tab, 50:50 split, 细线 divider
 
 ### Notes
 
-None yet.
+- Phase 1 discuss-phase completed with clear layout architecture decision
+- New "分屏预览" tab coexists with existing "翻译区" tab
 
 ---
 
