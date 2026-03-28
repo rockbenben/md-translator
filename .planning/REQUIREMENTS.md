@@ -1,0 +1,96 @@
+# Requirements: MD Translator — Side-by-Side Editor
+
+**Defined:** 2026-03-28
+**Core Value:** 在翻译过程中提供清晰的原文/译文对照视图，提升翻译效率和准确性
+
+## v1 Requirements
+
+Requirements for initial release. Each maps to roadmap phases.
+
+### Layout
+
+- [ ] **SBS-01**: 左右分屏编辑器，左侧显示原始 Markdown，右侧显示翻译结果
+- [ ] **SBS-02**: 面板宽度可通过拖拽调整
+- [ ] **SBS-03**: 面板比例可通过 context 持久化
+
+### Panels
+
+- [ ] **SBS-04**: 左侧面板显示原始 Markdown 文本（只读）
+- [ ] **SBS-05**: 右侧面板显示翻译结果（只读）
+- [ ] **SBS-06**: 面板之间同步滚动
+
+### Preview Mode
+
+- [ ] **SBS-07**: 右侧面板支持切换：译文文本 ↔ 预览模式
+- [ ] **SBS-08**: 预览模式进入专门的分屏视图
+- [ ] **SBS-09**: 预览可切换：预览原文 / 预览译文
+- [ ] **SBS-10**: Markdown 预览渲染（标题、列表、代码块、链接等）
+
+### Scroll Sync
+
+- [ ] **SBS-11**: 基于行索引的同步滚动算法
+- [ ] **SBS-12**: 防止双向滚动死循环（isScrolling 标志）
+- [ ] **SBS-13**: 支持关闭/开启同步滚动
+
+### Edge Cases
+
+- [ ] **SBS-14**: 处理代码块、LaTeX 等高度不同的元素
+- [ ] **SBS-15**: 处理表格、列表等嵌套元素
+- [ ] **SBS-16**: 移动端响应式降级
+
+## v2 Requirements
+
+Deferred to future release. Tracked but not in current roadmap.
+
+### Advanced Features
+
+- **SBS-17**: 焦点高亮（当前行/段落高亮）
+- **SBS-18**: 视图记忆（记住面板比例）
+- **SBS-19**: 键盘快捷键切换预览
+- **SBS-20**: 虚拟滚动（大型文档 5000+ 行）
+
+## Out of Scope
+
+Explicitly excluded. Documented to prevent scope creep.
+
+| Feature | Reason |
+|---------|--------|
+| 可编辑译文 | 避免与翻译服务状态不一致 |
+| 实时协同编辑 | 高复杂度，后续考虑 |
+| 多语言 UI 改造 | 保持现有 i18n 不变 |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| SBS-01 | Phase 1 | Pending |
+| SBS-02 | Phase 1 | Pending |
+| SBS-03 | Phase 1 | Pending |
+| SBS-04 | Phase 2 | Pending |
+| SBS-05 | Phase 2 | Pending |
+| SBS-06 | Phase 3 | Pending |
+| SBS-07 | Phase 2 | Pending |
+| SBS-08 | Phase 2 | Pending |
+| SBS-09 | Phase 2 | Pending |
+| SBS-10 | Phase 2 | Pending |
+| SBS-11 | Phase 3 | Pending |
+| SBS-12 | Phase 3 | Pending |
+| SBS-13 | Phase 3 | Pending |
+| SBS-14 | Phase 3 | Pending |
+| SBS-15 | Phase 3 | Pending |
+| SBS-16 | Phase 4 | Pending |
+| SBS-17 | Phase 4 | Pending |
+| SBS-18 | Phase 4 | Pending |
+| SBS-19 | Phase 4 | Pending |
+| SBS-20 | Phase 4 | Pending |
+
+**Coverage:**
+- v1 requirements: 16 total
+- Mapped to phases: 16
+- Unmapped: 0 ✓
+
+---
+*Requirements defined: 2026-03-28*
+*Last updated: 2026-03-28 after research synthesis*
