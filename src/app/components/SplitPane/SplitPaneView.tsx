@@ -35,6 +35,9 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [previewContent, setPreviewContent] = useState<'source' | 'translation'>('source');
 
+  // 移动端 Tab 状态
+  const [mobileActiveTab, setMobileActiveTab] = useState<'source' | 'translation'>('source');
+
   // 滚动同步状态 (默认开启，持久化到 localStorage)
   const [scrollSyncEnabled, setScrollSyncEnabled] = useLocalStorage("splitPaneScrollSync", true);
 
@@ -153,7 +156,7 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
   );
 
   return (
-    <div className="h-full">
+    <div className="h-full flex flex-col">
       {/* 翻译操作栏 */}
       <Flex justify="space-between" align="center" className="mb-3">
         <Text type="secondary">
@@ -165,6 +168,7 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
             onClick={() => setScrollSyncEnabled(!scrollSyncEnabled)}
             type={scrollSyncEnabled ? "primary" : "default"}
             title={t("scrollSync")}
+            className="hidden md:inline-flex"
           >
             {t("scrollSync")}
           </Button>
@@ -186,11 +190,80 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
         </Flex>
       </Flex>
 
-      {/* 分屏容器 */}
-      <SplitPaneContainer
-        leftPanel={leftPanel}
-        rightPanel={rightPanel}
-      />
+      {/* 桌面端分屏容器 (>= 768px) */}
+      <div className="hidden md:block flex-1 min-h-0">
+        <SplitPaneContainer
+          leftPanel={leftPanel}
+          rightPanel={rightPanel}
+        />
+      </div>
+
+      {/* 移动端单面板视图 (< 768px) */}
+      <div className="block md:hidden flex-1 flex flex-col min-h-0">
+        {/* 移动端内容区域 */}
+        <Card className="flex-1 min-h-0" title={mobileActiveTab === 'source' ? t("sourceArea") : t("translationResult")}>
+          <Flex vertical className="h-full" gap="small">
+            <div className="flex-1 overflow-auto">
+              {mobileActiveTab === 'source' ? (
+                isPreviewMode ? (
+                  <MarkdownPreview content={sourceText} className="h-full" />
+                ) : (
+                  <TextArea
+                    value={sourceText}
+                    onChange={(e) => setSourceText(e.target.value)}
+                    placeholder={t("pasteUploadContent")}
+                    rows={8}
+                    className="h-full"
+                    aria-label={t("sourceArea")}
+                  />
+                )
+              ) : (
+                isPreviewMode ? (
+                  <MarkdownPreview
+                    content={previewContent === 'source' ? sourceText : translatedText}
+                    className="h-full"
+                  />
+                ) : (
+                  <TextArea
+                    value={translatedText}
+                    readOnly
+                    placeholder={t("translationResult")}
+                    rows={8}
+                    className="h-full"
+                    aria-label={t("translationResult")}
+                  />
+                )
+              )}
+            </div>
+            <Flex justify="end">
+              <Text type="secondary" className="!text-xs">
+                {mobileActiveTab === 'source'
+                  ? `${sourceText.length} ${t("charLabel")} / ${sourceText.split("\n").length} ${t("lineLabel")}`
+                  : `${translatedText.length} ${t("charLabel")} / ${translatedText.split("\n").length} ${t("lineLabel")}`
+                }
+              </Text>
+            </Flex>
+          </Flex>
+        </Card>
+
+        {/* 移动端底部 Tab Bar */}
+        <Flex justify="center" gap="middle" className="py-3 border-t bg-background">
+          <Button
+            type={mobileActiveTab === 'source' ? 'primary' : 'default'}
+            icon={<FileTextOutlined />}
+            onClick={() => setMobileActiveTab('source')}
+          >
+            {t("sourceArea")}
+          </Button>
+          <Button
+            type={mobileActiveTab === 'translation' ? 'primary' : 'default'}
+            icon={<GlobalOutlined />}
+            onClick={() => setMobileActiveTab('translation')}
+          >
+            {t("translationResult")}
+          </Button>
+        </Flex>
+      </div>
     </div>
   );
 };
