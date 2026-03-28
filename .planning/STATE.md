@@ -56,6 +56,8 @@ Plan: Not started
 | 同步方向 | 双向同步 — 滚动任一面板，另一面板同步 | Phase 3 Decided |
 | 同步默认状态 | 默认开启 | Phase 3 Decided |
 | 同步生效模式 | 文本模式和预览模式都启用 | Phase 3 Decided |
+| 移动端断点 | md (768px) | Phase 4 Decided |
+| 移动端布局 | 底部 Tab 切换「原文」/「译文」 | Phase 4 Decided |
 
 - [Phase 01]: SplitPaneContainer 组件创建完成：react-split + useLocalStorage 持久化
 - [Phase 01]: SplitPaneView maintains independent source text state (D-03: independent source input)
@@ -98,6 +100,11 @@ None yet.
 - **2026-03-29**: Phase 3 Plan 02 executed
   - Commit: 43ced5d
   - Summary: `.planning/phases/03-scroll-sync/03-02-SUMMARY.md`
+
+- **2026-03-29**: Phase 4 context gathered
+  - Phase: 04-polish
+  - Context file: `.planning/phases/04-polish/04-CONTEXT.md`
+  - Decisions: Mobile breakpoint md (768px), bottom tab switching
   - Added scroll sync toggle button with localStorage persistence
   - Wired up scroll container refs to left/right panels
 
