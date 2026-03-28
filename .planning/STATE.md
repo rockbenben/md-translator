@@ -46,6 +46,9 @@ Plan: Not started
 | 设置面板位置 | 分屏区使用翻译区的设置，无独立设置 | Phase 1 Decided |
 | 默认分屏比例 | 50:50 均等分割 | Phase 1 Decided |
 | 拖拽手柄 | 细线分隔线，hover高亮 | Phase 1 Decided |
+| 预览切换方式 | 全局图标按钮，切换左右面板为渲染模式 | Phase 2 Decided |
+| 预览内容 | 预览模式下左=渲染原文，右=渲染译文 | Phase 2 Decided |
+| Markdown 范围 | 基础 + GFM + LaTeX | Phase 2 Decided |
 
 - [Phase 01]: SplitPaneContainer 组件创建完成：react-split + useLocalStorage 持久化
 - [Phase 01]: SplitPaneView maintains independent source text state (D-03: independent source input)
@@ -69,10 +72,16 @@ None yet.
   - Context file: `.planning/phases/01-foundation/01-CONTEXT.md`
   - Decisions: Tab-based layout, settings from translation tab, 50:50 split, 细线 divider
 
+- **2026-03-28**: Phase 2 context gathered
+  - Phase: 2-panels-preview
+  - Context file: `.planning/phases/02-panels-preview/02-CONTEXT.md`
+  - Decisions: Global preview toggle, both panels render in preview, Basic+GFM+LaTeX
+
 ### Notes
 
 - Phase 1 discuss-phase completed with clear layout architecture decision
 - New "分屏预览" tab coexists with existing "翻译区" tab
+- Phase 2: Global preview toggle (icon button), both panels render in preview mode
 
 ---
 
