@@ -9,6 +9,7 @@
     "pasteUploadContent": "Or type/paste text here",
     "example": "Example",
     "basicTab": "Translation",
+    "splitPreviewTab": "Split Preview",
     "advancedTab": "API Settings",
     "sourceLanguage": "Source Language",
     "targetLanguage": "Target Language",

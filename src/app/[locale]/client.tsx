@@ -8,6 +8,7 @@ import MDTranslator from "./MDTranslator";
 import { useTranslations, useLocale } from "next-intl";
 import { TranslationProvider } from "@/app/components/TranslationContext";
 import { getDocUrl } from "@/app/utils";
+import SplitPaneView from "@/app/components/SplitPane/SplitPaneView";
 
 const TranslationSettings = dynamic(() => import("@/app/components/TranslationSettings"), {
   loading: () => (
@@ -36,6 +37,11 @@ const ClientPage = () => {
       key: "basic",
       label: t("basicTab"),
       children: <MDTranslator />,
+    },
+    {
+      key: "split",
+      label: t("splitPreviewTab"),
+      children: <SplitPaneView />,
     },
     {
       key: "advanced",
