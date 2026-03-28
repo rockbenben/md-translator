@@ -29,7 +29,7 @@
 3. 面板比例在页面刷新后保持不变
 
 **Plans:**
-- [ ] 01-01-PLAN.md — react-split 安装 + SplitPaneContainer 组件
+1/2 plans executed
 - [ ] 01-02-PLAN.md — SplitPaneView + Tab 集成
 
 ---
@@ -92,7 +92,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/2 | In progress | - |
+| 1. Foundation | 1/2 | In Progress|  |
 | 2. Panels + Preview | 0/5 | Not started | - |
 | 3. Scroll Sync | 0/5 | Not started | - |
 | 4. Polish | 0/2 | Not started | - |
