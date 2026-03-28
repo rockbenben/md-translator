@@ -18,12 +18,15 @@ MD Translator 现有编辑器增加左右分屏视图功能，左侧显示原始
 
 ### Active
 
-- [ ] **SBS-01**: 左右分屏编辑器，左侧原文，右侧译文
 - [ ] **SBS-02**: 原文与译文面板同步滚动
 - [ ] **SBS-03**: 右侧面板支持切换：译文文本 ↔ 预览模式
 - [ ] **SBS-04**: 预览模式进入专门的分屏视图
 - [ ] **SBS-05**: 预览可切换：预览原文 / 预览译文
 - [ ] **SBS-06**: 译文面板为只读（显示翻译结果）
+
+### Phase 1 Completed
+
+- ✓ **SBS-01**: 左右分屏编辑器，左侧原文，右侧译文 — Phase 1
 
 ### Out of Scope
 
@@ -56,4 +59,4 @@ MD Translator 现有编辑器增加左右分屏视图功能，左侧显示原始
 | 切换式预览 | 节省屏幕空间，避免固定三分屏 | — Pending |
 
 ---
-*Last updated: 2026-03-28 after feature requirements gathering*
+*Last updated: 2026-03-28 after Phase 1 completion*
