@@ -2,10 +2,11 @@
 
 import React, { useState, useCallback } from "react";
 import { Card, Button, Typography, Input, Flex, App } from "antd";
-import { GlobalOutlined } from "@ant-design/icons";
+import { GlobalOutlined, EyeOutlined, EyeInvisibleOutlined, FileTextOutlined } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import { useTranslationContext } from "@/app/components/TranslationContext";
 import { SplitPaneContainer } from "./index";
+import MarkdownPreview from "./MarkdownPreview";
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -27,6 +28,10 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
 
   // 分屏视图独立的原文文本状态
   const [sourceText, setSourceText] = useState("");
+
+  // 预览模式状态
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [previewContent, setPreviewContent] = useState<'source' | 'translation'>('source');
 
   // 从 useTranslationContext 获取翻译结果 (只读显示)
   // 注意: 这里实际上需要使用 translationContext 的 translatedText
@@ -65,18 +70,22 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
     }
   }, [sourceText, translateContent, translationMethod, targetLanguage, getCurrentConfig, message, t, onTranslate]);
 
-  // 左侧面板: 原文输入
+  // 左侧面板: 原文输入/预览
   const leftPanel = (
     <Card className="h-full" title={t("sourceArea")}>
       <Flex vertical className="h-full" gap="small">
-        <TextArea
-          value={sourceText}
-          onChange={(e) => setSourceText(e.target.value)}
-          placeholder={t("pasteUploadContent")}
-          rows={12}
-          className="flex-1"
-          aria-label={t("sourceArea")}
-        />
+        {isPreviewMode ? (
+          <MarkdownPreview content={sourceText} className="flex-1 overflow-auto" />
+        ) : (
+          <TextArea
+            value={sourceText}
+            onChange={(e) => setSourceText(e.target.value)}
+            placeholder={t("pasteUploadContent")}
+            rows={12}
+            className="flex-1"
+            aria-label={t("sourceArea")}
+          />
+        )}
         <Flex justify="end">
           <Text type="secondary" className="!text-xs">
             {sourceText.length} {t("charLabel")} / {sourceText.split("\n").length} {t("lineLabel")}
@@ -86,18 +95,42 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
     </Card>
   );
 
-  // 右侧面板: 译文显示
+  // 右侧面板: 译文显示/预览
   const rightPanel = (
-    <Card className="h-full" title={t("translationResult")}>
+    <Card
+      className="h-full"
+      title={
+        <Flex justify="space-between" align="center">
+          <span>{t("translationResult")}</span>
+          {isPreviewMode && (
+            <Button
+              type="text"
+              size="small"
+              icon={previewContent === 'source' ? <FileTextOutlined /> : <GlobalOutlined />}
+              onClick={() => setPreviewContent(previewContent === 'source' ? 'translation' : 'source')}
+            >
+              {previewContent === 'source' ? t("sourceArea") : t("translationResult")}
+            </Button>
+          )}
+        </Flex>
+      }
+    >
       <Flex vertical className="h-full" gap="small">
-        <TextArea
-          value={translatedText}
-          readOnly
-          placeholder={t("translationResult")}
-          rows={12}
-          className="flex-1"
-          aria-label={t("translationResult")}
-        />
+        {isPreviewMode ? (
+          <MarkdownPreview
+            content={previewContent === 'source' ? sourceText : translatedText}
+            className="flex-1 overflow-auto"
+          />
+        ) : (
+          <TextArea
+            value={translatedText}
+            readOnly
+            placeholder={t("translationResult")}
+            rows={12}
+            className="flex-1"
+            aria-label={t("translationResult")}
+          />
+        )}
         <Flex justify="end">
           <Text type="secondary" className="!text-xs">
             {translatedText.length} {t("charLabel")} / {translatedText.split("\n").length} {t("lineLabel")}
@@ -114,15 +147,23 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
         <Text type="secondary">
           {t("sourceArea")}: {sourceLanguage} → {targetLanguage}
         </Text>
-        <Button
-          type="primary"
-          icon={<GlobalOutlined spin={translateInProgress} />}
-          onClick={handleTranslate}
-          disabled={translateInProgress || !sourceText.trim()}
-          loading={translateInProgress}
-        >
-          {t("translate")}
-        </Button>
+        <Flex gap="small">
+          <Button
+            icon={isPreviewMode ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+            onClick={() => setIsPreviewMode(!isPreviewMode)}
+          >
+            {isPreviewMode ? t("textMode") : t("previewMode")}
+          </Button>
+          <Button
+            type="primary"
+            icon={<GlobalOutlined spin={translateInProgress} />}
+            onClick={handleTranslate}
+            disabled={translateInProgress || !sourceText.trim()}
+            loading={translateInProgress}
+          >
+            {t("translate")}
+          </Button>
+        </Flex>
       </Flex>
 
       {/* 分屏容器 */}

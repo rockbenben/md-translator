@@ -23,6 +23,8 @@
     "getApiKey": "获取 API Key",
     "charLabel": "字符",
     "lineLabel": "行",
+    "previewMode": "预览",
+    "textMode": "文本",
     "advancedSettings": "高级设置",
     "singleFileModeTooltip": "仅保留一个文件，新上传的文件会替换当前文件",
     "singleFileMode": "单文件模式",

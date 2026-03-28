@@ -23,6 +23,8 @@
     "getApiKey": "Get API Key",
     "charLabel": "Chars",
     "lineLabel": "Lines",
+    "previewMode": "Preview",
+    "textMode": "Text",
     "advancedSettings": "Advanced Settings",
     "singleFileModeTooltip": "Keep only one file; new uploads replace the current file",
     "singleFileMode": "Single File Mode",
