@@ -70,7 +70,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SBS-03 | Phase 1 | Pending |
 | SBS-04 | Phase 2 | Pending |
 | SBS-05 | Phase 2 | Pending |
-| SBS-06 | Phase 3 | Pending |
+| SBS-06 | Phase 2 | Pending |
 | SBS-07 | Phase 2 | Pending |
 | SBS-08 | Phase 2 | Pending |
 | SBS-09 | Phase 2 | Pending |
@@ -81,10 +81,6 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SBS-14 | Phase 3 | Pending |
 | SBS-15 | Phase 3 | Pending |
 | SBS-16 | Phase 4 | Pending |
-| SBS-17 | Phase 4 | Pending |
-| SBS-18 | Phase 4 | Pending |
-| SBS-19 | Phase 4 | Pending |
-| SBS-20 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 16 total
