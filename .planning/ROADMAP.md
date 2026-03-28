@@ -86,7 +86,8 @@
 1. 移动端设备显示降级后的单面板切换模式
 2. 翻译流程在移动端正常工作
 
-**Plans:** TBD
+**Plans:** 1 plan
+- [ ] 04-01-PLAN.md — 移动端响应式适配
 
 ---
 
@@ -97,7 +98,7 @@
 | 1. Foundation | 1/2 | In Progress|  |
 | 2. Panels + Preview | 0/2 | Not started | - |
 | 3. Scroll Sync | 2/2 | Completed | 2026-03-29 |
-| 4. Polish | 0/2 | Not started | - |
+| 4. Polish | 0/1 | In Progress | - |
 
 ---
 
