@@ -28,7 +28,9 @@
 2. 用户可以通过拖拽分隔线调整左右面板宽度
 3. 面板比例在页面刷新后保持不变
 
-**Plans:** TBD
+**Plans:**
+- [ ] 01-01-PLAN.md — react-split 安装 + SplitPaneContainer 组件
+- [ ] 01-02-PLAN.md — SplitPaneView + Tab 集成
 
 ---
 
@@ -90,7 +92,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Not started | - |
+| 1. Foundation | 0/2 | In progress | - |
 | 2. Panels + Preview | 0/5 | Not started | - |
 | 3. Scroll Sync | 0/5 | Not started | - |
 | 4. Polish | 0/2 | Not started | - |
