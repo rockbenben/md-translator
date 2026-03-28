@@ -49,7 +49,9 @@
 4. 预览模式可以切换：预览原文 / 预览译文
 5. 预览模式正确渲染 Markdown 格式（标题、列表、代码块、链接等）
 
-**Plans:** TBD
+**Plans:** 2 plans
+- [ ] 02-01-PLAN.md — 安装 Markdown 渲染依赖 + MarkdownPreview 组件
+- [ ] 02-02-PLAN.md — SplitPaneView 预览模式切换
 
 ---
 
@@ -93,7 +95,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/2 | In Progress|  |
-| 2. Panels + Preview | 0/5 | Not started | - |
+| 2. Panels + Preview | 0/2 | Not started | - |
 | 3. Scroll Sync | 0/5 | Not started | - |
 | 4. Polish | 0/2 | Not started | - |
 
