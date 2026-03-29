@@ -89,7 +89,7 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
       <div className="flex-1 min-h-0" data-scroll-sync="left">
         {isPreviewMode ? (
           <MarkdownPreview
-            content={previewContent === 'source' ? sourceText : translatedText}
+            content={sourceText}
             className="h-full"
           />
         ) : (
@@ -123,7 +123,7 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
       <div className="flex-1 min-h-0" data-scroll-sync="right">
         {isPreviewMode ? (
           <MarkdownPreview
-            content={previewContent === 'source' ? sourceText : translatedText}
+            content={translatedText}
             className="h-full"
           />
         ) : (
