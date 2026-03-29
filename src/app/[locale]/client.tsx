@@ -62,7 +62,7 @@ const ClientPage = () => {
         {tMarkdown("clientDescription")}
         {t("privacyNotice")}
       </Paragraph>
-      <Tabs activeKey={activeKey} onChange={handleTabChange} items={items} type="card" className="w-full" animated={{ inkBar: true, tabPane: true }} />
+      <Tabs activeKey={activeKey} onChange={handleTabChange} items={items} type="card" className="w-full h-full" animated={{ inkBar: true, tabPane: true }} />
     </TranslationProvider>
   );
 };

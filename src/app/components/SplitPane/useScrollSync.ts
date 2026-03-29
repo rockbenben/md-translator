@@ -34,6 +34,7 @@ export interface UseScrollSyncReturn {
  * - isScrolling flag prevents infinite scroll loops
  * - RAF batching for smooth 60fps performance
  * - data-index attribute matching for precise row-level sync
+ * - Percentage fallback for plain textareas
  * - Refs (not state) for DOM manipulation to avoid re-renders
  */
 export function useScrollSync(options: UseScrollSyncOptions = {}): UseScrollSyncReturn {
@@ -90,37 +91,60 @@ export function useScrollSync(options: UseScrollSyncOptions = {}): UseScrollSync
   );
 
   /**
-   * Scroll target container to match source element's position
-   * Uses data-index for precise row-level sync
+   * Check if container has data-index elements (for markdown content)
    */
-  const scrollToMatchingIndex = useCallback(
-    (sourceContainer: HTMLElement | null, targetContainer: HTMLElement | null) => {
-      if (!sourceContainer || !targetContainer || !enabled) return;
-
-      const firstVisibleElement = getFirstVisibleElement(sourceContainer);
-      const targetElement = findTargetElement(firstVisibleElement, targetContainer);
-
-      if (targetElement) {
-        targetElement.scrollIntoView({ behavior: "instant", block: "start" });
-      }
-    },
-    [enabled, getFirstVisibleElement, findTargetElement]
-  );
+  const hasDataIndexElements = useCallback((container: HTMLElement | null): boolean => {
+    if (!container) return false;
+    return container.querySelectorAll("[data-index]").length > 0;
+  }, []);
 
   /**
    * Scroll target container using percentage-based sync
-   * Fallback when data-index is not available
+   * Works for both divs and textareas
    */
   const scrollToPercentage = useCallback(
     (sourceContainer: HTMLElement | null, targetContainer: HTMLElement | null) => {
       if (!sourceContainer || !targetContainer || !enabled) return;
 
-      const scrollPercentage = sourceContainer.scrollTop / (sourceContainer.scrollHeight - sourceContainer.clientHeight);
-      const targetScrollTop = scrollPercentage * (targetContainer.scrollHeight - targetContainer.clientHeight);
+      // Calculate scroll percentage in source
+      const sourceScrollableHeight = sourceContainer.scrollHeight - sourceContainer.clientHeight;
+      const scrollPercentage = sourceScrollableHeight > 0 
+        ? sourceContainer.scrollTop / sourceScrollableHeight 
+        : 0;
+
+      // Apply same percentage to target
+      const targetScrollableHeight = targetContainer.scrollHeight - targetContainer.clientHeight;
+      const targetScrollTop = scrollPercentage * targetScrollableHeight;
 
       targetContainer.scrollTop = targetScrollTop;
     },
     [enabled]
+  );
+
+  /**
+   * Scroll target container to match source element's position
+   * Uses data-index for precise row-level sync when available
+   * Falls back to percentage-based sync for plain content (like textarea)
+   */
+  const scrollToMatchingIndex = useCallback(
+    (sourceContainer: HTMLElement | null, targetContainer: HTMLElement | null) => {
+      if (!sourceContainer || !targetContainer || !enabled) return;
+
+      // If source container has data-index elements (markdown preview), use precise sync
+      if (hasDataIndexElements(sourceContainer)) {
+        const firstVisibleElement = getFirstVisibleElement(sourceContainer);
+        const targetElement = findTargetElement(firstVisibleElement, targetContainer);
+
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: "instant", block: "start" });
+          return;
+        }
+      }
+
+      // Fall back to percentage-based sync for plain textareas
+      scrollToPercentage(sourceContainer, targetContainer);
+    },
+    [enabled, getFirstVisibleElement, findTargetElement, hasDataIndexElements, scrollToPercentage]
   );
 
   /**

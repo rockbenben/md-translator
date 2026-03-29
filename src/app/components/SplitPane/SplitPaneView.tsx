@@ -49,6 +49,7 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
   // 但由于分屏视图是独立输入，分屏视图需要自己调用翻译
   const {
     translatedText,
+    setTranslatedText,
     translateInProgress,
     translationMethod,
     sourceLanguage,
@@ -73,8 +74,9 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
     // 调用翻译
     try {
       const lines = sourceText.split("\n");
-      await translateContent(lines, translationMethod, targetLanguage);
-      // 翻译结果会通过 useTranslationContext 自动更新 translatedText
+      const translatedLines = await translateContent(lines, translationMethod, targetLanguage);
+      // 使用返回值更新 translatedText 状态
+      setTranslatedText(translatedLines.join("\n"));
       onTranslate?.();
     } catch (error) {
       message.error(t("translationError"));
@@ -83,27 +85,30 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
 
   // 左侧面板: 原文输入/预览
   const leftPanel = (
-    <Card className="h-full" title={t("sourceArea")}>
-      <Flex vertical className="h-full" gap="small">
-        <div ref={leftScrollRef as React.RefObject<HTMLDivElement>} className="flex-1 overflow-auto">
-          {isPreviewMode ? (
-            <MarkdownPreview content={sourceText} className="h-full" />
-          ) : (
+    <Card className="h-full shadow-md border-transparent hover:shadow-lg transition-shadow duration-300" title={t("sourceArea")} styles={{ body: { height: '100%', display: 'flex', flexDirection: 'column' } }}>
+      <div className="flex-1 min-h-0" data-scroll-sync="left">
+        {isPreviewMode ? (
+          <MarkdownPreview
+            content={previewContent === 'source' ? sourceText : translatedText}
+            className="h-full"
+          />
+        ) : (
+          <div ref={leftScrollRef as React.RefObject<HTMLDivElement>} className="h-full overflow-auto">
             <TextArea
               value={sourceText}
               onChange={(e) => setSourceText(e.target.value)}
               placeholder={t("pasteUploadContent")}
-              rows={12}
+              rows={16}
               className="h-full"
               aria-label={t("sourceArea")}
             />
-          )}
-        </div>
-        <Flex justify="end">
-          <Text type="secondary" className="!text-xs">
-            {sourceText.length} {t("charLabel")} / {sourceText.split("\n").length} {t("lineLabel")}
-          </Text>
-        </Flex>
+          </div>
+        )}
+      </div>
+      <Flex justify="end" className="shrink-0 pt-1">
+        <Text type="secondary" className="!text-xs">
+          {sourceText.length} {t("charLabel")} / {sourceText.split("\n").length} {t("lineLabel")}
+        </Text>
       </Flex>
     </Card>
   );
@@ -111,46 +116,33 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
   // 右侧面板: 译文显示/预览
   const rightPanel = (
     <Card
-      className="h-full"
-      title={
-        <Flex justify="space-between" align="center">
-          <span>{t("translationResult")}</span>
-          {isPreviewMode && (
-            <Button
-              type="text"
-              size="small"
-              icon={previewContent === 'source' ? <FileTextOutlined /> : <GlobalOutlined />}
-              onClick={() => setPreviewContent(previewContent === 'source' ? 'translation' : 'source')}
-            >
-              {previewContent === 'source' ? t("sourceArea") : t("translationResult")}
-            </Button>
-          )}
-        </Flex>
-      }
+      className="h-full shadow-md border-transparent hover:shadow-lg transition-shadow duration-300"
+      title={t("translationResult")}
+      styles={{ body: { height: '100%', display: 'flex', flexDirection: 'column' } }}
     >
-      <Flex vertical className="h-full" gap="small">
-        <div ref={rightScrollRef as React.RefObject<HTMLDivElement>} className="flex-1 overflow-auto">
-          {isPreviewMode ? (
-            <MarkdownPreview
-              content={previewContent === 'source' ? sourceText : translatedText}
-              className="h-full"
-            />
-          ) : (
+      <div className="flex-1 min-h-0" data-scroll-sync="right">
+        {isPreviewMode ? (
+          <MarkdownPreview
+            content={previewContent === 'source' ? sourceText : translatedText}
+            className="h-full"
+          />
+        ) : (
+          <div ref={rightScrollRef as React.RefObject<HTMLDivElement>} className="h-full overflow-auto">
             <TextArea
               value={translatedText}
               readOnly
               placeholder={t("translationResult")}
-              rows={12}
+              rows={16}
               className="h-full"
               aria-label={t("translationResult")}
             />
-          )}
-        </div>
-        <Flex justify="end">
-          <Text type="secondary" className="!text-xs">
-            {translatedText.length} {t("charLabel")} / {translatedText.split("\n").length} {t("lineLabel")}
-          </Text>
-        </Flex>
+          </div>
+        )}
+      </div>
+      <Flex justify="end" className="shrink-0 pt-1">
+        <Text type="secondary" className="!text-xs">
+          {translatedText.length} {t("charLabel")} / {translatedText.split("\n").length} {t("lineLabel")}
+        </Text>
       </Flex>
     </Card>
   );
@@ -158,7 +150,7 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
   return (
     <div className="h-full flex flex-col">
       {/* 翻译操作栏 */}
-      <Flex justify="space-between" align="center" className="mb-3">
+      <Flex justify="space-between" align="center" className="mb-3 shrink-0">
         <Text type="secondary">
           {t("sourceArea")}: {sourceLanguage} → {targetLanguage}
         </Text>
@@ -190,8 +182,8 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
         </Flex>
       </Flex>
 
-      {/* 桌面端分屏容器 (>= 768px) */}
-      <div className="hidden md:block flex-1 min-h-0">
+      {/* 桌面端分屏容器 (>= 768px) - 使用 flex-1 填充剩余高度 */}
+      <div className="hidden md:flex flex-1 min-h-0">
         <SplitPaneContainer
           leftPanel={leftPanel}
           rightPanel={rightPanel}
@@ -201,7 +193,7 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
       {/* 移动端单面板视图 (< 768px) */}
       <div className="block md:hidden flex-1 flex flex-col min-h-0">
         {/* 移动端内容区域 */}
-        <Card className="flex-1 min-h-0" title={mobileActiveTab === 'source' ? t("sourceArea") : t("translationResult")}>
+        <Card className="flex-1 min-h-0 shadow-md border-transparent hover:shadow-lg transition-shadow duration-300" title={mobileActiveTab === 'source' ? t("sourceArea") : t("translationResult")}>
           <Flex vertical className="h-full" gap="small">
             <div className="flex-1 overflow-auto">
               {mobileActiveTab === 'source' ? (
@@ -235,7 +227,7 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
                 )
               )}
             </div>
-            <Flex justify="end">
+            <Flex justify="end" className="shrink-0">
               <Text type="secondary" className="!text-xs">
                 {mobileActiveTab === 'source'
                   ? `${sourceText.length} ${t("charLabel")} / ${sourceText.split("\n").length} ${t("lineLabel")}`
@@ -247,18 +239,24 @@ const SplitPaneView: React.FC<SplitPaneViewProps> = ({ onTranslate }) => {
         </Card>
 
         {/* 移动端底部 Tab Bar */}
-        <Flex justify="center" gap="middle" className="py-3 border-t bg-background">
+        <Flex justify="center" gap="middle" className="py-3 border-t bg-background shrink-0">
           <Button
             type={mobileActiveTab === 'source' ? 'primary' : 'default'}
             icon={<FileTextOutlined />}
-            onClick={() => setMobileActiveTab('source')}
+            onClick={() => {
+              setMobileActiveTab('source');
+              setPreviewContent('source');
+            }}
           >
             {t("sourceArea")}
           </Button>
           <Button
             type={mobileActiveTab === 'translation' ? 'primary' : 'default'}
             icon={<GlobalOutlined />}
-            onClick={() => setMobileActiveTab('translation')}
+            onClick={() => {
+              setMobileActiveTab('translation');
+              setPreviewContent('translation');
+            }}
           >
             {t("translationResult")}
           </Button>

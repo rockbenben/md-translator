@@ -113,7 +113,22 @@ const MDTranslator = () => {
   });
   const [rawTranslationMode, setRawTranslationMode] = useLocalStorage("mdTranslatorRawMode", false);
   const [contextTranslation, setContextTranslation] = useLocalStorage("mdTranslatorContextMode", false);
-  const [activeCollapseKeys, setActiveCollapseKeys] = useLocalStorage<string[]>("mdTranslatorCollapseKeys", ["markdown"]);
+  const [activeCollapseKeys, setActiveCollapseKeys] = useState<string[]>(["markdown"]);
+  // Sync with localStorage after mount to avoid hydration mismatch
+  useEffect(() => {
+    const stored = localStorage.getItem("mdTranslatorCollapseKeys");
+    if (stored) {
+      try {
+        setActiveCollapseKeys(JSON.parse(stored));
+      } catch {
+        // ignore parse errors
+      }
+    }
+  }, []);
+  // Persist collapse keys to localStorage
+  useEffect(() => {
+    localStorage.setItem("mdTranslatorCollapseKeys", JSON.stringify(activeCollapseKeys));
+  }, [activeCollapseKeys]);
   const [multiLangModalOpen, setMultiLangModalOpen] = useState(false);
   const { customFileName, setCustomFileName, generateFileName } = useExportFilename("md");
 
@@ -318,7 +333,7 @@ const MDTranslator = () => {
   const config = getCurrentConfig();
 
   return (
-    <Spin spinning={isFileProcessing} description="Please wait..." size="large">
+    <Spin spinning={isFileProcessing} size="large">
       <Row gutter={[24, 24]}>
         {/* Left Column: Upload and Main Actions */}
         <Col xs={24} lg={14} xl={15}>

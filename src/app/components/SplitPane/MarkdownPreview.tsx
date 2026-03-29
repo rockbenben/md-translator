@@ -6,7 +6,8 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { oneDark, oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { useTheme } from "next-themes";
 import "katex/dist/katex.min.css";
 
 interface MarkdownPreviewProps {
@@ -26,6 +27,10 @@ interface MarkdownPreviewProps {
  * - data-index 属性用于滚动同步
  */
 const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content, className }) => {
+  const { resolvedTheme } = useTheme();
+  // 根据主题选择语法高亮样式
+  const syntaxStyle = resolvedTheme === "light" ? oneLight : oneDark;
+
   // 使用 ref 追踪每个元素类型的索引计数器
   // 使用 ref 而非 state 避免不必要的重渲染
   const countersRef = useRef({
@@ -96,7 +101,7 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content, className })
             if (isInline) {
               return (
                 <code
-                  className="px-1 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-sm font-mono"
+                  className="px-1 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-sm font-mono text-gray-800 dark:text-gray-200"
                   {...props}
                 >
                   {children}
@@ -106,10 +111,10 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content, className })
 
             return (
               <SyntaxHighlighter
-                style={oneDark}
+                style={syntaxStyle}
                 language={match ? match[1] : "text"}
                 PreTag="div"
-                className="!my-2 !rounded-lg !bg-gray-900"
+                className="!my-2 !rounded-lg"
               >
                 {String(children).replace(/\n$/, "")}
               </SyntaxHighlighter>

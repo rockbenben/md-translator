@@ -1,9 +1,9 @@
 ---
-status: testing
+status: diagnosed
 phase: milestone-v1.0
 source: [01-01-SUMMARY.md, 01-02-SUMMARY.md, 02-01-SUMMARY.md, 02-02-SUMMARY.md, 03-01-SUMMARY.md, 03-02-SUMMARY.md, 04-01-SUMMARY.md]
 started: 2026-03-29T00:30:00Z
-updated: 2026-03-29T00:46:00Z
+updated: 2026-03-29T00:50:00Z
 ---
 
 ## Current Test
@@ -90,31 +90,20 @@ skipped: 0
 
 ## Gaps
 
-- truth: "Dragging the divider between panels adjusts the split ratio. Default is 50:50."
-  status: failed
-  reason: "User reported: 无法拖动调节分屏比例"
-  severity: major
-  test: 4
-  artifacts: []
-  missing: []
-- truth: "After dragging to a new ratio and refreshing the page, the split ratio should remain at the adjusted position."
-  status: failed
-  reason: "User reported: 无法拖动调节分屏比例"
-  severity: major
-  test: 5
-  artifacts: []
-  missing: []
-- truth: "On mobile (<768px), the split pane is replaced with a single panel and bottom tab buttons (\"原文\" / \"译文\") for switching."
-  status: failed
-  reason: "User reported: 在手机移动端，翻译后预览渲染，点击下方切换到翻译结果，但渲染的还是原文，而不是译文"
-  severity: major
-  test: 13
-  artifacts: []
-  missing: []
-- truth: "Preview mode and text mode work correctly on mobile, with the same toggle button."
-  status: failed
-  reason: "User reported: 在手机移动端，翻译后预览渲染，点击下方切换到翻译结果，但渲染的还是原文，而不是译文"
-  severity: major
-  test: 14
-  artifacts: []
-  missing: []
+### Gap 1: 分屏比例拖动失效
+- **truth**: "Dragging the divider between panels adjusts the split ratio. Default is 50:50."
+- **status**: diagnosed
+- **reason**: "overflow: hidden 创建 BFC，float 布局与 react-split gutter 事件捕获冲突"
+- **severity**: major
+- **test**: 4
+- **root_cause**: "SplitPaneContainer.tsx 中的 CSS 样式 overflow: hidden 与 react-split 的 gutter 事件捕获机制冲突"
+- **fix_plan**: "修改 CSS 布局，使用 flexbox 替代 float，移除 overflow: hidden"
+
+### Gap 2: 移动端预览切换错误
+- **truth**: "On mobile (<768px), clicking '译文' tab shows source instead of translation in preview mode"
+- **status**: diagnosed
+- **reason**: "previewContent 状态只在桌面端预览切换按钮更新，移动端 Tab 点击只更新 mobileActiveTab"
+- **severity**: major
+- **test**: 13, 14
+- **root_cause**: "移动端点击 Tab 时只更新 mobileActiveTab，不更新 previewContent，导致预览时永远走 source 分支"
+- **fix_plan**: "在移动端点击'译文' Tab 时，同步更新 previewContent 为 'translation'"

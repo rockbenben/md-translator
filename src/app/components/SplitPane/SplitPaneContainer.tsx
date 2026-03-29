@@ -39,7 +39,7 @@ export default function SplitPaneContainer({
 
   return (
     <Split
-      className={`split-pane-container ${className}`}
+      className={`split-pane-container split-horizontal h-full w-full ${className}`}
       sizes={sizes}
       minSize={minSize}
       gutterSize={gutterSize}
