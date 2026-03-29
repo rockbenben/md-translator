@@ -151,7 +151,7 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content, className })
           th({ children, ...props }) {
             return (
               <th
-                className="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 font-semibold text-left"
+                className="px-4 py-2 bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 font-semibold text-left"
                 {...props}
               >
                 {children}
