@@ -115,7 +115,13 @@
     "rawTranslationModeTooltip": "ข้ามการวิเคราะห์ Markdown; เอาต์พุตไม่ต้องรักษารูปแบบอย่างเข้มงวด",
     "rawTranslationMode": "ข้ามการจัดรูปแบบ",
     "tLinkText": "แปลข้อความในลิงก์",
-    "textWithPlaceholders": "ข้อความต้นฉบับ (พร้อม placeholder)"
+    "textWithPlaceholders": "ข้อความต้นฉบับ (พร้อม placeholder)",
+    "faq1q": "รักษาบล็อกโค้ดเมื่อแปล Markdown ได้อย่างไร?",
+    "faq1a": "เครื่องมือตรวจจับและข้ามบล็อกโค้ด สูตร LaTeX และลิงก์โดยอัตโมมัติ แปลเฉพาะข้อความ",
+    "faq2q": "เครื่องมือไหนแปลบทความเทคนิคเป็นชุด?",
+    "faq2a": "MDTranslator รองรับอัปโหลดหลายไฟล์ Markdown พร้อมแปลคลิกเดียว รักษา Front Matter",
+    "faq3q": "เครื่องมือแปล Markdown ฟรีที่ดีที่สุด?",
+    "faq3a": "MDTranslator ฟรีและโอเพนซอร์ส รองรับ Google และ AI รักษาไวยากรณ์ Markdown อัจฉริยะ"
   },
   "TranslationSettings": {
     "docs": "เอกสาร",
@@ -148,9 +154,9 @@
     "delayTime": "หน่วงเวลา",
     "CurrentTransConfig": "การตั้งค่าปัจจุบัน",
     "useRelay": "API Relay",
-    "useRelayTooltip": "เปิด API relay สำหรับ DeepSeek เมื่อพบข้อผิดพลาด CORS หรือ 403",
+    "useRelayTooltip": "เปิด API relay เมื่อพบข้อผิดพลาด CORS หรือ 403",
     "enableThinking": "เปิดใช้งานโหมดการคิด",
-    "enableThinkingTooltip": "เปิดใช้งานโหมดการคิดสำหรับโมเดลที่รองรับ (Kimi, DeepSeek, GLM, GPT-OSS)",
+    "enableThinkingTooltip": "เปิดใช้งานโหมดการคิด / การให้เหตุผลสำหรับโมเดลที่รองรับ",
     "presetSelect": "เลือกพรีเซ็ต",
     "presetSave": "บันทึกพรีเซ็ต",
     "presetDelete": "ลบพรีเซ็ต",
@@ -162,7 +168,11 @@
     "presetUpdate": "อัปเดตพรีเซ็ต",
     "presetUpdated": "อัปเดตพรีเซ็ตแล้ว",
     "presetDeleteConfirm": "ลบพรีเซ็ตนี้หรือไม่?",
-    "qwenMtDomains": "พรอมต์โดเมน (ภาษาอังกฤษเท่านั้น)"
+    "qwenMtDomains": "พรอมต์โดเมน (ภาษาอังกฤษเท่านั้น)",
+    "selectService": "เลือกบริการแปล",
+    "configuredServices": "ตั้งค่าแล้ว",
+    "globalPrompts": "พรอมต์ LLM (ทั่วทั้งระบบ)",
+    "globalPromptsExtra": "บริการ LLM ทั้งหมดใช้พรอมต์ชุดนี้ร่วมกัน การเปลี่ยนบริการจะไม่รีเซ็ต"
   },
   "tools": {
     "subtitleTranslator": {

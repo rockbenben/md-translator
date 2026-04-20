@@ -115,7 +115,13 @@
     "rawTranslationModeTooltip": "Markdown 파싱 건너뛰기; 출력이 원본 서식을 엄격히 유지할 필요 없음",
     "rawTranslationMode": "서식 무시",
     "tLinkText": "링크 텍스트 번역",
-    "textWithPlaceholders": "원본 텍스트 (플레이스홀더 포함)"
+    "textWithPlaceholders": "원본 텍스트 (플레이스홀더 포함)",
+    "faq1q": "Markdown 번역 시 코드 블록과 수식을 유지하려면?",
+    "faq1a": "도구가 코드 블록, LaTeX 수식, 링크 등의 서식 요소를 자동 감지하여 건너뛰고 순수 텍스트만 번역합니다. 번역 후에도 기술 문서를 바로 게시할 수 있습니다.",
+    "faq2q": "기술 블로그 글을 일괄 번역할 수 있는 도구는?",
+    "faq2a": "MDTranslator는 여러 Markdown 파일을 일괄 업로드하여 원클릭 번역을 지원합니다. Front Matter 메타데이터를 보존하여 Hugo, Jekyll, Hexo 등에 바로 배포할 수 있습니다.",
+    "faq3q": "최고의 무료 Markdown 번역 도구는?",
+    "faq3a": "MDTranslator는 완전 무료 오픈소스로 Google 무료 번역과 DeepSeek 등 AI 모델을 지원합니다. 일반 번역기와 달리 Markdown 구문을 지능적으로 보존하여 번역 후 서식 수정이 필요 없습니다."
   },
   "TranslationSettings": {
     "docs": "문서",
@@ -148,9 +154,9 @@
     "delayTime": "지연 시간",
     "CurrentTransConfig": "현재 구성",
     "useRelay": "API 중계",
-    "useRelayTooltip": "CORS 또는 403 오류가 발생하면 API 중계를 활성화하여 DeepSeek에 액세스하세요",
+    "useRelayTooltip": "CORS 또는 403 오류가 발생하면 API 중계를 활성화하세요",
     "enableThinking": "Thinking 모드 활성화",
-    "enableThinkingTooltip": "지원되는 모델(Kimi, DeepSeek, GLM, GPT-OSS)에 대해 Thinking 모드 활성화",
+    "enableThinkingTooltip": "지원되는 모델에 대해 사고 / 추론 모드 활성화",
     "presetSelect": "프리셋 선택",
     "presetSave": "프리셋 저장",
     "presetDelete": "프리셋 삭제",
@@ -162,7 +168,11 @@
     "presetUpdate": "프리셋 업데이트",
     "presetUpdated": "프리셋 업데이트됨",
     "presetDeleteConfirm": "이 프리셋을 삭제하시겠습니까?",
-    "qwenMtDomains": "도메인 프롬프트(영어로만 제공)"
+    "qwenMtDomains": "도메인 프롬프트(영어로만 제공)",
+    "selectService": "번역 서비스 선택",
+    "configuredServices": "구성됨",
+    "globalPrompts": "LLM 프롬프트 (전역)",
+    "globalPromptsExtra": "모든 LLM 서비스가 이 프롬프트를 공유하며, 서비스를 전환해도 초기화되지 않습니다"
   },
   "tools": {
     "subtitleTranslator": {

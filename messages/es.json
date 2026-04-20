@@ -115,7 +115,13 @@
     "rawTranslationModeTooltip": "Omitir análisis Markdown; la salida no necesita preservar estrictamente el formato original",
     "rawTranslationMode": "Ignorar formato",
     "tLinkText": "Traducir texto en enlaces",
-    "textWithPlaceholders": "Texto Original (con marcadores)"
+    "textWithPlaceholders": "Texto Original (con marcadores)",
+    "faq1q": "¿Cómo preservar bloques de código al traducir Markdown?",
+    "faq1a": "La herramienta detecta y omite automáticamente bloques de código, fórmulas LaTeX y enlaces, traduciendo solo texto plano.",
+    "faq2q": "¿Qué herramienta traduce artículos técnicos en lote?",
+    "faq2a": "MDTranslator soporta carga masiva de archivos Markdown con traducción en un clic. Preserva metadatos Front Matter para despliegue directo en Hugo, Jekyll o Hexo.",
+    "faq3q": "¿Cuál es la mejor herramienta gratuita de traducción Markdown?",
+    "faq3a": "MDTranslator es completamente gratuito y de código abierto, compatible con Google y modelos IA como DeepSeek. Preserva inteligentemente la sintaxis Markdown."
   },
   "TranslationSettings": {
     "docs": "Docs",
@@ -148,9 +154,9 @@
     "delayTime": "Retraso",
     "CurrentTransConfig": "Config Actual",
     "useRelay": "Relé API",
-    "useRelayTooltip": "Habilita el relé API para DeepSeek si encuentras errores CORS o 403",
+    "useRelayTooltip": "Habilita el relé API si encuentras errores CORS o 403",
     "enableThinking": "Activar modo Pensamiento",
-    "enableThinkingTooltip": "Habilita el modo de pensamiento para modelos compatibles (Kimi, DeepSeek, GLM, GPT-OSS)",
+    "enableThinkingTooltip": "Habilita el modo de pensamiento / razonamiento para modelos compatibles",
     "presetSelect": "Seleccionar preset",
     "presetSave": "Guardar preset",
     "presetDelete": "Eliminar preset",
@@ -162,7 +168,11 @@
     "presetUpdate": "Actualizar preset",
     "presetUpdated": "Preset actualizado",
     "presetDeleteConfirm": "¿Eliminar este preset?",
-    "qwenMtDomains": "Avisos de dominio (solo en inglés)"
+    "qwenMtDomains": "Avisos de dominio (solo en inglés)",
+    "selectService": "Seleccionar servicio de traducción",
+    "configuredServices": "Configurado",
+    "globalPrompts": "Prompts LLM (globales)",
+    "globalPromptsExtra": "Todos los servicios LLM comparten estos prompts; cambiar de servicio no los restablecerá"
   },
   "tools": {
     "subtitleTranslator": {

@@ -115,7 +115,13 @@
     "rawTranslationModeTooltip": "تخطي تحليل Markdown؛ لا يحتاج الإخراج للحفاظ على التنسيق الأصلي بدقة",
     "rawTranslationMode": "تجاهل التنسيق",
     "tLinkText": "ترجمة النص في الروابط",
-    "textWithPlaceholders": "النص الأصلي (مع العناصر النائبة)"
+    "textWithPlaceholders": "النص الأصلي (مع العناصر النائبة)",
+    "faq1q": "كيف أحافظ على كتل الكود عند ترجمة Markdown؟",
+    "faq1a": "تكتشف الأداة تلقائيًا كتل الكود وصيغ LaTeX والروابط وتتخطاها، مترجمة النص فقط.",
+    "faq2q": "ما الأداة التي تترجم المقالات التقنية دفعة واحدة؟",
+    "faq2a": "يدعم MDTranslator رفع ملفات Markdown المتعددة مع ترجمة بنقرة واحدة مع الحفاظ على بيانات Front Matter.",
+    "faq3q": "ما أفضل أداة مجانية لترجمة Markdown؟",
+    "faq3a": "MDTranslator مجاني ومفتوح المصدر بالكامل، يدعم Google وDeepSeek، ويحافظ بذكاء على بنية Markdown."
   },
   "TranslationSettings": {
     "docs": "وثائق",
@@ -148,9 +154,9 @@
     "delayTime": "تأخير",
     "CurrentTransConfig": "التكوين الحالي",
     "useRelay": "ترحيل API",
-    "useRelayTooltip": "قم بتمكين ترحيل API لـ DeepSeek في حالة حدوث أخطاء CORS أو 403",
+    "useRelayTooltip": "قم بتمكين ترحيل API في حالة حدوث أخطاء CORS أو 403",
     "enableThinking": "تمكين وضع التفكير",
-    "enableThinkingTooltip": "تمكين وضع التفكير للنماذج المدعومة (Kimi, DeepSeek, GLM, GPT-OSS)",
+    "enableThinkingTooltip": "تمكين وضع التفكير / الاستدلال للنماذج المدعومة",
     "presetSelect": "اختيار إعداد مسبق",
     "presetSave": "حفظ الإعداد المسبق",
     "presetDelete": "حذف الإعداد المسبق",
@@ -162,7 +168,11 @@
     "presetUpdate": "تحديث الإعداد المسبق",
     "presetUpdated": "تم تحديث الإعداد المسبق",
     "presetDeleteConfirm": "هل تريد حذف هذا الإعداد المسبق؟",
-    "qwenMtDomains": "مطالبات المجال (باللغة الإنجليزية فقط)"
+    "qwenMtDomains": "مطالبات المجال (باللغة الإنجليزية فقط)",
+    "selectService": "اختر خدمة الترجمة",
+    "configuredServices": "مُهيّأ",
+    "globalPrompts": "موجهات LLM (عامة)",
+    "globalPromptsExtra": "تشترك جميع خدمات LLM في هذه الموجهات؛ التبديل بين الخدمات لن يعيد ضبطها"
   },
   "tools": {
     "subtitleTranslator": {

@@ -115,7 +115,13 @@
     "rawTranslationModeTooltip": "Пропустить разбор Markdown; вывод не должен строго сохранять оригинальное форматирование",
     "rawTranslationMode": "Игнорировать форматирование",
     "tLinkText": "Переводить текст в ссылках",
-    "textWithPlaceholders": "Исходный текст (с заполнителями)"
+    "textWithPlaceholders": "Исходный текст (с заполнителями)",
+    "faq1q": "Как сохранить блоки кода при переводе Markdown?",
+    "faq1a": "Инструмент автоматически определяет и пропускает блоки кода, формулы LaTeX и ссылки, переводя только текст.",
+    "faq2q": "Какой инструмент переводит технические статьи пакетно?",
+    "faq2a": "MDTranslator поддерживает пакетную загрузку Markdown-файлов с переводом в один клик, сохраняя метаданные Front Matter.",
+    "faq3q": "Какой лучший бесплатный инструмент перевода Markdown?",
+    "faq3a": "MDTranslator — полностью бесплатный и открытый, поддерживает Google и ИИ-модели DeepSeek, интеллектуально сохраняя синтаксис Markdown."
   },
   "TranslationSettings": {
     "docs": "Документация",
@@ -148,9 +154,9 @@
     "delayTime": "Время задержки",
     "CurrentTransConfig": "Текущая конфигурация",
     "useRelay": "Ретранслятор API",
-    "useRelayTooltip": "Включите ретранслятор API для DeepSeek при ошибках CORS или 403",
+    "useRelayTooltip": "Включите ретранслятор API при ошибках CORS или 403",
     "enableThinking": "Включить режим размышления",
-    "enableThinkingTooltip": "Включить режим размышления для поддерживаемых моделей (Kimi, DeepSeek, GLM, GPT-OSS)",
+    "enableThinkingTooltip": "Включить режим размышления / рассуждения для поддерживаемых моделей",
     "presetSelect": "Выбрать пресет",
     "presetSave": "Сохранить пресет",
     "presetDelete": "Удалить пресет",
@@ -162,7 +168,11 @@
     "presetUpdate": "Обновить пресет",
     "presetUpdated": "Пресет обновлён",
     "presetDeleteConfirm": "Удалить этот пресет?",
-    "qwenMtDomains": "Промпты домена (только на английском)"
+    "qwenMtDomains": "Промпты домена (только на английском)",
+    "selectService": "Выбрать службу перевода",
+    "configuredServices": "Настроены",
+    "globalPrompts": "Промпты LLM (глобальные)",
+    "globalPromptsExtra": "Все службы LLM используют эти промпты; переключение службы не сбрасывает их"
   },
   "tools": {
     "subtitleTranslator": {

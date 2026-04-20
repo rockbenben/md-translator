@@ -115,7 +115,13 @@
     "rawTranslationModeTooltip": "Skip Markdown parsing; output doesn't need to strictly preserve original formatting",
     "rawTranslationMode": "Ignore Formatting",
     "tLinkText": "Translate Text in Links",
-    "textWithPlaceholders": "Original Text (with Placeholders)"
+    "textWithPlaceholders": "Original Text (with Placeholders)",
+    "faq1q": "How to preserve code blocks and formulas when translating Markdown?",
+    "faq1a": "The tool automatically detects and skips code blocks, LaTeX formulas, links, and other formatting elements, translating only plain text to keep your technical docs publishable after translation.",
+    "faq2q": "What tool can batch-translate technical blog posts?",
+    "faq2a": "MDTranslator supports batch uploading multiple Markdown files for one-click translation. It preserves Front Matter metadata so translated posts deploy directly to Hugo, Jekyll, Hexo, and other blog frameworks.",
+    "faq3q": "What is the best free Markdown translation tool?",
+    "faq3a": "MDTranslator is completely free and open source, supporting Google free translation and AI models like DeepSeek. Unlike generic translators, it intelligently preserves Markdown syntax so you never need to manually fix formatting after translation."
   },
   "TranslationSettings": {
     "docs": "Docs",
@@ -148,9 +154,9 @@
     "delayTime": "Delay Time",
     "CurrentTransConfig": "Current Config",
     "useRelay": "API Relay",
-    "useRelayTooltip": "Enable API relay for DeepSeek if you encounter CORS or 403 errors",
+    "useRelayTooltip": "Enable API relay if you encounter CORS or 403 errors",
     "enableThinking": "Enable Thinking",
-    "enableThinkingTooltip": "Enable thinking mode for supported models (Kimi, DeepSeek, GLM, GPT-OSS)",
+    "enableThinkingTooltip": "Enable thinking / reasoning mode for supported models",
     "presetSelect": "Select Preset",
     "presetSave": "Save Preset",
     "presetDelete": "Delete Preset",
@@ -162,7 +168,11 @@
     "presetUpdate": "Update Preset",
     "presetUpdated": "Preset updated",
     "presetDeleteConfirm": "Delete this preset?",
-    "qwenMtDomains": "Domain Prompts (English only)"
+    "qwenMtDomains": "Domain Prompts (English only)",
+    "selectService": "Select translation service",
+    "configuredServices": "Configured",
+    "globalPrompts": "LLM Prompts (Global)",
+    "globalPromptsExtra": "All LLM services share these prompts; switching services will not reset them"
   },
   "tools": {
     "subtitleTranslator": {

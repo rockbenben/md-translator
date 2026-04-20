@@ -115,7 +115,13 @@
     "rawTranslationModeTooltip": "Markdown-Parsing überspringen; Ausgabe muss nicht streng der Originalformatierung entsprechen",
     "rawTranslationMode": "Formatierung ignorieren",
     "tLinkText": "Text in Links übersetzen",
-    "textWithPlaceholders": "Originaltext (mit Platzhaltern)"
+    "textWithPlaceholders": "Originaltext (mit Platzhaltern)",
+    "faq1q": "Wie bleiben Codeblöcke bei der Markdown-Übersetzung erhalten?",
+    "faq1a": "Das Tool erkennt automatisch Codeblöcke, LaTeX-Formeln und Links und überspringt sie, sodass nur reiner Text übersetzt wird.",
+    "faq2q": "Welches Tool kann technische Blogbeiträge im Stapel übersetzen?",
+    "faq2a": "MDTranslator unterstützt den Stapel-Upload mehrerer Markdown-Dateien mit Ein-Klick-Übersetzung. Front-Matter-Metadaten bleiben für direktes Deployment auf Hugo, Jekyll oder Hexo erhalten.",
+    "faq3q": "Was ist das beste kostenlose Markdown-Übersetzungstool?",
+    "faq3a": "MDTranslator ist komplett kostenlos und Open Source, unterstützt Google und KI-Modelle wie DeepSeek. Im Gegensatz zu generischen Übersetzern wird die Markdown-Syntax intelligent beibehalten."
   },
   "TranslationSettings": {
     "docs": "Dokumentation",
@@ -148,9 +154,9 @@
     "delayTime": "Verzögerungszeit",
     "CurrentTransConfig": "Aktuelle Konfiguration",
     "useRelay": "API-Relay",
-    "useRelayTooltip": "Aktivieren Sie API-Relay für DeepSeek bei CORS- oder 403-Fehlern",
+    "useRelayTooltip": "Aktivieren Sie API-Relay bei CORS- oder 403-Fehlern",
     "enableThinking": "Thinking-Modus aktivieren",
-    "enableThinkingTooltip": "Aktiviert den Thinking-Modus für unterstützte Modelle (Kimi, DeepSeek, GLM, GPT-OSS)",
+    "enableThinkingTooltip": "Aktiviert den Thinking- / Reasoning-Modus für unterstützte Modelle",
     "presetSelect": "Voreinstellung wählen",
     "presetSave": "Voreinstellung speichern",
     "presetDelete": "Voreinstellung löschen",
@@ -162,7 +168,11 @@
     "presetUpdate": "Voreinstellung aktualisieren",
     "presetUpdated": "Voreinstellung aktualisiert",
     "presetDeleteConfirm": "Diese Voreinstellung löschen?",
-    "qwenMtDomains": "Domänen-Prompts (nur Englisch)"
+    "qwenMtDomains": "Domänen-Prompts (nur Englisch)",
+    "selectService": "Übersetzungsdienst auswählen",
+    "configuredServices": "Konfiguriert",
+    "globalPrompts": "LLM-Prompts (global)",
+    "globalPromptsExtra": "Alle LLM-Dienste teilen sich diese Prompts; ein Dienstwechsel setzt sie nicht zurück"
   },
   "tools": {
     "subtitleTranslator": {

@@ -115,7 +115,13 @@
     "rawTranslationModeTooltip": "Markdown ayrıştırmasını atla; çıktının orijinal biçimlendirmeyi kesinlikle koruması gerekmez",
     "rawTranslationMode": "Biçimlendirmeyi Yoksay",
     "tLinkText": "Bağlantılardaki Metni Çevir",
-    "textWithPlaceholders": "Orijinal Metin (yer tutucularla)"
+    "textWithPlaceholders": "Orijinal Metin (yer tutucularla)",
+    "faq1q": "Markdown çevirirken kod blokları nasıl korunur?",
+    "faq1a": "Araç kod bloklarını, LaTeX formüllerini ve bağlantıları otomatik algılayıp atlar.",
+    "faq2q": "Teknik blog yazılarını toplu çeviren araç hangisi?",
+    "faq2a": "MDTranslator birden fazla Markdown dosyasını tek tıkla çevirir, Front Matter'ı korur.",
+    "faq3q": "En iyi ücretsiz Markdown çeviri aracı hangisi?",
+    "faq3a": "MDTranslator tamamen ücretsiz ve açık kaynaklıdır, Markdown sözdizimini akıllıca korur."
   },
   "TranslationSettings": {
     "docs": "Belgeler",
@@ -148,9 +154,9 @@
     "delayTime": "Gecikme",
     "CurrentTransConfig": "Mevcut Yapılandırma",
     "useRelay": "API Aktarıcı",
-    "useRelayTooltip": "CORS veya 403 hatalarında DeepSeek için API aktarıcıyı etkinleştirin",
+    "useRelayTooltip": "CORS veya 403 hatalarında API aktarıcıyı etkinleştirin",
     "enableThinking": "Düşünme Modunu Etkinleştir",
-    "enableThinkingTooltip": "Desteklenen modeller için düşünme modunu etkinleştir (Kimi, DeepSeek, GLM, GPT-OSS)",
+    "enableThinkingTooltip": "Desteklenen modeller için düşünme / akıl yürütme modunu etkinleştir",
     "presetSelect": "Ön Ayar Seç",
     "presetSave": "Ön Ayarı Kaydet",
     "presetDelete": "Ön Ayarı Sil",
@@ -162,7 +168,11 @@
     "presetUpdate": "Ön Ayarı Güncelle",
     "presetUpdated": "Ön ayar güncellendi",
     "presetDeleteConfirm": "Bu ön ayarı silmek istiyor musunuz?",
-    "qwenMtDomains": "Etki Alanı İpuçları (yalnızca İngilizce)"
+    "qwenMtDomains": "Etki Alanı İpuçları (yalnızca İngilizce)",
+    "selectService": "Çeviri hizmeti seç",
+    "configuredServices": "Yapılandırılmış",
+    "globalPrompts": "LLM İstemleri (global)",
+    "globalPromptsExtra": "Tüm LLM hizmetleri bu istemleri paylaşır; hizmet değiştirmek onları sıfırlamaz"
   },
   "tools": {
     "subtitleTranslator": {

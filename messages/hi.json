@@ -115,7 +115,13 @@
     "rawTranslationModeTooltip": "Markdown पार्सिंग को स्किप करें; आउटपुट को मूल फॉर्मेटिंग को सख्ती से संरक्षित करने की आवश्यकता नहीं",
     "rawTranslationMode": "प्रारूपण की उपेक्षा करें",
     "tLinkText": "लिंक में टेक्स्ट का अनुवाद करें",
-    "textWithPlaceholders": "मूल पाठ (प्लेसहोल्डर के साथ)"
+    "textWithPlaceholders": "मूल पाठ (प्लेसहोल्डर के साथ)",
+    "faq1q": "Markdown अनुवाद में कोड ब्लॉक कैसे सुरक्षित रखें?",
+    "faq1a": "टूल स्वचालित रूप से कोड ब्लॉक, LaTeX सूत्र और लिंक का पता लगाता है और छोड़ देता है, केवल सादे टेक्स्ट का अनुवाद करता है।",
+    "faq2q": "तकनीकी ब्लॉग पोस्ट का बैच अनुवाद कौन सा टूल करता है?",
+    "faq2a": "MDTranslator कई Markdown फाइलों के बैच अपलोड और एक-क्लिक अनुवाद का समर्थन करता है। Front Matter मेटाडेटा संरक्षित रहता है।",
+    "faq3q": "सबसे अच्छा मुफ्त Markdown अनुवाद टूल कौन सा है?",
+    "faq3a": "MDTranslator पूरी तरह मुफ्त और ओपन सोर्स है, Google और DeepSeek जैसे AI मॉडल समर्थित हैं।"
   },
   "TranslationSettings": {
     "docs": "दस्तावेज़",
@@ -148,9 +154,9 @@
     "delayTime": "विलंब",
     "CurrentTransConfig": "वर्तमान कॉन्फ़िगरेशन",
     "useRelay": "API रिले",
-    "useRelayTooltip": "CORS या 403 त्रुटियों के मामले में DeepSeek के लिए API रिले सक्षम करें",
+    "useRelayTooltip": "CORS या 403 त्रुटि होने पर API रिले सक्षम करें",
     "enableThinking": "Thinking मोड सक्षम करें",
-    "enableThinkingTooltip": "समर्थित मॉडल (Kimi, DeepSeek, GLM, GPT-OSS) के लिए Thinking मोड सक्षम करें",
+    "enableThinkingTooltip": "समर्थित मॉडल के लिए सोचने / तर्क मोड सक्षम करें",
     "presetSelect": "प्रीसेट चुनें",
     "presetSave": "प्रीसेट सहेजें",
     "presetDelete": "प्रीसेट हटाएं",
@@ -162,7 +168,11 @@
     "presetUpdate": "प्रीसेट अपडेट करें",
     "presetUpdated": "प्रीसेट अपडेट हो गया",
     "presetDeleteConfirm": "क्या आप इस प्रीसेट को हटाना चाहते हैं?",
-    "qwenMtDomains": "डोमेन प्रॉम्प्ट (केवल अंग्रेजी)"
+    "qwenMtDomains": "डोमेन प्रॉम्प्ट (केवल अंग्रेजी)",
+    "selectService": "अनुवाद सेवा चुनें",
+    "configuredServices": "कॉन्फ़िगर किया गया",
+    "globalPrompts": "LLM प्रॉम्प्ट (वैश्विक)",
+    "globalPromptsExtra": "सभी LLM सेवाएँ इन प्रॉम्प्ट को साझा करती हैं; सेवा बदलने से वे रीसेट नहीं होंगे"
   },
   "tools": {
     "subtitleTranslator": {

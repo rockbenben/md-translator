@@ -115,7 +115,13 @@
     "rawTranslationModeTooltip": "Markdown解析をスキップし、出力は元のフォーマットを厳密に維持する必要がありません",
     "rawTranslationMode": "フォーマットを無視",
     "tLinkText": "リンク内のテキストを翻訳",
-    "textWithPlaceholders": "元のテキスト（プレースホルダー付き）"
+    "textWithPlaceholders": "元のテキスト（プレースホルダー付き）",
+    "faq1q": "Markdown 翻訳時にコードブロックや数式を保持するには？",
+    "faq1a": "ツールがコードブロック・LaTeX 数式・リンクなどの書式要素を自動検出してスキップし、プレーンテキストのみを翻訳します。翻訳後もそのまま公開可能です。",
+    "faq2q": "技術ブログ記事を一括翻訳できるツールは？",
+    "faq2a": "MDTranslator は複数の Markdown ファイルを一括アップロードしてワンクリック翻訳に対応。Front Matter メタデータも保持され、Hugo・Jekyll・Hexo などにそのままデプロイできます。",
+    "faq3q": "最適な無料 Markdown 翻訳ツールは？",
+    "faq3a": "MDTranslator は完全無料・オープンソースで、Google 無料翻訳や DeepSeek 等の AI モデルに対応。汎用翻訳器と異なり Markdown 構文を賢く保持するため、翻訳後の書式修正が不要です。"
   },
   "TranslationSettings": {
     "docs": "ドキュメント",
@@ -148,9 +154,9 @@
     "delayTime": "遅延時間",
     "CurrentTransConfig": "現在の設定",
     "useRelay": "API 中継",
-    "useRelayTooltip": "CORS や 403 エラーが発生した場合は、API 中継を有効にして DeepSeek にアクセスしてください",
+    "useRelayTooltip": "CORS や 403 エラーが発生した場合は API 中継を有効にしてください",
     "enableThinking": "思考モードを有効化",
-    "enableThinkingTooltip": "対応モデル（Kimi、DeepSeek、GLM、GPT-OSS）で思考モードを有効にする",
+    "enableThinkingTooltip": "対応モデルで思考 / 推論モードを有効にします",
     "presetSelect": "プリセットを選択",
     "presetSave": "プリセットを保存",
     "presetDelete": "プリセットを削除",
@@ -162,7 +168,11 @@
     "presetUpdate": "プリセットを更新",
     "presetUpdated": "プリセットを更新しました",
     "presetDeleteConfirm": "このプリセットを削除しますか？",
-    "qwenMtDomains": "ドメインプロンプト（英語のみ）"
+    "qwenMtDomains": "ドメインプロンプト（英語のみ）",
+    "selectService": "翻訳サービスを選択",
+    "configuredServices": "設定済み",
+    "globalPrompts": "LLM プロンプト（グローバル）",
+    "globalPromptsExtra": "すべての LLM サービスでこのプロンプトを共有します。サービスを切り替えてもリセットされません"
   },
   "tools": {
     "subtitleTranslator": {

@@ -115,7 +115,13 @@
     "rawTranslationModeTooltip": "Lewati parsing Markdown; output tidak perlu mempertahankan format asli secara ketat",
     "rawTranslationMode": "Abaikan Format",
     "tLinkText": "Terjemahkan Teks di Tautan",
-    "textWithPlaceholders": "Teks Asli (dengan placeholder)"
+    "textWithPlaceholders": "Teks Asli (dengan placeholder)",
+    "faq1q": "Bagaimana menjaga blok kode saat menerjemahkan Markdown?",
+    "faq1a": "Alat mendeteksi dan melewati blok kode, rumus LaTeX dan tautan secara otomatis.",
+    "faq2q": "Alat apa yang menerjemahkan artikel teknis secara massal?",
+    "faq2a": "MDTranslator mendukung unggah massal file Markdown dengan terjemahan satu klik, mempertahankan Front Matter.",
+    "faq3q": "Alat terjemahan Markdown gratis terbaik?",
+    "faq3a": "MDTranslator sepenuhnya gratis dan open source, mempertahankan sintaks Markdown secara cerdas."
   },
   "TranslationSettings": {
     "docs": "Dokumen",
@@ -148,9 +154,9 @@
     "delayTime": "Penundaan",
     "CurrentTransConfig": "Konfigurasi Saat Ini",
     "useRelay": "Relay API",
-    "useRelayTooltip": "Aktifkan relay API untuk DeepSeek jika terjadi kesalahan CORS atau 403",
+    "useRelayTooltip": "Aktifkan relay API jika terjadi kesalahan CORS atau 403",
     "enableThinking": "Aktifkan Mode Berpikir",
-    "enableThinkingTooltip": "Aktifkan mode berpikir untuk model yang didukung (Kimi, DeepSeek, GLM, GPT-OSS)",
+    "enableThinkingTooltip": "Aktifkan mode berpikir / penalaran untuk model yang didukung",
     "presetSelect": "Pilih Preset",
     "presetSave": "Simpan Preset",
     "presetDelete": "Hapus Preset",
@@ -162,7 +168,11 @@
     "presetUpdate": "Perbarui Preset",
     "presetUpdated": "Preset diperbarui",
     "presetDeleteConfirm": "Hapus preset ini?",
-    "qwenMtDomains": "Prompt Domain (hanya bahasa Inggris)"
+    "qwenMtDomains": "Prompt Domain (hanya bahasa Inggris)",
+    "selectService": "Pilih layanan terjemahan",
+    "configuredServices": "Terkonfigurasi",
+    "globalPrompts": "Prompt LLM (global)",
+    "globalPromptsExtra": "Semua layanan LLM berbagi prompt ini; berpindah layanan tidak akan mereset-nya"
   },
   "tools": {
     "subtitleTranslator": {

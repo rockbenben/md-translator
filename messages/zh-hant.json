@@ -115,7 +115,13 @@
     "rawTranslationModeTooltip": "不解析 Markdown 格式，翻譯結果無需嚴格保留原有排版",
     "rawTranslationMode": "忽略格式",
     "tLinkText": "翻譯連結文字",
-    "textWithPlaceholders": "原始文本（含佔位符）"
+    "textWithPlaceholders": "原始文本（含佔位符）",
+    "faq1q": "翻譯 Markdown 文檔時如何保留代碼塊和公式？",
+    "faq1a": "工具會自動識別並跳過代碼塊、LaTeX 公式、鏈接等格式元素，只翻譯純文本部分，確保技術文檔翻譯後格式完好可直接發布。",
+    "faq2q": "有什麼工具可以批量翻譯技術博客文章？",
+    "faq2a": "MDTranslator 支持批量上傳多個 Markdown 文件，一鍵翻譯爲目標語言。保留 Front Matter 元數據，翻譯後的文章可直接部署到 Hugo、Jekyll、Hexo 等博客框架。",
+    "faq3q": "免費的 Markdown 翻譯工具哪個好用？",
+    "faq3a": "MDTranslator 完全免費且開源，支持 Google 免費翻譯和 DeepSeek 等 AI 模型。相比手動翻譯或通用翻譯器，能智能保留 Markdown 語法，無需翻譯後再手動修復格式。"
   },
   "TranslationSettings": {
     "docs": "文檔",
@@ -148,9 +154,9 @@
     "delayTime": "延遲時間",
     "CurrentTransConfig": "當前配置",
     "useRelay": "中轉 API",
-    "useRelayTooltip": "如遇到 CORS 或 403 錯誤，請開啟中轉 API 來訪問 DeepSeek",
+    "useRelayTooltip": "如遇到 CORS 或 403 錯誤，請開啟中轉 API",
     "enableThinking": "啟用思考模式",
-    "enableThinkingTooltip": "為支持的模型啟用思考模式（Kimi、DeepSeek、GLM、GPT-OSS）",
+    "enableThinkingTooltip": "為支持的模型啟用思考 / 推理模式",
     "presetSelect": "選擇預設",
     "presetSave": "儲存預設",
     "presetDelete": "刪除預設",
@@ -162,7 +168,11 @@
     "presetUpdate": "更新預設",
     "presetUpdated": "預設已更新",
     "presetDeleteConfirm": "確定要刪除此預設嗎？",
-    "qwenMtDomains": "領域提示詞 (僅支持英文)"
+    "qwenMtDomains": "領域提示詞 (僅支持英文)",
+    "selectService": "選擇翻譯服務",
+    "configuredServices": "已配置",
+    "globalPrompts": "LLM 提示詞（全域）",
+    "globalPromptsExtra": "所有 LLM 服務共用這組提示詞，切換服務不會重置"
   },
   "tools": {
     "subtitleTranslator": {

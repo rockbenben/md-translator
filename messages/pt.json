@@ -115,7 +115,13 @@
     "rawTranslationModeTooltip": "Ignorar análise Markdown; a saída não precisa preservar estritamente a formatação original",
     "rawTranslationMode": "Ignorar Formatação",
     "tLinkText": "Traduzir texto em links",
-    "textWithPlaceholders": "Texto Original (com Espaços Reservados)"
+    "textWithPlaceholders": "Texto Original (com Espaços Reservados)",
+    "faq1q": "Como preservar blocos de código ao traduzir Markdown?",
+    "faq1a": "A ferramenta detecta e pula automaticamente blocos de código, fórmulas LaTeX e links, traduzindo apenas texto simples.",
+    "faq2q": "Qual ferramenta traduz posts técnicos em lote?",
+    "faq2a": "O MDTranslator suporta upload em lote de arquivos Markdown com tradução em um clique, preservando metadados Front Matter.",
+    "faq3q": "Qual é a melhor ferramenta gratuita de tradução Markdown?",
+    "faq3a": "O MDTranslator é totalmente gratuito e open source, suportando Google e modelos IA como DeepSeek, preservando inteligentemente a sintaxe Markdown."
   },
   "TranslationSettings": {
     "docs": "Docs",
@@ -148,9 +154,9 @@
     "delayTime": "Atraso",
     "CurrentTransConfig": "Config Atual",
     "useRelay": "Relay da API",
-    "useRelayTooltip": "Ative o relay da API para DeepSeek em caso de erros CORS ou 403",
+    "useRelayTooltip": "Ative o relay da API em caso de erros CORS ou 403",
     "enableThinking": "Ativar modo Pensamento",
-    "enableThinkingTooltip": "Ativar modo de pensamento para modelos suportados (Kimi, DeepSeek, GLM, GPT-OSS)",
+    "enableThinkingTooltip": "Ativar modo de pensamento / raciocínio para modelos suportados",
     "presetSelect": "Selecionar predefinição",
     "presetSave": "Salvar predefinição",
     "presetDelete": "Excluir predefinição",
@@ -162,7 +168,11 @@
     "presetUpdate": "Atualizar predefinição",
     "presetUpdated": "Predefinição atualizada",
     "presetDeleteConfirm": "Excluir esta predefinição?",
-    "qwenMtDomains": "Prompts de Domínio (apenas em inglês)"
+    "qwenMtDomains": "Prompts de Domínio (apenas em inglês)",
+    "selectService": "Selecionar serviço de tradução",
+    "configuredServices": "Configurados",
+    "globalPrompts": "Prompts LLM (globais)",
+    "globalPromptsExtra": "Todos os serviços LLM compartilham esses prompts; alternar de serviço não os redefinirá"
   },
   "tools": {
     "subtitleTranslator": {

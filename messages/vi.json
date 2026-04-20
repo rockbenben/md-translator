@@ -115,7 +115,13 @@
     "rawTranslationModeTooltip": "Bỏ qua phân tích Markdown; đầu ra không cần giữ nghiêm ngặt định dạng gốc",
     "rawTranslationMode": "Bỏ qua định dạng",
     "tLinkText": "Dịch văn bản trong liên kết",
-    "textWithPlaceholders": "Văn bản gốc (với placeholder)"
+    "textWithPlaceholders": "Văn bản gốc (với placeholder)",
+    "faq1q": "Cách giữ khối mã khi dịch Markdown?",
+    "faq1a": "Công cụ tự động phát hiện và bỏ qua khối mã, công thức LaTeX, chỉ dịch văn bản thuần.",
+    "faq2q": "Công cụ nào dịch hàng loạt bài blog kỹ thuật?",
+    "faq2a": "MDTranslator hỗ trợ tải hàng loạt file Markdown với dịch một click, giữ nguyên Front Matter.",
+    "faq3q": "Công cụ dịch Markdown miễn phí tốt nhất?",
+    "faq3a": "MDTranslator hoàn toàn miễn phí và mã nguồn mở, giữ thông minh cú pháp Markdown."
   },
   "TranslationSettings": {
     "docs": "Tài liệu",
@@ -148,9 +154,9 @@
     "delayTime": "Độ trễ",
     "CurrentTransConfig": "Cấu hình hiện tại",
     "useRelay": "Chuyển tiếp API",
-    "useRelayTooltip": "Bật chuyển tiếp API cho DeepSeek khi gặp lỗi CORS hoặc 403",
+    "useRelayTooltip": "Bật chuyển tiếp API khi gặp lỗi CORS hoặc 403",
     "enableThinking": "Bật chế độ suy nghĩ",
-    "enableThinkingTooltip": "Bật chế độ suy nghĩ cho các mô hình được hỗ trợ (Kimi, DeepSeek, GLM, GPT-OSS)",
+    "enableThinkingTooltip": "Bật chế độ suy nghĩ / suy luận cho các mô hình được hỗ trợ",
     "presetSelect": "Chọn cài đặt sẵn",
     "presetSave": "Lưu cài đặt sẵn",
     "presetDelete": "Xóa cài đặt sẵn",
@@ -162,7 +168,11 @@
     "presetUpdate": "Cập nhật cài đặt sẵn",
     "presetUpdated": "Đã cập nhật cài đặt sẵn",
     "presetDeleteConfirm": "Xóa cài đặt sẵn này?",
-    "qwenMtDomains": "Lời nhắc tên miền (chỉ tiếng Anh)"
+    "qwenMtDomains": "Lời nhắc tên miền (chỉ tiếng Anh)",
+    "selectService": "Chọn dịch vụ dịch thuật",
+    "configuredServices": "Đã cấu hình",
+    "globalPrompts": "Prompt LLM (toàn cục)",
+    "globalPromptsExtra": "Tất cả dịch vụ LLM dùng chung bộ prompt này; chuyển dịch vụ sẽ không đặt lại chúng"
   },
   "tools": {
     "subtitleTranslator": {
