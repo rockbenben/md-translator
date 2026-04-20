@@ -88,6 +88,7 @@ const MDTranslator = () => {
     setTranslateInProgress,
     progressPercent,
     setProgressPercent,
+    progressInfo,
     extractedText,
     setExtractedText,
     handleLanguageChange,
@@ -657,7 +658,14 @@ const MDTranslator = () => {
         </div>
       )}
 
-      <TranslationProgressModal open={translateInProgress} percent={progressPercent} multiLanguageMode={multiLanguageMode} targetLanguageCount={target_langs.length} />
+      <TranslationProgressModal
+        open={translateInProgress}
+        percent={progressPercent}
+        multiLanguageMode={multiLanguageMode}
+        targetLanguageCount={target_langs.length}
+        currentCount={progressInfo.current}
+        totalCount={progressInfo.total}
+      />
 
       <MultiLanguageSettingsModal
         open={multiLangModalOpen}
