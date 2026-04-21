@@ -98,7 +98,14 @@
     "retryTimeout": "タイムアウト",
     "retryTimeoutTooltip": "翻訳リクエストごとの最大待機時間",
     "customExportFilename": "エクスポートファイル名の形式",
-    "customExportFilenameTooltip": "'{'name'}' = 元のファイル名, '{'lang'}' = 言語, '{'ext'}' = 拡張子, '{'date'}' = 日付, '{'time'}' = 時間"
+    "customExportFilenameTooltip": "'{'name'}' = 元のファイル名, '{'lang'}' = 言語, '{'ext'}' = 拡張子, '{'date'}' = 日付, '{'time'}' = 時間",
+    "partialFailureTitle": "{count}行の翻訳に失敗しました",
+    "partialFailureDesc": "自動再試行では復元できませんでした。失敗した行は元のテキストを保持しています。「再試行」をクリックする（成功した行はキャッシュから提供されます）か、失敗した行を表示して手動で処理してください。",
+    "retryFailedLines": "再試行",
+    "viewFailedLines": "失敗した行を表示",
+    "failedLinesModalTitle": "失敗した{count}行",
+    "copyAllFailed": "すべてコピー",
+    "closeFailedLinesModal": "閉じる"
   },
   "markdown": {
     "title": "MDTranslator | 書式保持のMarkdown多言語翻訳",

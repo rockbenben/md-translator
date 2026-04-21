@@ -98,7 +98,14 @@
     "retryTimeout": "Timeout",
     "retryTimeoutTooltip": "Tempo massimo di attesa per richiesta di traduzione",
     "customExportFilename": "Modello nome file",
-    "customExportFilenameTooltip": "'{'name'}' = nome originale, '{'lang'}' = lingua, '{'ext'}' = estensione, '{'date'}' = data, '{'time'}' = ora"
+    "customExportFilenameTooltip": "'{'name'}' = nome originale, '{'lang'}' = lingua, '{'ext'}' = estensione, '{'date'}' = data, '{'time'}' = ora",
+    "partialFailureTitle": "{count} riga/righe non riuscite",
+    "partialFailureDesc": "Il riprova automatico non le ha recuperate. Le righe non riuscite hanno mantenuto il testo originale. Fai clic su Riprova (le righe riuscite vengono servite dalla cache) o visualizza le righe non riuscite per gestirle manualmente.",
+    "retryFailedLines": "Riprova",
+    "viewFailedLines": "Visualizza righe non riuscite",
+    "failedLinesModalTitle": "{count} riga/righe non riuscite",
+    "copyAllFailed": "Copia tutto",
+    "closeFailedLinesModal": "Chiudi"
   },
   "markdown": {
     "title": "Traduttore Markdown Online - Traduzione IA con Formattazione",

@@ -98,7 +98,14 @@
     "retryTimeout": "超时时间",
     "retryTimeoutTooltip": "每次翻译请求的最大等待时间",
     "customExportFilename": "导出文件名格式",
-    "customExportFilenameTooltip": "'{'name'}' = 原始文件名, '{'lang'}' = 语言, '{'ext'}' = 扩展名, '{'date'}' = 日期, '{'time'}' = 时间"
+    "customExportFilenameTooltip": "'{'name'}' = 原始文件名, '{'lang'}' = 语言, '{'ext'}' = 扩展名, '{'date'}' = 日期, '{'time'}' = 时间",
+    "partialFailureTitle": "翻译失败 {count} 行",
+    "partialFailureDesc": "自动重试过一次后仍未成功。失败行已保留原文，可点「再试一次」（成功的行走缓存不会重复请求），或查看失败行手动处理。",
+    "retryFailedLines": "再试一次",
+    "viewFailedLines": "查看失败行",
+    "failedLinesModalTitle": "失败的 {count} 行",
+    "copyAllFailed": "复制全部",
+    "closeFailedLinesModal": "关闭"
   },
   "markdown": {
     "title": "MDTranslator | 保留格式的 Markdown 多语言文档翻译工具",

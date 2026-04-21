@@ -98,7 +98,14 @@
     "retryTimeout": "समय सीमा",
     "retryTimeoutTooltip": "प्रति अनुवाद अनुरोध अधिकतम प्रतीक्षा समय",
     "customExportFilename": "निर्यात फ़ाइल नाम पैटर्न",
-    "customExportFilenameTooltip": "'{'name'}' = मूल फ़ाइल नाम, '{'lang'}' = भाषा, '{'ext'}' = एक्सटेंशन, '{'date'}' = दिनांक, '{'time'}' = समय"
+    "customExportFilenameTooltip": "'{'name'}' = मूल फ़ाइल नाम, '{'lang'}' = भाषा, '{'ext'}' = एक्सटेंशन, '{'date'}' = दिनांक, '{'time'}' = समय",
+    "partialFailureTitle": "{count} पंक्तियाँ अनुवाद करने में विफल",
+    "partialFailureDesc": "ऑटो-रिट्राई ने उन्हें पुनर्प्राप्त नहीं किया। विफल पंक्तियों ने मूल टेक्स्ट बनाए रखा। पुनः प्रयास पर क्लिक करें (सफल पंक्तियाँ कैश से परोसी जाती हैं) या उन्हें मैन्युअल रूप से संभालने के लिए विफल पंक्तियाँ देखें।",
+    "retryFailedLines": "पुनः प्रयास",
+    "viewFailedLines": "विफल पंक्तियाँ देखें",
+    "failedLinesModalTitle": "{count} विफल पंक्तियाँ",
+    "copyAllFailed": "सभी कॉपी करें",
+    "closeFailedLinesModal": "बंद करें"
   },
   "markdown": {
     "title": "मार्डाउन अनुवादक ऑनलाइन - प्रारूप सुरक्षित AI अनुवाद",

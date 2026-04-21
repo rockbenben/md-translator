@@ -98,7 +98,14 @@
     "retryTimeout": "Timeout",
     "retryTimeoutTooltip": "Maximum wait time per translation request",
     "customExportFilename": "Export Filename Pattern",
-    "customExportFilenameTooltip": "'{'name'}' = original filename, '{'lang'}' = language, '{'ext'}' = extension, '{'date'}' = date, '{'time'}' = time"
+    "customExportFilenameTooltip": "'{'name'}' = original filename, '{'lang'}' = language, '{'ext'}' = extension, '{'date'}' = date, '{'time'}' = time",
+    "partialFailureTitle": "{count} line(s) failed",
+    "partialFailureDesc": "Auto-retry couldn't recover them. Failed lines kept the original text. Click Retry (successful lines are served from cache) or view the failed lines to handle them manually.",
+    "retryFailedLines": "Retry",
+    "viewFailedLines": "View failed lines",
+    "failedLinesModalTitle": "{count} failed line(s)",
+    "copyAllFailed": "Copy all",
+    "closeFailedLinesModal": "Close"
   },
   "markdown": {
     "title": "Markdown Translator | Preserve Format & Code for Docs",

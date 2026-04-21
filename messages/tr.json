@@ -98,7 +98,14 @@
     "retryTimeout": "Zaman Aşımı",
     "retryTimeoutTooltip": "Çeviri isteği başına maksimum bekleme süresi",
     "customExportFilename": "Dışa Aktarma Dosya Adı Kalıbı",
-    "customExportFilenameTooltip": "'{'name'}' = orijinal dosya adı, '{'lang'}' = dil, '{'ext'}' = uzantı, '{'date'}' = tarih, '{'time'}' = saat"
+    "customExportFilenameTooltip": "'{'name'}' = orijinal dosya adı, '{'lang'}' = dil, '{'ext'}' = uzantı, '{'date'}' = tarih, '{'time'}' = saat",
+    "partialFailureTitle": "{count} satır çevrilemedi",
+    "partialFailureDesc": "Otomatik yeniden deneme onları kurtaramadı. Başarısız satırlar orijinal metni korudu. Yeniden Dene düğmesine tıklayın (başarılı satırlar önbellekten sunulur) veya başarısız satırları manuel olarak ele almak için görüntüleyin.",
+    "retryFailedLines": "Yeniden dene",
+    "viewFailedLines": "Başarısız satırları gör",
+    "failedLinesModalTitle": "{count} başarısız satır",
+    "copyAllFailed": "Tümünü kopyala",
+    "closeFailedLinesModal": "Kapat"
   },
   "markdown": {
     "title": "Online Markdown Çevirici - Formatı Koruyan Yapay Zeka",

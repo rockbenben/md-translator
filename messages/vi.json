@@ -98,7 +98,14 @@
     "retryTimeout": "Thời gian chờ",
     "retryTimeoutTooltip": "Thời gian chờ tối đa cho mỗi yêu cầu dịch",
     "customExportFilename": "Mẫu tên tệp xuất",
-    "customExportFilenameTooltip": "'{'name'}' = tên tệp gốc, '{'lang'}' = ngôn ngữ, '{'ext'}' = phần mở rộng, '{'date'}' = ngày, '{'time'}' = thời gian"
+    "customExportFilenameTooltip": "'{'name'}' = tên tệp gốc, '{'lang'}' = ngôn ngữ, '{'ext'}' = phần mở rộng, '{'date'}' = ngày, '{'time'}' = thời gian",
+    "partialFailureTitle": "{count} dòng dịch thất bại",
+    "partialFailureDesc": "Tự động thử lại không khôi phục được. Các dòng thất bại giữ nguyên văn bản gốc. Nhấp Thử lại (các dòng thành công được phục vụ từ bộ nhớ đệm) hoặc xem các dòng thất bại để xử lý thủ công.",
+    "retryFailedLines": "Thử lại",
+    "viewFailedLines": "Xem các dòng thất bại",
+    "failedLinesModalTitle": "{count} dòng thất bại",
+    "copyAllFailed": "Sao chép tất cả",
+    "closeFailedLinesModal": "Đóng"
   },
   "markdown": {
     "title": "Dịch Giả Markdown Online - Dịch AI Giữ Nguyên Định Dạng",

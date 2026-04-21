@@ -98,7 +98,14 @@
     "retryTimeout": "Batas Waktu",
     "retryTimeoutTooltip": "Waktu tunggu maksimum per permintaan terjemahan",
     "customExportFilename": "Pola Nama File Ekspor",
-    "customExportFilenameTooltip": "'{'name'}' = nama file asli, '{'lang'}' = bahasa, '{'ext'}' = ekstensi, '{'date'}' = tanggal, '{'time'}' = waktu"
+    "customExportFilenameTooltip": "'{'name'}' = nama file asli, '{'lang'}' = bahasa, '{'ext'}' = ekstensi, '{'date'}' = tanggal, '{'time'}' = waktu",
+    "partialFailureTitle": "{count} baris gagal diterjemahkan",
+    "partialFailureDesc": "Coba ulang otomatis tidak memulihkannya. Baris yang gagal mempertahankan teks asli. Klik Coba lagi (baris yang berhasil dilayani dari cache) atau lihat baris yang gagal untuk menanganinya secara manual.",
+    "retryFailedLines": "Coba lagi",
+    "viewFailedLines": "Lihat baris yang gagal",
+    "failedLinesModalTitle": "{count} baris yang gagal",
+    "copyAllFailed": "Salin semua",
+    "closeFailedLinesModal": "Tutup"
   },
   "markdown": {
     "title": "Penerjemah Markdown Online - Terjemahan AI Pertahankan Format",

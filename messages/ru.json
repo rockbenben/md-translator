@@ -98,7 +98,14 @@
     "retryTimeout": "Тайм-аут",
     "retryTimeoutTooltip": "Максимальное время ожидания запроса перевода",
     "customExportFilename": "Шаблон имени файла",
-    "customExportFilenameTooltip": "'{'name'}' = имя оригинала, '{'lang'}' = язык, '{'ext'}' = расширение, '{'date'}' = дата, '{'time'}' = время"
+    "customExportFilenameTooltip": "'{'name'}' = имя оригинала, '{'lang'}' = язык, '{'ext'}' = расширение, '{'date'}' = дата, '{'time'}' = время",
+    "partialFailureTitle": "Не удалось перевести {count} строк",
+    "partialFailureDesc": "Автоматический повтор не помог. Неудачные строки сохранили исходный текст. Нажмите «Повторить» (успешные строки берутся из кэша) или просмотрите неудачные строки, чтобы обработать их вручную.",
+    "retryFailedLines": "Повторить",
+    "viewFailedLines": "Показать неудачные строки",
+    "failedLinesModalTitle": "{count} неудачных строк",
+    "copyAllFailed": "Копировать всё",
+    "closeFailedLinesModal": "Закрыть"
   },
   "markdown": {
     "title": "MDTranslator | Перевод Markdown и Документов",

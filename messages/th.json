@@ -98,7 +98,14 @@
     "retryTimeout": "หมดเวลา",
     "retryTimeoutTooltip": "เวลารอสูงสุดต่อคำขอการแปล",
     "customExportFilename": "รูปแบบชื่อไฟล์ส่งออก",
-    "customExportFilenameTooltip": "'{'name'}' = ชื่อไฟล์เดิม, '{'lang'}' = ภาษา, '{'ext'}' = นามสกุล, '{'date'}' = วันที่, '{'time'}' = เวลา"
+    "customExportFilenameTooltip": "'{'name'}' = ชื่อไฟล์เดิม, '{'lang'}' = ภาษา, '{'ext'}' = นามสกุล, '{'date'}' = วันที่, '{'time'}' = เวลา",
+    "partialFailureTitle": "แปลล้มเหลว {count} บรรทัด",
+    "partialFailureDesc": "การลองใหม่อัตโนมัติไม่สามารถกู้คืนได้ บรรทัดที่ล้มเหลวยังคงข้อความต้นฉบับไว้ คลิกลองอีกครั้ง (บรรทัดที่สำเร็จจะถูกให้บริการจากแคช) หรือดูบรรทัดที่ล้มเหลวเพื่อจัดการด้วยตนเอง",
+    "retryFailedLines": "ลองอีกครั้ง",
+    "viewFailedLines": "ดูบรรทัดที่ล้มเหลว",
+    "failedLinesModalTitle": "{count} บรรทัดที่ล้มเหลว",
+    "copyAllFailed": "คัดลอกทั้งหมด",
+    "closeFailedLinesModal": "ปิด"
   },
   "markdown": {
     "title": "ตัวแปล Markdown ออนไลน์ - แปล AI รักษาการจัดรูปแบบ",

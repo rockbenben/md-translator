@@ -98,7 +98,14 @@
     "retryTimeout": "Zeitüberschreitung",
     "retryTimeoutTooltip": "Maximale Wartezeit pro Übersetzungsanfrage",
     "customExportFilename": "Dateinamenmuster",
-    "customExportFilenameTooltip": "'{'name'}' = Originalname, '{'lang'}' = Sprache, '{'ext'}' = Endung, '{'date'}' = Datum, '{'time'}' = Zeit"
+    "customExportFilenameTooltip": "'{'name'}' = Originalname, '{'lang'}' = Sprache, '{'ext'}' = Endung, '{'date'}' = Datum, '{'time'}' = Zeit",
+    "partialFailureTitle": "{count} Zeile(n) fehlgeschlagen",
+    "partialFailureDesc": "Der automatische Wiederholungsversuch konnte sie nicht wiederherstellen. Fehlgeschlagene Zeilen behielten den Originaltext. Klicke auf Erneut versuchen (erfolgreiche Zeilen werden aus dem Cache bereitgestellt) oder zeige die fehlgeschlagenen Zeilen an, um sie manuell zu bearbeiten.",
+    "retryFailedLines": "Erneut versuchen",
+    "viewFailedLines": "Fehlgeschlagene Zeilen anzeigen",
+    "failedLinesModalTitle": "{count} fehlgeschlagene Zeile(n)",
+    "copyAllFailed": "Alle kopieren",
+    "closeFailedLinesModal": "Schließen"
   },
   "markdown": {
     "title": "MDTranslator | Markdown- & Doku-Übersetzer",

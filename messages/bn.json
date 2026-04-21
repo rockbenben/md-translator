@@ -98,7 +98,14 @@
     "retryTimeout": "সময়সীমা",
     "retryTimeoutTooltip": "প্রতি অনুবাদ অনুরোধের জন্য সর্বোচ্চ অপেক্ষা সময়",
     "customExportFilename": "এক্সপোর্ট ফাইলের নাম বিন্যাস",
-    "customExportFilenameTooltip": "'{'name'}' = মূল ফাইলের নাম, '{'lang'}' = ভাষা, '{'ext'}' = এক্সটেনশন, '{'date'}' = তারিখ, '{'time'}' = সময়"
+    "customExportFilenameTooltip": "'{'name'}' = মূল ফাইলের নাম, '{'lang'}' = ভাষা, '{'ext'}' = এক্সটেনশন, '{'date'}' = তারিখ, '{'time'}' = সময়",
+    "partialFailureTitle": "{count}টি লাইন অনুবাদ করতে ব্যর্থ হয়েছে",
+    "partialFailureDesc": "স্বয়ংক্রিয় পুনরায় চেষ্টা সফল হয়নি। ব্যর্থ লাইনগুলি মূল টেক্সট রেখেছে। পুনরায় চেষ্টা ক্লিক করুন (সফল লাইনগুলি ক্যাশে থেকে পরিবেশিত হয়) অথবা ব্যর্থ লাইনগুলি দেখে হাতে কলমে পরিচালনা করুন।",
+    "retryFailedLines": "পুনরায় চেষ্টা করুন",
+    "viewFailedLines": "ব্যর্থ লাইন দেখুন",
+    "failedLinesModalTitle": "{count}টি ব্যর্থ লাইন",
+    "copyAllFailed": "সব কপি করুন",
+    "closeFailedLinesModal": "বন্ধ করুন"
   },
   "markdown": {
     "title": "Markdown অনুবাদক অনলাইন - ফরম্যাট ঠিক রেখে AI অনুবাদ",

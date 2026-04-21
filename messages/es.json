@@ -98,7 +98,14 @@
     "retryTimeout": "Tiempo de espera",
     "retryTimeoutTooltip": "Tiempo máximo de espera por solicitud de traducción",
     "customExportFilename": "Patrón de nombre de archivo",
-    "customExportFilenameTooltip": "'{'name'}' = nombre original, '{'lang'}' = idioma, '{'ext'}' = extensión, '{'date'}' = fecha, '{'time'}' = hora"
+    "customExportFilenameTooltip": "'{'name'}' = nombre original, '{'lang'}' = idioma, '{'ext'}' = extensión, '{'date'}' = fecha, '{'time'}' = hora",
+    "partialFailureTitle": "{count} línea(s) fallaron",
+    "partialFailureDesc": "El reintento automático no las recuperó. Las líneas fallidas mantuvieron el texto original. Haz clic en Reintentar (las líneas exitosas se sirven desde la caché) o visualiza las líneas fallidas para manejarlas manualmente.",
+    "retryFailedLines": "Reintentar",
+    "viewFailedLines": "Ver líneas fallidas",
+    "failedLinesModalTitle": "{count} línea(s) fallida(s)",
+    "copyAllFailed": "Copiar todo",
+    "closeFailedLinesModal": "Cerrar"
   },
   "markdown": {
     "title": "MDTranslator | Traductor de Markdown y Docs",

@@ -98,7 +98,14 @@
     "retryTimeout": "المهلة",
     "retryTimeoutTooltip": "الحد الأقصى لوقت الانتظار لكل طلب ترجمة",
     "customExportFilename": "نمط اسم ملف التصدير",
-    "customExportFilenameTooltip": "'{'name'}' = اسم الملف الأصلي، '{'lang'}' = اللغة، '{'ext'}' = الامتداد، '{'date'}' = التاريخ، '{'time'}' = الوقت"
+    "customExportFilenameTooltip": "'{'name'}' = اسم الملف الأصلي، '{'lang'}' = اللغة، '{'ext'}' = الامتداد، '{'date'}' = التاريخ، '{'time'}' = الوقت",
+    "partialFailureTitle": "فشلت {count} سطر في الترجمة",
+    "partialFailureDesc": "لم تتمكن إعادة المحاولة التلقائية من استعادتها. احتفظت الأسطر الفاشلة بالنص الأصلي. انقر فوق إعادة المحاولة (يتم تقديم الأسطر الناجحة من ذاكرة التخزين المؤقت) أو اعرض الأسطر الفاشلة لمعالجتها يدويًا.",
+    "retryFailedLines": "إعادة المحاولة",
+    "viewFailedLines": "عرض الأسطر الفاشلة",
+    "failedLinesModalTitle": "{count} سطر فاشل",
+    "copyAllFailed": "نسخ الكل",
+    "closeFailedLinesModal": "إغلاق"
   },
   "markdown": {
     "title": "مترجم Markdown أونلاين - ترجمة AI مع الحفاظ على التنسيق",
