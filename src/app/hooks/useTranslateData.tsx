@@ -497,18 +497,28 @@ const useTranslateData = () => {
     // (a single LLM batch can take 20-60s before the first updateProgress call)
     updateProgress(0.5, contentLines.length);
 
-    // Main loop: run batches in parallel with a fixed small concurrency.
-    // Not reusing translationConfig.batchSize — that field means "lines per
-    // request" in non-context mode (often 20-100, safe for MT) but would be
-    // disastrous as concurrency here (20 × ~150-line context-marked requests
-    // in flight = rate-limit storm on every mainstream provider).
+    // Main loop: run batches in parallel with user-configurable concurrency.
+    // Context mode uses `contextBatchSize` — each task sends ~contextWindow
+    // lines to the LLM in a single heavy request, so we cap hard. Non-context
+    // line-by-line mode uses the separate `batchSize` (see translateContent
+    // below) which is safe to run higher since each request is a single short
+    // prompt. Defaults per provider:
+    //   - Cloud LLMs (claude, gemini, openai-compat, ...): 3 — under every
+    //     mainstream provider's concurrent cap (Claude paid 5-10, DeepSeek
+    //     30, Gemini generous). Free-tier users hitting 429 get caught by
+    //     pRetry + auto-retry.
+    //   - Custom LLM (Ollama local): 1 — Ollama runs inference single-threaded
+    //     by default, >1 concurrent would queue on the server and our 180s
+    //     retryTimeout would fire on queued requests before they run.
+    // Power users with proper paid tiers can raise contextBatchSize in
+    // Advanced Settings for faster throughput.
     //
     // Rate-limit safety: pRetry already treats 429 as retryable with backoff,
     // auth errors cascade through abortControllerRef.abort() to stop peers
     // immediately. Each task operates on a disjoint [batchStart, batchEnd)
     // slice of translatedLines — no write contention.
-    const CONTEXT_BATCH_CONCURRENCY = 3; // under all provider caps (Claude 5-10, DeepSeek 30, Gemini generous)
-    const batchLimit = pLimit(CONTEXT_BATCH_CONCURRENCY);
+    const batchConcurrency = Math.max(Number(translationConfig.contextBatchSize) || 3, 1);
+    const batchLimit = pLimit(batchConcurrency);
     const interBatchDelay = translationConfig.delayTime ?? 0;
 
     const batchTasks: Promise<void>[] = [];
