@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Flex, Card, Button, Typography, Input, Upload, Form, Space, App, Tooltip, Spin, Row, Col, Divider, Switch, Collapse } from "antd";
+import { Flex, Card, Button, Typography, Input, Upload, Form, Space, App, Tooltip, Spin, Row, Col, Divider, Switch, Collapse, theme } from "antd";
 import {
   CopyOutlined,
   InboxOutlined,
@@ -11,6 +11,7 @@ import {
   FormatPainterOutlined,
   GlobalOutlined,
   ImportOutlined,
+  InfoCircleOutlined,
   SaveOutlined,
   FileMarkdownOutlined,
   ControlOutlined,
@@ -28,7 +29,8 @@ import { filterMarkdownLines, PLACEHOLDER_SPLIT_REGEX, PLACEHOLDER_TEST_REGEX, P
 import { LLM_MODELS } from "@/app/lib/translation";
 import { useLanguageOptions } from "@/app/components/languages";
 import LanguageSelector from "@/app/components/LanguageSelector";
-import TranslationAPISelector from "@/app/components/TranslationAPISelector";
+import ApiStatusBlock from "@/app/components/ApiStatusBlock";
+import ContextTranslationBlock from "@/app/components/ContextTranslationBlock";
 import { useTranslationContext } from "@/app/components/TranslationContext";
 import ResultCard from "@/app/components/ResultCard";
 import TranslationProgressModal from "@/app/components/TranslationProgressModal";
@@ -43,7 +45,11 @@ const { Text } = Typography;
 
 const uploadFileTypes = getFileTypePresetConfig("markdownText");
 
-const MDTranslator = () => {
+interface MDTranslatorProps {
+  onOpenApiSettings?: () => void;
+}
+
+const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
   const tMarkdown = useTranslations("markdown");
   const t = useTranslations("common");
 
@@ -68,11 +74,8 @@ const MDTranslator = () => {
     exportSettings,
     importSettings,
     translationMethod,
-    setTranslationMethod,
     translateContent,
     handleTranslate,
-    getCurrentConfig,
-    handleConfigChange,
     sourceLanguage,
     targetLanguage,
     target_langs,
@@ -95,6 +98,7 @@ const MDTranslator = () => {
     extractedText,
     setExtractedText,
     handleLanguageChange,
+    handleSwapLanguages,
     delay,
     validateTranslate,
     retryCount,
@@ -103,6 +107,8 @@ const MDTranslator = () => {
     setRetryTimeout,
   } = useTranslationContext();
   const { message } = App.useApp();
+  const { token } = theme.useToken();
+  const cardStyle: React.CSSProperties = { boxShadow: token.boxShadowTertiary };
 
   const sourceStats = useTextStats(sourceText);
   const resultStats = useTextStats(translatedText);
@@ -319,8 +325,6 @@ const MDTranslator = () => {
     copyToClipboard(extractedText, t("textExtracted"));
   };
 
-  const config = getCurrentConfig();
-
   return (
     <Spin spinning={isFileProcessing} description="Please wait..." size="large">
       <Row gutter={[24, 24]}>
@@ -349,7 +353,7 @@ const MDTranslator = () => {
                 </Button>
               </Tooltip>
             }
-            className="shadow-md border-transparent hover:shadow-lg transition-shadow duration-300">
+            style={cardStyle}>
             <Dragger
               customRequest={({ file }) => handleFileUpload(file as File)}
               accept={uploadFileTypes.accept}
@@ -397,7 +401,7 @@ const MDTranslator = () => {
                 type="primary"
                 size="large"
                 icon={<GlobalOutlined spin={translateInProgress} />}
-                className="flex-1 shadow-md"
+                className="flex-1"
                 onClick={() => (uploadMode === "single" ? handleTranslate(performTranslation, sourceText) : handleMultipleTranslate())}
                 disabled={translateInProgress}
                 loading={translateInProgress}>
@@ -421,7 +425,7 @@ const MDTranslator = () => {
                 <SettingOutlined /> {t("configuration")}
               </Space>
             }
-            className="shadow-md border-transparent hover:shadow-lg transition-shadow duration-300"
+            style={cardStyle}
             extra={
               <Space>
                 <Tooltip title={t("exportSettingTooltip")}>
@@ -453,42 +457,39 @@ const MDTranslator = () => {
                 </Tooltip>
               </Space>
             }>
-            <Form layout="vertical" className="w-full">
-              {/* Language Selection - Always Visible */}
+            <Form layout="vertical" className="w-full !mb-3">
               <LanguageSelector
                 sourceLanguage={sourceLanguage}
                 targetLanguage={targetLanguage}
                 target_langs={target_langs}
                 multiLanguageMode={multiLanguageMode}
                 handleLanguageChange={handleLanguageChange}
+                handleSwapLanguages={handleSwapLanguages}
                 setTarget_langs={setTarget_langs}
                 setMultiLanguageMode={setMultiLanguageMode}
               />
-
-              {/* API Settings - Always Visible */}
-              <TranslationAPISelector translationMethod={translationMethod} setTranslationMethod={setTranslationMethod} config={config} handleConfigChange={handleConfigChange} />
-
-              {LLM_MODELS.includes(translationMethod) && (
-                <Flex justify="space-between" align="center">
-                  <Tooltip title={t("contextAwareTranslationTooltip")}>
-                    <span>{t("contextAwareTranslation")}</span>
-                  </Tooltip>
-                  <Switch
-                    size="small"
-                    checked={contextTranslation}
-                    onChange={(checked) => {
-                      setContextTranslation(checked);
-                      if (checked) {
-                        setRawTranslationMode(true);
-                      }
-                    }}
-                    aria-label={t("contextAwareTranslation")}
-                  />
-                </Flex>
-              )}
             </Form>
 
-            <Divider className="!my-3" />
+            <ApiStatusBlock onOpenApiSettings={onOpenApiSettings} disabled={translateInProgress} />
+
+            {LLM_MODELS.includes(translationMethod) && (
+              <>
+                <ContextTranslationBlock
+                  enabled={contextTranslation}
+                  onEnabledChange={(checked) => {
+                    setContextTranslation(checked);
+                    if (checked) {
+                      setRawTranslationMode(true);
+                    }
+                  }}
+                  disabled={translateInProgress}
+                />
+                <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, marginTop: -8, marginBottom: 12, paddingLeft: 4 }}>
+                  <InfoCircleOutlined style={{ marginRight: 4 }} />
+                  {tMarkdown("contextTranslationRawNote")}
+                </Typography.Text>
+              </>
+            )}
 
             <Collapse
               ghost
@@ -505,80 +506,82 @@ const MDTranslator = () => {
                     </Space>
                   ),
                   children: (
-                    <Flex vertical gap="small">
-                      <Flex justify="space-between" align="center">
-                        <Tooltip title={tMarkdown("tFrontmatterTooltip")}>
-                          <span>{tMarkdown("tFrontmatter")}</span>
-                        </Tooltip>
-                        <Switch
-                          size="small"
-                          checked={mdOption.translateFrontmatter}
-                          onChange={(checked) =>
-                            setMdOption((prev) => ({
-                              ...prev,
-                              translateFrontmatter: checked,
-                            }))
-                          }
-                          aria-label="Frontmatter"
-                        />
-                      </Flex>
-                      <Flex justify="space-between" align="center">
-                        <Tooltip title={tMarkdown("tCodeBlocksTooltip")}>
-                          <span>{tMarkdown("tCodeBlocks")}</span>
-                        </Tooltip>
-                        <Switch
-                          size="small"
-                          checked={mdOption.translateMultilineCode}
-                          onChange={(checked) =>
-                            setMdOption((prev) => ({
-                              ...prev,
-                              translateMultilineCode: checked,
-                            }))
-                          }
-                          aria-label={tMarkdown("tCodeBlocks")}
-                        />
-                      </Flex>
-                      <Flex justify="space-between" align="center">
-                        <Tooltip title={tMarkdown("tLatexTooltip")}>
-                          <span>{tMarkdown("tLatex")}</span>
-                        </Tooltip>
-                        <Switch
-                          size="small"
-                          checked={mdOption.translateLatex}
-                          onChange={(checked) =>
-                            setMdOption((prev) => ({
-                              ...prev,
-                              translateLatex: checked,
-                            }))
-                          }
-                          aria-label={tMarkdown("tLatex")}
-                        />
-                      </Flex>
-                      <Flex justify="space-between" align="center">
-                        <Tooltip title={tMarkdown("tLinkText")}>
-                          <span>{tMarkdown("tLinkText")}</span>
-                        </Tooltip>
-                        <Switch
-                          size="small"
-                          checked={mdOption.translateLinkText}
-                          onChange={(checked) =>
-                            setMdOption((prev) => ({
-                              ...prev,
-                              translateLinkText: checked,
-                            }))
-                          }
-                          aria-label={tMarkdown("tLinkText")}
-                        />
-                      </Flex>
+                    <Flex vertical gap="middle">
+                      <section
+                        style={{
+                          padding: token.paddingSM,
+                          background: "transparent",
+                          border: `1px solid ${token.colorBorderSecondary}`,
+                          borderRadius: token.borderRadiusLG,
+                        }}>
+                        <Text strong style={{ display: "block", marginBottom: token.marginXS, fontSize: token.fontSizeSM }}>
+                          {tMarkdown("translateContentGroup")}
+                        </Text>
+                        <Flex vertical gap="small">
+                          <Flex justify="space-between" align="center">
+                            <Tooltip title={tMarkdown("tFrontmatterTooltip")}>
+                              <span>{tMarkdown("tFrontmatter")}</span>
+                            </Tooltip>
+                            <Switch
+                              size="small"
+                              checked={mdOption.translateFrontmatter}
+                              onChange={(checked) => setMdOption((prev) => ({ ...prev, translateFrontmatter: checked }))}
+                              aria-label="Frontmatter"
+                            />
+                          </Flex>
+                          <Flex justify="space-between" align="center">
+                            <Tooltip title={tMarkdown("tCodeBlocksTooltip")}>
+                              <span>{tMarkdown("tCodeBlocks")}</span>
+                            </Tooltip>
+                            <Switch
+                              size="small"
+                              checked={mdOption.translateMultilineCode}
+                              onChange={(checked) => setMdOption((prev) => ({ ...prev, translateMultilineCode: checked }))}
+                              aria-label={tMarkdown("tCodeBlocks")}
+                            />
+                          </Flex>
+                          <Flex justify="space-between" align="center">
+                            <Tooltip title={tMarkdown("tLatexTooltip")}>
+                              <span>{tMarkdown("tLatex")}</span>
+                            </Tooltip>
+                            <Switch
+                              size="small"
+                              checked={mdOption.translateLatex}
+                              onChange={(checked) => setMdOption((prev) => ({ ...prev, translateLatex: checked }))}
+                              aria-label={tMarkdown("tLatex")}
+                            />
+                          </Flex>
+                          <Flex justify="space-between" align="center">
+                            <Tooltip title={tMarkdown("tLinkText")}>
+                              <span>{tMarkdown("tLinkText")}</span>
+                            </Tooltip>
+                            <Switch
+                              size="small"
+                              checked={mdOption.translateLinkText}
+                              onChange={(checked) => setMdOption((prev) => ({ ...prev, translateLinkText: checked }))}
+                              aria-label={tMarkdown("tLinkText")}
+                            />
+                          </Flex>
+                        </Flex>
+                      </section>
 
-                      <Divider className="!my-1" />
-
-                      <Flex justify="space-between" align="center">
-                        <Tooltip title={tMarkdown("rawTranslationModeTooltip")}>
-                          <span>{tMarkdown("rawTranslationMode")}</span>
-                        </Tooltip>
-                        <Switch size="small" checked={rawTranslationMode} onChange={setRawTranslationMode} disabled={contextTranslation} aria-label={tMarkdown("rawTranslationMode")} />
-                      </Flex>
+                      <section
+                        style={{
+                          padding: token.paddingSM,
+                          background: "transparent",
+                          border: `1px solid ${token.colorBorderSecondary}`,
+                          borderRadius: token.borderRadiusLG,
+                        }}>
+                        <Text strong style={{ display: "block", marginBottom: token.marginXS, fontSize: token.fontSizeSM }}>
+                          {tMarkdown("formatModeGroup")}
+                        </Text>
+                        <Flex justify="space-between" align="center">
+                          <Tooltip title={tMarkdown("rawTranslationModeTooltip")}>
+                            <span>{tMarkdown("rawTranslationMode")}</span>
+                          </Tooltip>
+                          <Switch size="small" checked={rawTranslationMode} onChange={setRawTranslationMode} disabled={contextTranslation} aria-label={tMarkdown("rawTranslationMode")} />
+                        </Flex>
+                      </section>
                     </Flex>
                   ),
                 },
@@ -637,7 +640,6 @@ const MDTranslator = () => {
                     message.success(`${t("exportedFile")}: ${fileName}`);
                   }}
                   textDirection={getLangDir(targetLanguage)}
-                  className="shadow-md border-transparent hover:shadow-lg transition-shadow duration-300"
                 />
               </Col>
             )}
@@ -650,7 +652,8 @@ const MDTranslator = () => {
                       <FileTextOutlined /> {t("extractedText")}
                     </Space>
                   }
-                  className="shadow-md border-transparent hover:shadow-lg transition-shadow duration-300 h-full"
+                  className="h-full"
+                  style={{ boxShadow: token.boxShadowTertiary }}
                   extra={
                     <Space wrap>
                       <Button type="text" icon={<CopyOutlined />} onClick={() => copyToClipboard(extractedText)}>
