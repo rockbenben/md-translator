@@ -139,7 +139,7 @@
     "tLatex": "LaTeX formüllerini çevir",
     "rawTranslationModeTooltip": "Markdown ayrıştırmasını atla; çıktının orijinal biçimlendirmeyi kesinlikle koruması gerekmez",
     "rawTranslationMode": "Biçimlendirmeyi Yoksay",
-    "contextTranslationRawNote": "Etkinleştirildiğinde, çeviri düz metin modunda çalışır ve Markdown biçimlendirmesi yok sayılır.",
+    "contextAwareRawNote": "Etkinleştirildiğinde, çeviri düz metin modunda çalışır ve Markdown biçimlendirmesi yok sayılır.",
     "tLinkText": "Bağlantılardaki Metni Çevir",
     "textWithPlaceholders": "Orijinal Metin (yer tutucularla)"
   },

@@ -139,7 +139,7 @@
     "tLatex": "LaTeX-Formeln übersetzen",
     "rawTranslationModeTooltip": "Markdown-Parsing überspringen; Ausgabe muss nicht streng der Originalformatierung entsprechen",
     "rawTranslationMode": "Formatierung ignorieren",
-    "contextTranslationRawNote": "Wenn aktiviert, läuft die Übersetzung im Nur-Text-Modus und die Markdown-Formatierung wird ignoriert.",
+    "contextAwareRawNote": "Wenn aktiviert, läuft die Übersetzung im Nur-Text-Modus und die Markdown-Formatierung wird ignoriert.",
     "tLinkText": "Text in Links übersetzen",
     "textWithPlaceholders": "Originaltext (mit Platzhaltern)"
   },

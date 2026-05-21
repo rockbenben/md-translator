@@ -139,7 +139,7 @@
     "tLatex": "แปลสูตร LaTeX",
     "rawTranslationModeTooltip": "ข้ามการวิเคราะห์ Markdown; เอาต์พุตไม่ต้องรักษารูปแบบอย่างเข้มงวด",
     "rawTranslationMode": "ข้ามการจัดรูปแบบ",
-    "contextTranslationRawNote": "เมื่อเปิดใช้งาน การแปลจะทำงานในโหมดข้อความธรรมดาและจะละเว้นการจัดรูปแบบ Markdown",
+    "contextAwareRawNote": "เมื่อเปิดใช้งาน การแปลจะทำงานในโหมดข้อความธรรมดาและจะละเว้นการจัดรูปแบบ Markdown",
     "tLinkText": "แปลข้อความในลิงก์",
     "textWithPlaceholders": "ข้อความต้นฉบับ (พร้อม placeholder)"
   },

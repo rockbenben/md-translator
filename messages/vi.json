@@ -139,7 +139,7 @@
     "tLatex": "Dịch công thức LaTeX",
     "rawTranslationModeTooltip": "Bỏ qua phân tích Markdown; đầu ra không cần giữ nghiêm ngặt định dạng gốc",
     "rawTranslationMode": "Bỏ qua định dạng",
-    "contextTranslationRawNote": "Khi được bật, bản dịch chạy ở chế độ văn bản thuần túy và định dạng Markdown bị bỏ qua.",
+    "contextAwareRawNote": "Khi được bật, bản dịch chạy ở chế độ văn bản thuần túy và định dạng Markdown bị bỏ qua.",
     "tLinkText": "Dịch văn bản trong liên kết",
     "textWithPlaceholders": "Văn bản gốc (với placeholder)"
   },

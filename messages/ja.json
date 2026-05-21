@@ -139,7 +139,7 @@
     "tLatex": "LaTeX数式を翻訳",
     "rawTranslationModeTooltip": "Markdown解析をスキップし、出力は元のフォーマットを厳密に維持する必要がありません",
     "rawTranslationMode": "フォーマットを無視",
-    "contextTranslationRawNote": "有効にすると、翻訳はプレーンテキストモードで実行され、Markdown の書式は無視されます。",
+    "contextAwareRawNote": "有効にすると、翻訳はプレーンテキストモードで実行され、Markdown の書式は無視されます。",
     "tLinkText": "リンク内のテキストを翻訳",
     "textWithPlaceholders": "元のテキスト（プレースホルダー付き）"
   },

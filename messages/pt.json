@@ -139,7 +139,7 @@
     "tLatex": "Traduzir fórmulas LaTeX",
     "rawTranslationModeTooltip": "Ignorar análise Markdown; a saída não precisa preservar estritamente a formatação original",
     "rawTranslationMode": "Ignorar Formatação",
-    "contextTranslationRawNote": "Quando ativado, a tradução é executada em modo de texto simples e a formatação Markdown é ignorada.",
+    "contextAwareRawNote": "Quando ativado, a tradução é executada em modo de texto simples e a formatação Markdown é ignorada.",
     "tLinkText": "Traduzir texto em links",
     "textWithPlaceholders": "Texto Original (com Espaços Reservados)"
   },

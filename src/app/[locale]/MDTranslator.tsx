@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Flex, Card, Button, Typography, Input, Upload, Form, Space, App, Tooltip, Spin, Row, Col, Divider, Switch, Collapse, theme } from "antd";
 import {
   CopyOutlined,
@@ -47,11 +47,7 @@ const { Text } = Typography;
 
 const uploadFileTypes = getFileTypePresetConfig("markdownText");
 
-interface MDTranslatorProps {
-  onOpenApiSettings?: () => void;
-}
-
-const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
+const MDTranslator = () => {
   const tMarkdown = useTranslations("MDTranslator");
   const t = useTranslations("common");
 
@@ -76,8 +72,8 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
     exportSettings,
     importSettings,
     translationMethod,
-    translateContent,
-    handleTranslate,
+    translateBatch,
+    runTranslation,
     sourceLanguage,
     targetLanguage,
     targetLanguages,
@@ -97,11 +93,9 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
     progressPercent,
     setProgressPercent,
     progressInfo,
-    extractedText,
-    setExtractedText,
     handleLanguageChange,
     handleSwapLanguages,
-    validateTranslate,
+    validate,
     retryCount,
     setRetryCount,
     requestTimeoutSec,
@@ -126,12 +120,18 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
   const [contextAware, setContextAware] = useLocalStorage("md-translator-contextAware", false);
   const [collapseKeys, setCollapseKeys] = useLocalStorage<string[]>("md-translator-collapseKeys", ["MDTranslator"]);
   const [multiLangModalOpen, setMultiLangModalOpen] = useState(false);
+  // 提取出的纯文本预览 — tool-local,不放在共享 TranslationContext 里。
+  const [extractedText, setExtractedText] = useState("");
   const { customFileName, setCustomFileName, generateFileName } = useExportFilename("md-translator");
 
-  useEffect(() => {
+  // 源文本变化时复位 extracted/translated 预览。render-time pattern 而非
+  // useEffect+setState (react-hooks/set-state-in-effect 禁止后者)。
+  const [prevSourceText, setPrevSourceText] = useState(sourceText);
+  if (prevSourceText !== sourceText) {
+    setPrevSourceText(sourceText);
     setExtractedText("");
     setTranslatedText("");
-  }, [sourceText, setExtractedText, setTranslatedText]);
+  }
 
   /**
    * 翻译函数：
@@ -193,8 +193,8 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
             lineSegments.push({ segments, mapping });
           }
 
-          // 第二步：一次性翻译所有片段（translateContent 内部已有 pLimit 并发控制）
-          const translatedTexts = await translateContent(textsToTranslate, translationMethod, currentTargetLang, fileIndex, totalFiles);
+          // 第二步：一次性翻译所有片段（translateBatch 内部已有 pLimit 并发控制）
+          const translatedTexts = await translateBatch(textsToTranslate, translationMethod, currentTargetLang, fileIndex, totalFiles);
 
           // 第三步：回填翻译结果
           const finalTranslatedLines = lineSegments.map(({ mapping }) =>
@@ -225,7 +225,7 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
         } else {
           // Raw text mode: translate all lines
           // If context mode is enabled, use context-aware translation with markdown type
-          const translatedLines = await translateContent(lines, translationMethod, currentTargetLang, fileIndex, totalFiles, contextAware ? "markdown" : undefined);
+          const translatedLines = await translateBatch(lines, translationMethod, currentTargetLang, fileIndex, totalFiles, contextAware ? "markdown" : undefined);
           translatedTextWithPlaceholders = translatedLines.join("\n");
         }
 
@@ -261,20 +261,20 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
   };
 
   const handleMultipleTranslate = async () => {
-    const isValid = await validateTranslate();
-    if (!isValid) {
-      return;
-    }
-
     if (multipleFiles.length === 0) {
       message.error(t("noFileUploaded"));
       return;
     }
 
+    // validate 不再自管 isTranslating, 这里 try/finally 兜底
+    // 让 progress modal 在 test ping → 文件循环之间保持连续可见。
     setIsTranslating(true);
     setProgressPercent(0);
 
     try {
+      const isValid = await validate();
+      if (!isValid) return;
+
       for (let i = 0; i < multipleFiles.length; i++) {
         const currentFile = multipleFiles[i];
         await new Promise<void>((resolve) => {
@@ -381,7 +381,7 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
                 size="large"
                 icon={<GlobalOutlined spin={isTranslating} />}
                 className="flex-1"
-                onClick={() => (uploadMode === "single" ? handleTranslate(performTranslation, sourceText) : handleMultipleTranslate())}
+                onClick={() => (uploadMode === "single" ? runTranslation(performTranslation, sourceText) : handleMultipleTranslate())}
                 disabled={isTranslating}
                 loading={isTranslating}>
                 {multiLanguageMode ? `${t("translate")} | ${t("totalLanguages")}${targetLanguages.length || 0}` : t("translate")}
@@ -449,7 +449,7 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
               />
             </Form>
 
-            <ApiStatusBlock onOpenApiSettings={onOpenApiSettings} disabled={isTranslating} />
+            <ApiStatusBlock disabled={isTranslating} />
 
             {LLM_MODELS.includes(translationMethod) && (
               <>
@@ -600,7 +600,7 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
         count={translateFailedCount}
         lines={translateFailedLines}
         disabled={isTranslating}
-        onRetry={() => (uploadMode === "single" ? handleTranslate(performTranslation, sourceText) : handleMultipleTranslate())}
+        onRetry={() => (uploadMode === "single" ? runTranslation(performTranslation, sourceText) : handleMultipleTranslate())}
       />
 
       {/* Results Section */}

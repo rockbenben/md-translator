@@ -139,7 +139,7 @@
     "tLatex": "Terjemahkan rumus LaTeX",
     "rawTranslationModeTooltip": "Lewati parsing Markdown; output tidak perlu mempertahankan format asli secara ketat",
     "rawTranslationMode": "Abaikan Format",
-    "contextTranslationRawNote": "Saat diaktifkan, terjemahan berjalan dalam mode teks biasa dan pemformatan Markdown diabaikan.",
+    "contextAwareRawNote": "Saat diaktifkan, terjemahan berjalan dalam mode teks biasa dan pemformatan Markdown diabaikan.",
     "tLinkText": "Terjemahkan Teks di Tautan",
     "textWithPlaceholders": "Teks Asli (dengan placeholder)"
   },

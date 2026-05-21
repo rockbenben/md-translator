@@ -139,7 +139,7 @@
     "tLatex": "翻译 LaTeX 公式",
     "rawTranslationModeTooltip": "不解析 Markdown 格式，翻译结果无需严格保留原有排版",
     "rawTranslationMode": "忽略格式",
-    "contextTranslationRawNote": "开启后按纯文本翻译，Markdown 格式将被忽略",
+    "contextAwareRawNote": "开启后按纯文本翻译，Markdown 格式将被忽略",
     "tLinkText": "翻译链接文本",
     "textWithPlaceholders": "原始文本（含占位符）"
   },

@@ -139,7 +139,7 @@
     "tLatex": "ترجمة صيغ LaTeX",
     "rawTranslationModeTooltip": "تخطي تحليل Markdown؛ لا يحتاج الإخراج للحفاظ على التنسيق الأصلي بدقة",
     "rawTranslationMode": "تجاهل التنسيق",
-    "contextTranslationRawNote": "عند التفعيل، تعمل الترجمة في وضع النص العادي ويتم تجاهل تنسيق Markdown.",
+    "contextAwareRawNote": "عند التفعيل، تعمل الترجمة في وضع النص العادي ويتم تجاهل تنسيق Markdown.",
     "tLinkText": "ترجمة النص في الروابط",
     "textWithPlaceholders": "النص الأصلي (مع العناصر النائبة)"
   },

@@ -139,7 +139,7 @@
     "tLatex": "LaTeX 수식 번역",
     "rawTranslationModeTooltip": "Markdown 파싱 건너뛰기; 출력이 원본 서식을 엄격히 유지할 필요 없음",
     "rawTranslationMode": "서식 무시",
-    "contextTranslationRawNote": "활성화하면 번역이 일반 텍스트 모드로 실행되며 Markdown 서식은 무시됩니다.",
+    "contextAwareRawNote": "활성화하면 번역이 일반 텍스트 모드로 실행되며 Markdown 서식은 무시됩니다.",
     "tLinkText": "링크 텍스트 번역",
     "textWithPlaceholders": "원본 텍스트 (플레이스홀더 포함)"
   },

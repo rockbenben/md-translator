@@ -139,7 +139,7 @@
     "tLatex": "LaTeX সূত্র অনুবাদ করুন",
     "rawTranslationModeTooltip": "Markdown পার্সিং এড়িয়ে যান; আউটপুটে মূল ফর্ম্যাটিং কঠোরভাবে সংরক্ষণ করতে হবে না",
     "rawTranslationMode": "ফরম্যাটিং উপেক্ষা করুন",
-    "contextTranslationRawNote": "সক্রিয় হলে, অনুবাদ সাদা-টেক্সট মোডে চলে এবং Markdown ফরম্যাটিং উপেক্ষা করা হয়।",
+    "contextAwareRawNote": "সক্রিয় হলে, অনুবাদ সাদা-টেক্সট মোডে চলে এবং Markdown ফরম্যাটিং উপেক্ষা করা হয়।",
     "tLinkText": "লিঙ্কে পাঠ্য অনুবাদ করুন",
     "textWithPlaceholders": "আসল পাঠ্য (প্লেসহোল্ডার সহ)"
   },
