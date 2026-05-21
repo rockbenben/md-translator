@@ -13,68 +13,106 @@
   <a href="https://tools.newzone.top/en/md-translator"><img src="https://img.shields.io/badge/Live%20Demo-md--translator-blue" alt="Live Demo"></a>
 </p>
 
-**MD Translator** is an intelligent translation tool designed to solve the common problem of broken formatting when translating Markdown content. It delivers **high-quality translations** while **accurately preserving Markdown structure**, including code blocks, LaTeX formulas, and metadata.
+**MD Translator** solves the broken-formatting problem that plagues Markdown translation. It delivers high-quality translations while accurately preserving every Markdown construct — code blocks, LaTeX formulas, FrontMatter metadata, links, and emphasis all stay intact. Connect to 7 traditional translation APIs (DeepL, Google, Azure, DeepLX, Qwen-MT, TranslateGemma, GTX) or 17+ LLM providers, and translate into 50+ languages simultaneously.
 
 👉 **Try it online**: <https://tools.newzone.top/en/md-translator>
 
 ## Key Features
 
-- **Native Markdown Support**: Preserves headings, lists, code blocks, links, emphasis, and LaTeX formulas.
-- **High-Performance Caching (IndexedDB)**: Stores translation results with **unlimited capacity**—no browser storage limits.
-- **Context-Aware Translation** (AI models only): Translates with surrounding context for better paragraph coherence.
-- **Plain Text Mode**: Skip format parsing for direct translation of any text document (TXT, HTML, logs, etc.).
-- **Multi-language Output**: Translate into **50+ languages** simultaneously.
-- **Text Extraction**: Convert Markdown to clean plain text for summarization, NLP, or search indexing.
+- **Format-Preserving**: Tokenize FrontMatter, code blocks, LaTeX, links, headings, lists, and blockquotes into placeholders; restore them losslessly after translation.
+- **Native Markdown Support**: Translates only the prose layer; headings, lists, code blocks, links, emphasis, and LaTeX stay byte-perfect.
+- **Plain Text Mode**: Skip format parsing for plain text inputs (TXT, HTML, logs) — useful when the Markdown tokenizer would over-protect.
+- **Unlimited Caching** (IndexedDB): All translations cached locally with no browser-storage size limit.
+- **Context-Aware Translation** (LLM only): Surrounding paragraphs included as context for better coherence and terminology consistency.
+- **Multi-Language Output**: Translate to 50+ languages in one pass — each language exported as its own file.
+- **Text Extraction**: Strip Markdown syntax to clean plain text for summarization, NLP, or search indexing.
+- **Multi-Locale UI**: Powered by next-intl, with full UI translation across 18 languages.
 
 ## Supported Markdown Elements
 
-- FrontMatter metadata (`---`)
-- Headings (`#`)
-- Blockquotes (`> quote`)
-- Links (`[text](URL)`)
-- Unordered/Ordered lists
-- Emphasis (`**bold**`, `_italic_`)
-- Code blocks (` ``` `) and inline code
-- Inline/Block LaTeX formulas (`$formula$`, `$$formula$$`)
+| Element                        | Syntax                            | Protected |
+| ------------------------------ | --------------------------------- | --------- |
+| FrontMatter metadata           | `---` block                       | Optional  |
+| Headings                       | `#` … `######`                    | ✅        |
+| Lists                          | `-` / `*` / `1.`                  | ✅        |
+| Blockquotes                    | `> quote`                         | ✅        |
+| Links                          | `[text](url)`                     | ✅        |
+| Emphasis                       | `**bold**`, `_italic_`            | Inline    |
+| Code blocks                    | ` ``` ` and `` ` ``               | Optional  |
+| Inline / block LaTeX           | `$formula$`, `$$formula$$`        | Optional  |
+| Inline HTML                    | `<span>`, `<br/>`                 | ✅        |
 
-Translation for FrontMatter, code blocks, and LaTeX formulas is **optional** and configurable.
+FrontMatter, code blocks, and LaTeX formulas can be translated or kept as-is — each is an independent toggle.
 
 ## Translation APIs
 
-Supports **5 translation APIs** and **9 AI LLM models**:
+Supports **7 traditional MT APIs** and **17+ LLM providers**:
 
 ### Traditional APIs
 
-| API                  | Quality | Stability | Free Tier                        |
-| -------------------- | ------- | --------- | -------------------------------- |
-| **DeepL (X)**        | ★★★★★   | ★★★★☆     | 500K chars/month                 |
-| **Google Translate** | ★★★★☆   | ★★★★★     | 500K chars/month                 |
-| **Azure Translate**  | ★★★★☆   | ★★★★★     | 2M chars/month (first 12 months) |
-| **GTX API (Free)**   | ★★★☆☆   | ★★★☆☆     | Free (rate-limited)              |
-| **GTX Web (Free)**   | ★★★☆☆   | ★★☆☆☆     | Free                             |
+| API                  | Quality | Stability | Free Tier                             |
+| -------------------- | ------- | --------- | ------------------------------------- |
+| **DeepL**            | ★★★★★   | ★★★★☆     | 500K chars/month                      |
+| **Google Translate** | ★★★★☆   | ★★★★★     | 500K chars/month                      |
+| **Azure Translate**  | ★★★★☆   | ★★★★★     | 2M chars/month (first 12 months)      |
+| **DeepLX (Free)**    | ★★★★☆   | ★★★☆☆     | Self-host or free public endpoints    |
+| **Qwen-MT**          | ★★★★☆   | ★★★★☆     | Alibaba DashScope quota               |
+| **TranslateGemma**   | ★★★★☆   | ★★★★☆     | Self-host (LM Studio / Ollama / etc.) |
+| **GTX API (Free)**   | ★★★☆☆   | ★★★☆☆     | Free (rate-limited)                   |
 
-### LLM Models
+### LLM Providers
 
-Supports **DeepSeek**, **OpenAI**, **Gemini**, **Azure OpenAI**, **Siliconflow**, **Groq**, **OpenRouter**, **Perplexity**, and **Custom LLM**.
+Supports **DeepSeek**, **OpenAI**, **Claude**, **Gemini**, **Qwen**, **Moonshot**, **Doubao**, **Zhipu GLM**, **MiniMax**, **Mistral**, **Perplexity**, **Cohere**, **OpenRouter**, **Groq**, **SiliconFlow**, **Nvidia NIM**, **Azure OpenAI**, plus any **Custom (OpenAI-compatible)** endpoint (Ollama / LM Studio / vLLM / Together AI / Fireworks AI etc.). Each provider has a configurable model list, temperature, system / user prompts, and per-request thinking-mode toggle.
 
-## Context-Aware Translation
+## Context-Aware Translation (LLM only)
 
-_Context-Aware Translation_ (AI models only) slices documents into segments and sends them to the LLM with surrounding context, improving paragraph coherence and terminology consistency.
+LLM modes can send surrounding lines as context for each batch, improving paragraph-level coherence and terminology consistency.
 
-Two key parameters:
+- **Concurrent Lines**: max lines translated in parallel (default 20). Too high triggers rate limits.
+- **Context Lines**: lines included per batch as context (default 50). Higher = better coherence but more tokens.
 
-- **Concurrent Lines**: Maximum lines translated simultaneously (default: 20).
-- **Context Lines**: Lines included per batch for context (default: 50).
-
-⚠️ **Warning**: Due to Markdown complexity, enabling context mode may increase the risk of formatting errors (e.g., unclosed code blocks, list indentation issues). Monitor output carefully.
+⚠️ **Caveat**: Markdown is complex — enabling context mode may slightly raise the risk of formatting errors (unclosed code blocks, list indentation drift). Spot-check output, especially for documents with deeply nested structure.
 
 ## Use Cases
 
-- Bulk translation of multilingual technical documents
-- Internationalization of open-source project documentation
-- Bilingual synchronization of Markdown blog content
-- Format-preserving translation of mixed content (code, formulas)
-- Semantic translation and extraction for any text
+- 📚 Translate multilingual technical documentation in bulk
+- 🌐 Open-source project documentation i18n
+- ✍️ Bilingual Markdown blog content sync
+- 🧮 Format-preserving translation of mixed content (text + code + formulas)
+- 🔍 Strip Markdown to plain text for summarization / NLP / search indexing
+
+## Tech Stack
+
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router) + React 19 with the React Compiler
+- **UI**: [Ant Design 6](https://ant.design/) + [Tailwind CSS 4](https://tailwindcss.com/)
+- **i18n**: [next-intl](https://next-intl-docs.vercel.app/)
+- **Caching**: [idb](https://github.com/jakearchibald/idb) (IndexedDB)
+- **Testing**: [Vitest](https://vitest.dev/) — `restorePlaceholders` and other placeholder utilities ship with unit tests
+
+## Getting Started
+
+### Requirements
+
+- Node.js >= 20.9.0
+- Yarn (recommended), npm, or pnpm
+
+### Install & Run
+
+```bash
+git clone https://github.com/rockbenben/md-translator.git
+cd md-translator
+
+yarn install
+yarn dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000).
+
+### Production Build
+
+```bash
+yarn build
+```
 
 ## Documentation & Deployment
 
@@ -85,6 +123,11 @@ For detailed configuration, API setup, and self-hosting instructions, see the **
 ## Contributing
 
 Contributions are welcome! Feel free to open issues and pull requests.
+
+1. Fork the repo and create a feature branch
+2. Run `yarn` and `yarn dev` locally
+3. Add tests / docs when applicable
+4. Submit a PR with a clear description
 
 ## License
 
