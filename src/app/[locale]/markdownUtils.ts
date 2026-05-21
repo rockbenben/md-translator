@@ -18,7 +18,7 @@ export interface MarkdownOptions {
  * 占位符类型模式（单一来源，修改此处即可更新所有正则）
  */
 const placeholderPattern =
-  "FRONTMATTER_\\d+|MULTILINE_CODE_\\d+|LATEX_BLOCK_\\d+|CODE_\\d+|LATEX_INLINE_\\d+|LINK_PRE_\\d+|LINK_SUF_\\d+|LINK_\\d+|HEADING_\\d+|LIST_\\d+|BLOCKQUOTE_\\d+|STRONG_\\d+|HTML_\\d+";
+  "FRONTMATTER_\\d+|MULTILINE_CODE_\\d+|LATEX_BLOCK_\\d+|CODE_\\d+|LATEX_INLINE_\\d+|LINK_PRE_\\d+|LINK_SUF_\\d+|LINK_\\d+|HEADING_\\d+|LIST_\\d+|BLOCKQUOTE_\\d+|HTML_\\d+";
 
 /**
  * 预编译的正则表达式（基于 placeholderPattern 创建，模块加载时初始化一次）
@@ -44,10 +44,10 @@ export const PLACEHOLDER_REPLACE_REGEX = new RegExp(`<<<(?:${placeholderPattern}
  * - 引用 (>)
  *
  * @param lines - 源文本的行数组
- * @param mdOption - Markdown 翻译选项
+ * @param mdOptions - Markdown 翻译选项
  * @returns 包含处理后的行和各类占位符映射的对象
  */
-export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) => {
+export const filterMarkdownLines = (lines: string[], mdOptions: MarkdownOptions) => {
   const contentLines: string[] = [];
   const contentIndices: number[] = [];
 
@@ -57,7 +57,6 @@ export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) 
   const headingPlaceholders: { [key: string]: string } = {};
   const listPlaceholders: { [key: string]: string } = {};
   const blockquotePlaceholders: { [key: string]: string } = {};
-  const strongPlaceholders: { [key: string]: string } = {};
   const latexBlockPlaceholders: { [key: string]: string } = {};
   const latexInlinePlaceholders: { [key: string]: string } = {};
   const htmlPlaceholders: { [key: string]: string } = {};
@@ -68,7 +67,6 @@ export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) 
   let headingCounter = 100;
   let listCounter = 100;
   let blockquoteCounter = 100;
-  // let strongCounter = 100;
   let latexBlockCounter = 100;
   let latexInlineCounter = 100;
   let htmlCounter = 100;
@@ -76,7 +74,7 @@ export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) 
   // 合并所有行，处理多行 frontmatter 和代码块
   let fullText = lines.join("\n");
 
-  if (!mdOption.translateFrontmatter) {
+  if (!mdOptions.translateFrontmatter) {
     // 前置区域：使用明显的 <<<FRONTMATTER_x>>> 占位符
     fullText = fullText.replace(/^---\n[\s\S]*?\n---/, (match) => {
       const placeholder = `<<<FRONTMATTER_${frontmatterCounter}>>>`;
@@ -87,7 +85,7 @@ export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) 
   }
 
   // 多行代码块
-  if (!mdOption.translateMultilineCode) {
+  if (!mdOptions.translateMultilineCode) {
     fullText = fullText.replace(/```[\s\S]*?```/g, (match) => {
       const placeholder = `<<<MULTILINE_CODE_${codeCounter}>>>`;
       codePlaceholders[placeholder] = match;
@@ -97,7 +95,7 @@ export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) 
   }
 
   // latex 公式块
-  if (!mdOption.translateLatex) {
+  if (!mdOptions.translateLatex) {
     fullText = fullText.replace(/\$\$[\s\S]*?\$\$/g, (match) => {
       const placeholder = `<<<LATEX_BLOCK_${latexBlockCounter}>>>`;
       latexBlockPlaceholders[placeholder] = match;
@@ -121,7 +119,7 @@ export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) 
     });
 
     // 处理内联 LaTeX 公式，但避免识别货币符号
-    if (!mdOption.translateLatex) {
+    if (!mdOptions.translateLatex) {
       modifiedLine = modifiedLine.replace(/\$([^\$]+?)\$/g, (match, content) => {
         // 简单的启发式检测：如果只包含数字、逗号和小数点，可能是货币
         // 或者检查是否包含常见的 LaTeX 命令，如\
@@ -186,7 +184,7 @@ export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) 
 
     // 链接（非图片）- 根据选项决定是否翻译链接文本
     modifiedLine = modifiedLine.replace(/(\[)(.*?)(\]\(.*?\))/g, (match, prefix, content, suffix) => {
-      if (mdOption.translateLinkText) {
+      if (mdOptions.translateLinkText) {
         const prefixPlaceholder = `<<<LINK_PRE_${linkCounter}>>>`;
         const suffixPlaceholder = `<<<LINK_SUF_${linkCounter}>>>`;
         linkPlaceholders[prefixPlaceholder] = prefix;
@@ -226,13 +224,8 @@ export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) 
       return `${placeholder}${content}`;
     });
 
-    // 加粗文本（不作处理，避免语义被分割）
-    // modifiedLine = modifiedLine.replace(/\*\*(.*?)\*\*/g, (match, content) => {
-    //   const placeholder = `<<<STRONG_${strongCounter}>>>`;
-    //   strongPlaceholders[placeholder] = content;
-    //   strongCounter++;
-    //   return `${placeholder}${content}${placeholder}`;
-    // });
+    // 加粗文本不需要保护：** 不会被翻译模型当作可翻译内容剥离，
+    // 保护反而会切断句子，让模型失去上下文。保留为内联标记。
 
     contentLines.push(modifiedLine);
     contentIndices.push(index);
@@ -247,9 +240,42 @@ export const filterMarkdownLines = (lines: string[], mdOption: MarkdownOptions) 
     headingPlaceholders,
     listPlaceholders,
     blockquotePlaceholders,
-    strongPlaceholders,
     latexBlockPlaceholders,
     latexInlinePlaceholders,
     htmlPlaceholders,
   };
+};
+
+/** filterMarkdownLines 返回值中所有 placeholder map 字段的子集 */
+export type PlaceholderMaps = Pick<
+  ReturnType<typeof filterMarkdownLines>,
+  | "frontmatterPlaceholders"
+  | "codePlaceholders"
+  | "latexBlockPlaceholders"
+  | "linkPlaceholders"
+  | "headingPlaceholders"
+  | "listPlaceholders"
+  | "blockquotePlaceholders"
+  | "latexInlinePlaceholders"
+  | "htmlPlaceholders"
+>;
+
+/**
+ * 把翻译后文本中的占位符还原成原始内容。单次正则扫描 + Map.get 查表,
+ * 复杂度 O(text.length)。函数形式的 String.replace callback 返回值是字面量,
+ * 不会触发 `$&`/`$$` 解析,因此 LaTeX 块的 `$$` 也能安全还原。
+ */
+export const restorePlaceholders = (text: string, maps: PlaceholderMaps): string => {
+  const all = new Map<string, string>([
+    ...Object.entries(maps.frontmatterPlaceholders),
+    ...Object.entries(maps.codePlaceholders),
+    ...Object.entries(maps.latexBlockPlaceholders),
+    ...Object.entries(maps.linkPlaceholders),
+    ...Object.entries(maps.headingPlaceholders),
+    ...Object.entries(maps.listPlaceholders),
+    ...Object.entries(maps.blockquotePlaceholders),
+    ...Object.entries(maps.latexInlinePlaceholders),
+    ...Object.entries(maps.htmlPlaceholders),
+  ]);
+  return text.replace(PLACEHOLDER_REPLACE_REGEX, (match) => all.get(match) ?? match);
 };
