@@ -3,7 +3,7 @@
     "userGuide": "使用说明",
     "privacyNotice": "您的 API 密钥及数据仅存储在本地浏览器，确保隐私安全。如有问题或建议，欢迎通过社群或反馈页面联系我们。",
     "dragAndDropText": "点击或将文件拖拽至此上传",
-    "supportedFormats": "支持格式：",
+    "supportedFormats": "支持的格式：",
     "configuration": "配置选项",
     "operation": "操作",
     "optional": "可选",
@@ -25,7 +25,7 @@
     "charLabel": "字符",
     "lineLabel": "行",
     "advancedSettings": "高级设置",
-    "singleFileModeTooltip": "仅保留一个文件，新上传的文件会替换当前文件",
+    "singleFileModeTooltip": "每次只处理一个文件，上传新文件时自动替换",
     "singleFileMode": "单文件模式",
     "hideResultsTooltip": "隐藏结果预览，避免大量内容导致页面卡顿",
     "hideResults": "隐藏结果预览",
@@ -39,13 +39,18 @@
     "multiLanguageModeTooltip": "同时翻译为多种语言，分别保存为独立文件",
     "translate": "开始翻译",
     "totalLanguages": "目标语言数：",
-    "resetUpload": "清空",
     "resetUploadTooltip": "清空当前输入内容和已上传文件",
     "resetUploadSuccess": "已清空",
     "extractText": "提取纯文本",
     "translationResult": "翻译结果",
     "copy": "复制",
     "remove": "删除",
+    "format": "格式化",
+    "formatTooltip": "格式化：移除空行及首尾空格",
+    "resultToSource": "结果 ➔ 原文",
+    "resultToSourceTooltip": "将结果文本覆盖到输入框",
+    "readOnlyMode": "只读模式",
+    "readOnlyModeTooltip": "文本过长，为保证页面性能已自动切换为只读模式",
     "exportFile": "导出",
     "exportAllFile": "导出所有文件",
     "exportedFile": "已导出",
@@ -94,8 +99,8 @@
     "settingsApplied": "设置已应用",
     "retryCount": "重试次数",
     "retryCountTooltip": "翻译失败时的重试次数",
-    "retryTimeout": "超时时间",
-    "retryTimeoutTooltip": "单次请求的最大等待时间（秒）。LLM 思考耗时较长，建议 180 秒以上",
+    "requestTimeoutSec": "超时时间",
+    "requestTimeoutSecTooltip": "单次请求的最大等待时间（秒）。LLM 思考耗时较长，建议 180 秒以上",
     "customExportFilename": "导出文件名格式",
     "customExportFilenameTooltip": "'{'name'}' = 原始文件名, '{'lang'}' = 语言, '{'ext'}' = 扩展名, '{'date'}' = 日期, '{'time'}' = 时间",
     "partialFailureTitle": "翻译失败 {count} 行",
@@ -112,12 +117,19 @@
     "apiStatusConnected": "✓ 已连接",
     "apiStatusFailed": "连接失败",
     "testConnection": "测试连接",
-    "moreProviderSettings": "更多 Provider 设置"
+    "moreProviderSettings": "更多 Provider 设置",
+    "clearInputTooltip": "清空输入内容和上传的文件",
+    "fileExported": "已导出文件：{fileName}",
+    "exportSuccess": "导出成功：{fileName}",
+    "batchDownloaded": "处理完成，文件已自动下载",
+    "sourceTextPlaceholder": "请输入或粘贴待处理文本...",
+    "smartLineBreak": "智能换行",
+    "replaceText": "替换文本",
+    "generateJson": "生成 JSON",
+    "gtxFreeAPIUnavailable": "GTX Free 接口当前不可用，请检查您的网络连接",
+    "translategemmaUnavailable": "TranslateGemma 节点不可用，请确认本地服务器（LM Studio / llama.cpp / Ollama）已启动且 URL 正确"
   },
-  "markdown": {
-    "title": "MDTranslator | 保留格式的 Markdown 多语言文档翻译工具",
-    "description": "文档翻译格式总乱？MDTranslator 智能保留代码块与 LaTeX 公式，支持 DeepSeek 等主流 AI 模型。一键批量翻译技术文档或博客，完美保留元数据，立即免费试用！",
-    "clientTitle": "Markdown 翻译",
+  "MDTranslator": {
     "clientDescription": "上传 Markdown 文件或粘贴文本，智能保留格式、代码及公式，一键翻译为多种语言。",
     "translationOptions": "翻译选项",
     "translateContentGroup": "翻译内容",
@@ -132,13 +144,7 @@
     "rawTranslationMode": "忽略格式",
     "contextTranslationRawNote": "开启后按纯文本翻译，Markdown 格式将被忽略",
     "tLinkText": "翻译链接文本",
-    "textWithPlaceholders": "原始文本（含占位符）",
-    "faq1q": "翻译 Markdown 文档时如何保留代码块和公式？",
-    "faq1a": "工具会自动识别并跳过代码块、LaTeX 公式、链接等格式元素，只翻译纯文本部分，确保技术文档翻译后格式完好可直接发布。",
-    "faq2q": "有什么工具可以批量翻译技术博客文章？",
-    "faq2a": "MDTranslator 支持批量上传多个 Markdown 文件，一键翻译为目标语言。保留 Front Matter 元数据，翻译后的文章可直接部署到 Hugo、Jekyll、Hexo 等博客框架。",
-    "faq3q": "免费的 Markdown 翻译工具哪个好用？",
-    "faq3a": "MDTranslator 完全免费且开源，支持 Google 免费翻译和 DeepSeek 等 AI 模型。相比手动翻译或通用翻译器，能智能保留 Markdown 语法，无需翻译后再手动修复格式。"
+    "textWithPlaceholders": "原始文本（含占位符）"
   },
   "TranslationSettings": {
     "docs": "文档",
@@ -202,57 +208,46 @@
     "callParamsGroup": "调用参数"
   },
   "tools": {
-    "subtitleTranslator": {
-      "title": "字幕翻译器",
-      "description": "批量翻译 SRT、ASS、VTT、LRC 字幕，支持 50+ 语言"
-    },
-    "jsonTranslate": {
-      "title": "i18n JSON 翻译",
-      "description": "高效的多语言 JSON 翻译工具"
-    },
     "mdTranslator": {
       "title": "Markdown 翻译",
-      "description": "批量翻译 Markdown 文档，保留格式和代码"
-    },
-    "textSplitter": {
-      "title": "文本分割",
-      "description": "智能分割长文本，适用于 AI 输入和社交媒体"
-    },
-    "jsonValueExtractor": {
-      "title": "JSON 值提取",
-      "description": "批量提取 JSON 字段值，支持格式化输出"
-    },
-    "jsonNodeEdit": {
-      "title": "JSON 批量编辑",
-      "description": "批量编辑 JSON 节点值，支持前后缀和替换"
-    },
-    "jsonValueTransformer": {
-      "title": "JSON 键值映射",
-      "description": "字段值映射和迁移，支持 JSONPath 定位"
-    },
-    "jsonValueSwapper": {
-      "title": "JSON 键值互换",
-      "description": "一键交换两个字段的值"
-    },
-    "jsonNodeInserter": {
-      "title": "JSON 节点插入",
-      "description": "在指定位置批量插入新节点"
-    },
-    "jsonSortClassify": {
-      "title": "JSON 排序分类",
-      "description": "数组排序和分组，支持自定义规则"
-    },
-    "jsonMatchUpdate": {
-      "title": "JSON 匹配更新",
-      "description": "根据字段匹配批量更新数据"
-    },
-    "dataParserFlare": {
-      "title": "Flare 书签转换",
-      "description": "浏览器书签与 Flare 格式互转"
-    },
-    "dataParserImgPrompt": {
-      "title": "IMGPrompt 数据生成",
-      "description": "批量生成 IMGPrompt JSON 数据"
+      "description": "批量翻译 Markdown 文档，保留格式和代码",
+      "metaTitle": "Markdown 翻译工具 - 保留代码块与公式，多语言批量翻译",
+      "metaDescription": "文档翻译格式总乱？MDTranslator 智能保留代码块与 LaTeX 公式，支持 DeepSeek 等主流 AI 模型。一键批量翻译技术文档或博客，完美保留元数据，立即免费试用！",
+      "faq": [
+        {
+          "q": "翻译 Markdown 文档时如何保留代码块和公式？",
+          "a": "工具会自动识别并跳过代码块、LaTeX 公式、链接等格式元素，只翻译纯文本部分，确保技术文档翻译后格式完好可直接发布。"
+        },
+        {
+          "q": "有什么工具可以批量翻译技术博客文章？",
+          "a": "MDTranslator 支持批量上传多个 Markdown 文件，一键翻译为目标语言。保留 Front Matter 元数据，翻译后的文章可直接部署到 Hugo、Jekyll、Hexo 等博客框架。"
+        },
+        {
+          "q": "免费的 Markdown 翻译工具哪个好用？",
+          "a": "MDTranslator 完全免费且开源，支持 Google 免费翻译和 DeepSeek 等 AI 模型。相比手动翻译或通用翻译器，能智能保留 Markdown 语法，无需翻译后再手动修复格式。"
+        }
+      ],
+      "howto": [
+        {
+          "name": "上传 Markdown 文件",
+          "text": "上传一个或多个 .md 文件，或将 Markdown 内容粘贴到输入区。"
+        },
+        {
+          "name": "配置选项",
+          "text": "根据需要选择是否翻译 Front Matter、代码块和 LaTeX 公式。"
+        },
+        {
+          "name": "翻译并导出",
+          "text": "选择目标语言并点击翻译。下载翻译后的 .md 文件，格式完整保留。"
+        }
+      ],
+      "features": [
+        "翻译时保留代码块、LaTeX 公式和链接",
+        "可选翻译 Front Matter 元数据",
+        "批量上传 Markdown 文件翻译",
+        "兼容 Hugo、Jekyll、Hexo 博客框架",
+        "Raw 模式忽略 Markdown 格式"
+      ]
     }
   },
   "navigation": {

@@ -39,8 +39,7 @@
     "multiLanguageModeTooltip": "แปลเป็นหลายภาษาพร้อมกัน บันทึกเป็นไฟล์แยก",
     "translate": "แปล",
     "totalLanguages": "จำนวนภาษาทั้งหมด:",
-    "resetUpload": "ล้าง",
-    "resetUploadTooltip": "ล้างอินพุตปัจจุบันและไฟล์ที่อัปโหลด",
+    "resetUploadTooltip": "ล้างเนื้อหาที่ป้อนและไฟล์ที่อัปโหลด",
     "resetUploadSuccess": "ล้างแล้ว",
     "extractText": "แยกข้อความ",
     "translationResult": "ผลลัพธ์",
@@ -94,8 +93,8 @@
     "settingsApplied": "ใช้การตั้งค่าแล้ว",
     "retryCount": "จำนวนครั้งที่ลองใหม่",
     "retryCountTooltip": "จำนวนครั้งที่ลองใหม่เมื่อการแปลล้มเหลว",
-    "retryTimeout": "หมดเวลา",
-    "retryTimeoutTooltip": "เวลารอสูงสุดต่อคำขอ (วินาที). LLM ใช้เวลาคิดนานกว่า; แนะนำ 180 วินาทีขึ้นไป.",
+    "requestTimeoutSec": "หมดเวลา",
+    "requestTimeoutSecTooltip": "เวลารอสูงสุดต่อคำขอ (วินาที). LLM ใช้เวลาคิดนานกว่า; แนะนำ 180 วินาทีขึ้นไป.",
     "customExportFilename": "รูปแบบชื่อไฟล์ส่งออก",
     "customExportFilenameTooltip": "'{'name'}' = ชื่อไฟล์เดิม, '{'lang'}' = ภาษา, '{'ext'}' = นามสกุล, '{'date'}' = วันที่, '{'time'}' = เวลา",
     "partialFailureTitle": "แปลล้มเหลว {count} บรรทัด",
@@ -112,12 +111,25 @@
     "apiStatusConnected": "✓ เชื่อมต่อแล้ว",
     "apiStatusFailed": "เชื่อมต่อล้มเหลว",
     "testConnection": "ทดสอบการเชื่อมต่อ",
-    "moreProviderSettings": "การตั้งค่า Provider เพิ่มเติม"
+    "moreProviderSettings": "การตั้งค่า Provider เพิ่มเติม",
+    "format": "จัดรูปแบบ",
+    "formatTooltip": "จัดรูปแบบ: ลบบรรทัดว่างและช่องว่างหน้า/หลัง",
+    "resultToSource": "ผลลัพธ์ ➔ ต้นฉบับ",
+    "resultToSourceTooltip": "เขียนทับข้อความผลลัพธ์ลงในช่องอินพุต",
+    "readOnlyMode": "โหมดอ่านอย่างเดียว",
+    "readOnlyModeTooltip": "ข้อความยาวเกินไป ระบบเปลี่ยนเป็นโหมดอ่านอย่างเดียวอัตโนมัติเพื่อรักษาประสิทธิภาพหน้า",
+    "clearInputTooltip": "ล้างเนื้อหาที่ป้อนและไฟล์ที่อัปโหลด",
+    "fileExported": "ส่งออกไฟล์แล้ว: {fileName}",
+    "exportSuccess": "ส่งออกสำเร็จ: {fileName}",
+    "batchDownloaded": "ประมวลผลเสร็จสิ้น ไฟล์ถูกดาวน์โหลดอัตโนมัติ",
+    "sourceTextPlaceholder": "ป้อนหรือวางข้อความที่ต้องการประมวลผล...",
+    "smartLineBreak": "ขึ้นบรรทัดใหม่อัจฉริยะ",
+    "replaceText": "แทนที่ข้อความ",
+    "generateJson": "สร้าง JSON",
+    "gtxFreeAPIUnavailable": "API Google Translate ฟรี (GTX) ไม่สามารถใช้งานได้ในขณะนี้ โปรดตรวจสอบการเชื่อมต่อเครือข่ายของคุณ",
+    "translategemmaUnavailable": "โหนด TranslateGemma ไม่พร้อมใช้งาน โปรดตรวจสอบว่าเซิร์ฟเวอร์ภายในเครื่อง (LM Studio / llama.cpp / Ollama) กำลังทำงานและ URL ถูกต้อง"
   },
-  "markdown": {
-    "title": "ตัวแปล Markdown ออนไลน์ - แปล AI รักษาการจัดรูปแบบ",
-    "description": "แปลเอกสาร Markdown โดยไม่ทำลายการจัดรูปแบบหรือโค้ด รองรับ frontmatter และสูตร LaTeX เหมาะสำหรับบล็อกเทคนิคและเอกสารโปรเจกต์",
-    "clientTitle": "แปล Markdown",
+  "MDTranslator": {
     "clientDescription": "อัปโหลดไฟล์ Markdown หรือวางข้อความ รักษาการจัดรูปแบบ โค้ด และสูตรอย่างชาญฉลาด แปลเป็นหลายภาษาได้ในคลิกเดียว",
     "translationOptions": "ตัวเลือกการแปล",
     "translateContentGroup": "เนื้อหาที่จะแปล",
@@ -132,13 +144,7 @@
     "rawTranslationMode": "ข้ามการจัดรูปแบบ",
     "contextTranslationRawNote": "เมื่อเปิดใช้งาน การแปลจะทำงานในโหมดข้อความธรรมดาและจะละเว้นการจัดรูปแบบ Markdown",
     "tLinkText": "แปลข้อความในลิงก์",
-    "textWithPlaceholders": "ข้อความต้นฉบับ (พร้อม placeholder)",
-    "faq1q": "รักษาบล็อกโค้ดเมื่อแปล Markdown ได้อย่างไร?",
-    "faq1a": "เครื่องมือตรวจจับและข้ามบล็อกโค้ด สูตร LaTeX และลิงก์โดยอัตโมมัติ แปลเฉพาะข้อความ",
-    "faq2q": "เครื่องมือไหนแปลบทความเทคนิคเป็นชุด?",
-    "faq2a": "MDTranslator รองรับอัปโหลดหลายไฟล์ Markdown พร้อมแปลคลิกเดียว รักษา Front Matter",
-    "faq3q": "เครื่องมือแปล Markdown ฟรีที่ดีที่สุด?",
-    "faq3a": "MDTranslator ฟรีและโอเพนซอร์ส รองรับ Google และ AI รักษาไวยากรณ์ Markdown อัจฉริยะ"
+    "textWithPlaceholders": "ข้อความต้นฉบับ (พร้อม placeholder)"
   },
   "TranslationSettings": {
     "docs": "เอกสาร",
@@ -158,9 +164,9 @@
     "urlAutoCompleted": "เติม URL อัตโนมัติแล้ว",
     "modelExtra": "ชื่อโมเดล LLM ดูเอกสาร API",
     "temperatureExtra": "อุณหภูมิ (0-2): สูง = สุ่มมากขึ้น ต่ำ = แน่นอนมากขึ้น แนะนำ: 0.2-0.8",
-    "systemPrompt": "System Prompt",
+    "systemPrompt": "พรอมต์ระบบ",
     "systemPromptExtra": "System prompt สำหรับแปล LLM ปล่อยว่างสำหรับค่าเริ่มต้น",
-    "userPrompt": "User Prompt",
+    "userPrompt": "พรอมต์ผู้ใช้",
     "userPromptExtra": "Prompt แปลกำหนดเอง ปล่อยว่างสำหรับค่าเริ่มต้น ตัวแปร:",
     "for": "สำหรับ",
     "textToTranslate": "ข้อความที่ต้องแปล",
@@ -173,7 +179,7 @@
     "contextWindow": "บรรทัดบริบท",
     "contextWindowExtra": "บรรทัดต่อชุดในโหมดบริบท ค่าที่สูงขึ้นให้บริบทที่ดีขึ้นแต่อาจเกินขีดจำกัดโทเคนของโมเดล.",
     "delayTime": "หน่วงเวลา",
-    "useRelay": "API Relay",
+    "useRelay": "ใช้ API Relay",
     "useRelayTooltip": "เปิด API relay เมื่อพบข้อผิดพลาด CORS หรือ 403",
     "enableThinking": "เปิดใช้งานโหมดการคิด",
     "enableThinkingTooltip": "เปิดใช้งานโหมดการคิด / การให้เหตุผลสำหรับโมเดลที่รองรับ",
@@ -189,7 +195,7 @@
     "presetUpdate": "บันทึกในพรีเซ็ตปัจจุบัน",
     "presetUpdated": "บันทึกในพรีเซ็ตปัจจุบันแล้ว",
     "presetDeleteConfirm": "ลบพรีเซ็ตนี้หรือไม่?",
-    "presetEmptyHint": "No presets yet — edit and click Save",
+    "presetEmptyHint": "ยังไม่มีพรีเซ็ต — แก้ไขแล้วคลิกบันทึก",
     "qwenMtDomains": "พรอมต์โดเมน (ภาษาอังกฤษเท่านั้น)",
     "sendSystemPrompt": "ส่ง system prompt",
     "sendSystemPromptExtra": "ปิดเฉพาะเมื่อ chat template ปฏิเสธบทบาท system — ข้อผิดพลาดทั่วไป \"Conversations must start with a user prompt\" (เช่น ตระกูล Gemma)",
@@ -202,57 +208,46 @@
     "callParamsGroup": "พารามิเตอร์การเรียก"
   },
   "tools": {
-    "subtitleTranslator": {
-      "title": "ตัวแปลซับไตเติล",
-      "description": "แปล SRT, ASS, VTT, LRC เป็นชุด 50+ ภาษา"
-    },
-    "jsonTranslate": {
-      "title": "ตัวแปล JSON i18n",
-      "description": "เครื่องมือแปล JSON หลายภาษาที่มีประสิทธิภาพ"
-    },
     "mdTranslator": {
       "title": "ตัวแปล Markdown",
-      "description": "แปล Markdown เป็นชุด รักษาการจัดรูปแบบและโค้ด"
-    },
-    "textSplitter": {
-      "title": "ตัวแบ่งข้อความ",
-      "description": "แบ่งข้อความยาวอย่างชาญฉลาดสำหรับ AI และโซเชียลมีเดีย"
-    },
-    "jsonValueExtractor": {
-      "title": "ตัวแยกค่า JSON",
-      "description": "แยกค่า JSON เป็นชุด เอาต์พุตมีการจัดรูปแบบ"
-    },
-    "jsonNodeEdit": {
-      "title": "แก้ไข JSON เป็นชุด",
-      "description": "แก้ไขโหนด JSON เป็นชุด คำนำหน้า/คำต่อท้าย/แทนที่"
-    },
-    "jsonValueTransformer": {
-      "title": "ตัวแมปค่า JSON",
-      "description": "แมปและย้ายค่าด้วย JSONPath"
-    },
-    "jsonValueSwapper": {
-      "title": "ตัวสลับค่า JSON",
-      "description": "สลับค่าสองฟิลด์ได้ในคลิกเดียว"
-    },
-    "jsonNodeInserter": {
-      "title": "ตัวแทรกโหนด JSON",
-      "description": "แทรกโหนดใหม่ที่ตำแหน่งที่ระบุเป็นชุด"
-    },
-    "jsonSortClassify": {
-      "title": "เรียงลำดับ & จัดประเภท JSON",
-      "description": "เรียงลำดับและจัดกลุ่มอาร์เรย์ กฎที่กำหนดเอง"
-    },
-    "jsonMatchUpdate": {
-      "title": "อัปเดต JSON Match",
-      "description": "อัปเดตเป็นชุดตามการจับคู่ฟิลด์"
-    },
-    "dataParserFlare": {
-      "title": "ตัวแปลง Flare",
-      "description": "แปลงบุ๊กมาร์กเบราว์เซอร์และรูปแบบ Flare"
-    },
-    "dataParserImgPrompt": {
-      "title": "ตัวสร้างข้อมูล IMGPrompt",
-      "description": "สร้างข้อมูล JSON IMGPrompt เป็นชุด"
+      "description": "แปล Markdown เป็นชุด รักษาการจัดรูปแบบและโค้ด",
+      "metaTitle": "ตัวแปล Markdown ออนไลน์ - แปล AI รักษาการจัดรูปแบบ",
+      "metaDescription": "ต้องการแปลเอกสาร? แปลเอกสาร Markdown โดยไม่ทำลายการจัดรูปแบบหรือโค้ด รองรับ frontmatter และสูตร LaTeX เหมาะสำหรับบล็อกเทคนิคและเอกสารโปรเจกต์",
+      "faq": [
+        {
+          "q": "รักษาบล็อกโค้ดเมื่อแปล Markdown ได้อย่างไร?",
+          "a": "เครื่องมือตรวจจับและข้ามบล็อกโค้ด สูตร LaTeX และลิงก์โดยอัตโมมัติ แปลเฉพาะข้อความ"
+        },
+        {
+          "q": "เครื่องมือไหนแปลบทความเทคนิคเป็นชุด?",
+          "a": "MDTranslator รองรับอัปโหลดหลายไฟล์ Markdown พร้อมแปลคลิกเดียว รักษา Front Matter"
+        },
+        {
+          "q": "เครื่องมือแปล Markdown ฟรีที่ดีที่สุด?",
+          "a": "MDTranslator ฟรีและโอเพนซอร์ส รองรับ Google และ AI รักษาไวยากรณ์ Markdown อัจฉริยะ"
+        }
+      ],
+      "howto": [
+        {
+          "name": "อัปโหลด Markdown",
+          "text": "อัปโหลดไฟล์ .md หนึ่งไฟล์หรือมากกว่า หรือวางเนื้อหา Markdown"
+        },
+        {
+          "name": "กำหนดตัวเลือก",
+          "text": "เลือกแปล Front Matter บล็อกโค้ด และสูตร LaTeX ตามต้องการ"
+        },
+        {
+          "name": "แปลและส่งออก",
+          "text": "เลือกภาษา ดาวน์โหลดไฟล์ .md พร้อมรูปแบบที่เก็บไว้"
+        }
+      ],
+      "features": [
+        "รักษาบล็อกโค้ด LaTeX ลิงก์",
+        "แปล Front Matter ตัวเลือก",
+        "อัปโหลด Markdown เป็นชุด",
+        "เข้ากับ Hugo, Jekyll, Hexo",
+        "โหมดไม่มีรูปแบบ"
+      ]
     }
   },
   "navigation": {

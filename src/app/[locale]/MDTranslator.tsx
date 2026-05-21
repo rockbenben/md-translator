@@ -25,8 +25,9 @@ import { useTextStats } from "@/app/hooks/useTextStats";
 import { useExportFilename } from "@/app/hooks/useExportFilename";
 
 import { splitTextIntoLines, downloadFile, splitBySpaces, getErrorMessage, getFileTypePresetConfig } from "@/app/utils";
-import { filterMarkdownLines, PLACEHOLDER_SPLIT_REGEX, PLACEHOLDER_TEST_REGEX, PLACEHOLDER_REPLACE_REGEX } from "./markdownUtils";
+import { filterMarkdownLines, PLACEHOLDER_SPLIT_REGEX, PLACEHOLDER_TEST_REGEX, PLACEHOLDER_REPLACE_REGEX, restorePlaceholders } from "./markdownUtils";
 import { LLM_MODELS } from "@/app/lib/translation";
+import { delay } from "@/app/hooks/translation";
 import { useLanguageOptions } from "@/app/components/languages";
 import LanguageSelector from "@/app/components/LanguageSelector";
 import ApiStatusBlock from "@/app/components/ApiStatusBlock";
@@ -38,6 +39,7 @@ import AdvancedTranslationSettings from "@/app/components/AdvancedTranslationSet
 import TranslateFailurePanel from "@/app/components/TranslateFailurePanel";
 
 import MultiLanguageSettingsModal from "@/app/components/MultiLanguageSettingsModal";
+import SourceArea from "@/app/components/SourceArea";
 
 const { TextArea } = Input;
 const { Dragger } = Upload;
@@ -50,7 +52,7 @@ interface MDTranslatorProps {
 }
 
 const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
-  const tMarkdown = useTranslations("markdown");
+  const tMarkdown = useTranslations("MDTranslator");
   const t = useTranslations("common");
 
   const { sourceOptions } = useLanguageOptions();
@@ -78,8 +80,8 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
     handleTranslate,
     sourceLanguage,
     targetLanguage,
-    target_langs,
-    setTarget_langs,
+    targetLanguages,
+    setTargetLanguages,
     useCache,
     setUseCache,
     removeChars,
@@ -90,8 +92,8 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
     setTranslatedText,
     translateFailedCount,
     translateFailedLines,
-    translateInProgress,
-    setTranslateInProgress,
+    isTranslating,
+    setIsTranslating,
     progressPercent,
     setProgressPercent,
     progressInfo,
@@ -99,12 +101,11 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
     setExtractedText,
     handleLanguageChange,
     handleSwapLanguages,
-    delay,
     validateTranslate,
     retryCount,
     setRetryCount,
-    retryTimeout,
-    setRetryTimeout,
+    requestTimeoutSec,
+    setRequestTimeoutSec,
   } = useTranslationContext();
   const { message } = App.useApp();
   const { token } = theme.useToken();
@@ -115,17 +116,17 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
 
   const [taggedText, setTaggedText] = useState("");
 
-  const [mdOption, setMdOption] = useLocalStorage("mdTranslatorOptions", {
+  const [mdOptions, setMdOptions] = useLocalStorage("md-translator-options", {
     translateFrontmatter: false,
     translateMultilineCode: false,
     translateLatex: false,
     translateLinkText: true,
   });
-  const [rawTranslationMode, setRawTranslationMode] = useLocalStorage("mdTranslatorRawMode", false);
-  const [contextTranslation, setContextTranslation] = useLocalStorage("mdTranslatorContextMode", false);
-  const [activeCollapseKeys, setActiveCollapseKeys] = useLocalStorage<string[]>("mdTranslatorCollapseKeys", ["markdown"]);
+  const [rawMode, setRawMode] = useLocalStorage("md-translator-rawMode", false);
+  const [contextAware, setContextAware] = useLocalStorage("md-translator-contextAware", false);
+  const [collapseKeys, setCollapseKeys] = useLocalStorage<string[]>("md-translator-collapseKeys", ["MDTranslator"]);
   const [multiLangModalOpen, setMultiLangModalOpen] = useState(false);
-  const { customFileName, setCustomFileName, generateFileName } = useExportFilename("md");
+  const { customFileName, setCustomFileName, generateFileName } = useExportFilename("md-translator");
 
   useEffect(() => {
     setExtractedText("");
@@ -140,7 +141,7 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
    */
   const performTranslation = async (sourceText: string, fileNameSet?: string, fileIndex?: number, totalFiles?: number) => {
     // Determine target languages to translate to
-    const targetLanguagesToUse = multiLanguageMode ? target_langs : [targetLanguage];
+    const targetLanguagesToUse = multiLanguageMode ? targetLanguages : [targetLanguage];
     // If no target languages selected in multi-language mode, show error
     if (multiLanguageMode && targetLanguagesToUse.length === 0) {
       message.error(t("noTargetLanguage"));
@@ -156,17 +157,16 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
       headingPlaceholders,
       listPlaceholders,
       blockquotePlaceholders,
-      strongPlaceholders,
       latexBlockPlaceholders,
       latexInlinePlaceholders,
       htmlPlaceholders,
-    } = filterMarkdownLines(lines, mdOption);
+    } = filterMarkdownLines(lines, mdOptions);
 
     // For each target language, perform translation
     for (const currentTargetLang of targetLanguagesToUse) {
       let translatedTextWithPlaceholders = "";
       try {
-        if (!rawTranslationMode) {
+        if (!rawMode) {
           // 对每一行进行处理，分割占位符与普通文本，仅翻译普通文本部分。不处理加粗文本格式，否则对语义伤害较大。
           // 第一步：收集所有待翻译片段及其位置信息
           const textsToTranslate: string[] = [];
@@ -207,35 +207,25 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
           );
           translatedTextWithPlaceholders = finalTranslatedLines.join("\n");
 
-          // 合并所有占位符映射
-          const allPlaceholders = new Map([
-            ...Object.entries(frontmatterPlaceholders),
-            ...Object.entries(codePlaceholders),
-            ...Object.entries(latexBlockPlaceholders),
-            ...Object.entries(linkPlaceholders),
-            ...Object.entries(headingPlaceholders),
-            ...Object.entries(listPlaceholders),
-            ...Object.entries(blockquotePlaceholders),
-            ...Object.entries(latexInlinePlaceholders),
-            ...Object.entries(strongPlaceholders),
-            ...Object.entries(htmlPlaceholders),
-          ]);
-
-          // 按占位符长度降序排序，防止部分匹配替换
-          const sortedPlaceholders = Array.from(allPlaceholders.entries()).sort((a, b) => b[0].length - a[0].length);
-
-          for (const [placeholder, content] of sortedPlaceholders) {
-            let replacementContent = content;
-            if (placeholder.includes("LATEX_")) {
-              // replaceAll 的第二个参数中，$ 需要用 $$ 转义
-              replacementContent = content.replace(/\$/g, "$$$$");
-            }
-            translatedTextWithPlaceholders = translatedTextWithPlaceholders.replaceAll(placeholder, replacementContent);
-          }
+          // 单次正则扫描 + Map 查表还原所有占位符 (O(text.length))。
+          // 因为占位符自带 <<<...>>> 分隔符,literal 比较不会发生 prefix 重叠,
+          // 不再需要 sort by 长度;函数 callback 形式的 replace 不解析 $$,
+          // LATEX 也不需要 $$ 转义。
+          translatedTextWithPlaceholders = restorePlaceholders(translatedTextWithPlaceholders, {
+            frontmatterPlaceholders,
+            codePlaceholders,
+            latexBlockPlaceholders,
+            linkPlaceholders,
+            headingPlaceholders,
+            listPlaceholders,
+            blockquotePlaceholders,
+            latexInlinePlaceholders,
+            htmlPlaceholders,
+          });
         } else {
           // Raw text mode: translate all lines
           // If context mode is enabled, use context-aware translation with markdown type
-          const translatedLines = await translateContent(lines, translationMethod, currentTargetLang, fileIndex, totalFiles, contextTranslation ? "markdown" : undefined);
+          const translatedLines = await translateContent(lines, translationMethod, currentTargetLang, fileIndex, totalFiles, contextAware ? "markdown" : undefined);
           translatedTextWithPlaceholders = translatedLines.join("\n");
         }
 
@@ -281,7 +271,7 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
       return;
     }
 
-    setTranslateInProgress(true);
+    setIsTranslating(true);
     setProgressPercent(0);
 
     try {
@@ -298,7 +288,7 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
 
       message.success(t("translationExported"), 10);
     } finally {
-      setTranslateInProgress(false);
+      setIsTranslating(false);
     }
   };
 
@@ -315,7 +305,7 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
       return;
     }
     const lines = splitTextIntoLines(sourceText);
-    const { contentLines } = filterMarkdownLines(lines, mdOption);
+    const { contentLines } = filterMarkdownLines(lines, mdOptions);
     let extractedText = contentLines.join("\n");
     setTaggedText(extractedText);
     extractedText = extractedText.replace(PLACEHOLDER_REPLACE_REGEX, "");
@@ -341,15 +331,15 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
                 <Button
                   type="text"
                   danger
-                  disabled={translateInProgress}
+                  disabled={isTranslating}
                   onClick={() => {
                     resetUpload();
                     setTranslatedText("");
                     message.success(t("resetUploadSuccess"));
                   }}
                   icon={<ClearOutlined />}
-                  aria-label={t("resetUpload")}>
-                  {t("resetUpload")}
+                  aria-label={t("clearAll")}>
+                  {t("clearAll")}
                 </Button>
               </Tooltip>
             }
@@ -373,25 +363,14 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
             </Dragger>
 
             {uploadMode === "single" && (
-              <>
-                <TextArea
-                  placeholder={t("pasteUploadContent")}
-                  value={sourceStats.isEditable ? sourceText : sourceStats.displayText}
-                  onChange={sourceStats.isEditable ? (e) => setSourceText(e.target.value) : undefined}
-                  rows={8}
-                  className="mt-1"
-                  allowClear
-                  readOnly={!sourceStats.isEditable}
-                  aria-label={t("sourceArea")}
-                />
-                {sourceText && (
-                  <Flex justify="end" className="mt-2">
-                    <Typography.Text type="secondary" className="!text-xs">
-                      {sourceStats.charCount} {t("charLabel")} / {sourceStats.lineCount} {t("lineLabel")}
-                    </Typography.Text>
-                  </Flex>
-                )}
-              </>
+              <SourceArea
+                sourceText={sourceText}
+                setSourceText={setSourceText}
+                stats={sourceStats}
+                placeholder={t("pasteUploadContent")}
+                ariaLabel={t("sourceArea")}
+                className="mt-1"
+              />
             )}
 
             <Divider />
@@ -400,12 +379,12 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
               <Button
                 type="primary"
                 size="large"
-                icon={<GlobalOutlined spin={translateInProgress} />}
+                icon={<GlobalOutlined spin={isTranslating} />}
                 className="flex-1"
                 onClick={() => (uploadMode === "single" ? handleTranslate(performTranslation, sourceText) : handleMultipleTranslate())}
-                disabled={translateInProgress}
-                loading={translateInProgress}>
-                {multiLanguageMode ? `${t("translate")} | ${t("totalLanguages")}${target_langs.length || 0}` : t("translate")}
+                disabled={isTranslating}
+                loading={isTranslating}>
+                {multiLanguageMode ? `${t("translate")} | ${t("totalLanguages")}${targetLanguages.length || 0}` : t("translate")}
               </Button>
 
               {uploadMode === "single" && sourceText && (
@@ -433,7 +412,7 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
                     type="text"
                     icon={<SaveOutlined />}
                     size="small"
-                    disabled={translateInProgress}
+                    disabled={isTranslating}
                     onClick={async () => {
                       await exportSettings();
                     }}
@@ -445,7 +424,7 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
                     type="text"
                     icon={<ImportOutlined />}
                     size="small"
-                    disabled={translateInProgress}
+                    disabled={isTranslating}
                     onClick={async () => {
                       await importSettings();
                     }}
@@ -453,7 +432,7 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
                   />
                 </Tooltip>
                 <Tooltip title={t("batchEditMultiLangTooltip")}>
-                  <Button type="text" icon={<GlobalOutlined />} size="small" disabled={translateInProgress} onClick={() => setMultiLangModalOpen(true)} aria-label={t("batchEditMultiLangTooltip")} />
+                  <Button type="text" icon={<GlobalOutlined />} size="small" disabled={isTranslating} onClick={() => setMultiLangModalOpen(true)} aria-label={t("batchEditMultiLangTooltip")} />
                 </Tooltip>
               </Space>
             }>
@@ -461,32 +440,32 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
               <LanguageSelector
                 sourceLanguage={sourceLanguage}
                 targetLanguage={targetLanguage}
-                target_langs={target_langs}
+                targetLanguages={targetLanguages}
                 multiLanguageMode={multiLanguageMode}
                 handleLanguageChange={handleLanguageChange}
                 handleSwapLanguages={handleSwapLanguages}
-                setTarget_langs={setTarget_langs}
+                setTargetLanguages={setTargetLanguages}
                 setMultiLanguageMode={setMultiLanguageMode}
               />
             </Form>
 
-            <ApiStatusBlock onOpenApiSettings={onOpenApiSettings} disabled={translateInProgress} />
+            <ApiStatusBlock onOpenApiSettings={onOpenApiSettings} disabled={isTranslating} />
 
             {LLM_MODELS.includes(translationMethod) && (
               <>
                 <ContextTranslationBlock
-                  enabled={contextTranslation}
+                  enabled={contextAware}
                   onEnabledChange={(checked) => {
-                    setContextTranslation(checked);
+                    setContextAware(checked);
                     if (checked) {
-                      setRawTranslationMode(true);
+                      setRawMode(true);
                     }
                   }}
-                  disabled={translateInProgress}
+                  disabled={isTranslating}
                 />
                 <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, marginTop: -8, marginBottom: 12, paddingLeft: 4 }}>
                   <InfoCircleOutlined style={{ marginRight: 4 }} />
-                  {tMarkdown("contextTranslationRawNote")}
+                  {tMarkdown("contextAwareRawNote")}
                 </Typography.Text>
               </>
             )}
@@ -494,8 +473,8 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
             <Collapse
               ghost
               size="small"
-              activeKey={activeCollapseKeys}
-              onChange={(keys) => setActiveCollapseKeys(typeof keys === "string" ? [keys] : keys)}
+              activeKey={collapseKeys}
+              onChange={(keys) => setCollapseKeys(typeof keys === "string" ? [keys] : keys)}
               items={[
                 {
                   key: "markdown",
@@ -524,8 +503,8 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
                             </Tooltip>
                             <Switch
                               size="small"
-                              checked={mdOption.translateFrontmatter}
-                              onChange={(checked) => setMdOption((prev) => ({ ...prev, translateFrontmatter: checked }))}
+                              checked={mdOptions.translateFrontmatter}
+                              onChange={(checked) => setMdOptions((prev) => ({ ...prev, translateFrontmatter: checked }))}
                               aria-label="Frontmatter"
                             />
                           </Flex>
@@ -535,8 +514,8 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
                             </Tooltip>
                             <Switch
                               size="small"
-                              checked={mdOption.translateMultilineCode}
-                              onChange={(checked) => setMdOption((prev) => ({ ...prev, translateMultilineCode: checked }))}
+                              checked={mdOptions.translateMultilineCode}
+                              onChange={(checked) => setMdOptions((prev) => ({ ...prev, translateMultilineCode: checked }))}
                               aria-label={tMarkdown("tCodeBlocks")}
                             />
                           </Flex>
@@ -546,8 +525,8 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
                             </Tooltip>
                             <Switch
                               size="small"
-                              checked={mdOption.translateLatex}
-                              onChange={(checked) => setMdOption((prev) => ({ ...prev, translateLatex: checked }))}
+                              checked={mdOptions.translateLatex}
+                              onChange={(checked) => setMdOptions((prev) => ({ ...prev, translateLatex: checked }))}
                               aria-label={tMarkdown("tLatex")}
                             />
                           </Flex>
@@ -557,8 +536,8 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
                             </Tooltip>
                             <Switch
                               size="small"
-                              checked={mdOption.translateLinkText}
-                              onChange={(checked) => setMdOption((prev) => ({ ...prev, translateLinkText: checked }))}
+                              checked={mdOptions.translateLinkText}
+                              onChange={(checked) => setMdOptions((prev) => ({ ...prev, translateLinkText: checked }))}
                               aria-label={tMarkdown("tLinkText")}
                             />
                           </Flex>
@@ -579,7 +558,7 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
                           <Tooltip title={tMarkdown("rawTranslationModeTooltip")}>
                             <span>{tMarkdown("rawTranslationMode")}</span>
                           </Tooltip>
-                          <Switch size="small" checked={rawTranslationMode} onChange={setRawTranslationMode} disabled={contextTranslation} aria-label={tMarkdown("rawTranslationMode")} />
+                          <Switch size="small" checked={rawMode} onChange={setRawMode} disabled={contextAware} aria-label={tMarkdown("rawTranslationMode")} />
                         </Flex>
                       </section>
                     </Flex>
@@ -601,8 +580,8 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
                       setRemoveChars={setRemoveChars}
                       retryCount={retryCount}
                       setRetryCount={setRetryCount}
-                      retryTimeout={retryTimeout}
-                      setRetryTimeout={setRetryTimeout}
+                      requestTimeoutSec={requestTimeoutSec}
+                      setRequestTimeoutSec={setRequestTimeoutSec}
                       useCache={useCache}
                       setUseCache={setUseCache}
                       singleFileMode={singleFileMode}
@@ -620,7 +599,7 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
       <TranslateFailurePanel
         count={translateFailedCount}
         lines={translateFailedLines}
-        disabled={translateInProgress}
+        disabled={isTranslating}
         onRetry={() => (uploadMode === "single" ? handleTranslate(performTranslation, sourceText) : handleMultipleTranslate())}
       />
 
@@ -628,9 +607,10 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
       {uploadMode === "single" && (translatedText || extractedText) && (
         <div className="mt-6">
           <Row gutter={[24, 24]}>
-            {translatedText && !(multiLanguageMode && target_langs.length > 1) && (
+            {translatedText && !(multiLanguageMode && targetLanguages.length > 1) && (
               <Col xs={24} lg={extractedText ? 12 : 24}>
                 <ResultCard
+                  title={t("translationResult")}
                   content={resultStats.displayText}
                   charCount={resultStats.charCount}
                   lineCount={resultStats.lineCount}
@@ -673,10 +653,10 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
       )}
 
       <TranslationProgressModal
-        open={translateInProgress}
+        open={isTranslating}
         percent={progressPercent}
         multiLanguageMode={multiLanguageMode}
-        targetLanguageCount={target_langs.length}
+        targetLanguageCount={targetLanguages.length}
         currentCount={progressInfo.current}
         totalCount={progressInfo.total}
       />
@@ -684,8 +664,8 @@ const MDTranslator = ({ onOpenApiSettings }: MDTranslatorProps) => {
       <MultiLanguageSettingsModal
         open={multiLangModalOpen}
         onClose={() => setMultiLangModalOpen(false)}
-        target_langs={target_langs}
-        setTarget_langs={setTarget_langs}
+        targetLanguages={targetLanguages}
+        setTargetLanguages={setTargetLanguages}
         setMultiLanguageMode={setMultiLanguageMode}
       />
     </Spin>

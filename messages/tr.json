@@ -39,7 +39,6 @@
     "multiLanguageModeTooltip": "Aynı anda birden fazla dile çevirin, ayrı dosyalar olarak kaydedilir",
     "translate": "Çevir",
     "totalLanguages": "Toplam Dil:",
-    "resetUpload": "Temizle",
     "resetUploadTooltip": "Mevcut girişi ve yüklenen dosyaları temizle",
     "resetUploadSuccess": "Temizlendi",
     "extractText": "Metni Çıkar",
@@ -94,8 +93,8 @@
     "settingsApplied": "Ayarlar uygulandı",
     "retryCount": "Yeniden Deneme Sayısı",
     "retryCountTooltip": "Çeviri başarısız olduğunda yeniden deneme sayısı",
-    "retryTimeout": "Zaman Aşımı",
-    "retryTimeoutTooltip": "İstek başına maksimum bekleme süresi (saniye). LLM düşünmesi daha uzun sürer; 180 saniye veya daha fazlası önerilir.",
+    "requestTimeoutSec": "Zaman Aşımı",
+    "requestTimeoutSecTooltip": "İstek başına maksimum bekleme süresi (saniye). LLM düşünmesi daha uzun sürer; 180 saniye veya daha fazlası önerilir.",
     "customExportFilename": "Dışa Aktarma Dosya Adı Kalıbı",
     "customExportFilenameTooltip": "'{'name'}' = orijinal dosya adı, '{'lang'}' = dil, '{'ext'}' = uzantı, '{'date'}' = tarih, '{'time'}' = saat",
     "partialFailureTitle": "{count} satır çevrilemedi",
@@ -112,12 +111,25 @@
     "apiStatusConnected": "✓ Bağlandı",
     "apiStatusFailed": "Bağlantı başarısız",
     "testConnection": "Bağlantıyı test et",
-    "moreProviderSettings": "Daha fazla Provider ayarı"
+    "moreProviderSettings": "Daha fazla Provider ayarı",
+    "format": "Biçimlendir",
+    "formatTooltip": "Biçimlendir: boş satırları ve baş/son boşlukları kaldır",
+    "resultToSource": "Sonuç ➔ Kaynak",
+    "resultToSourceTooltip": "Giriş kutusunun içeriğini sonuç metniyle değiştir",
+    "readOnlyMode": "Salt Okunur Mod",
+    "readOnlyModeTooltip": "Metin çok uzun; sayfa performansını korumak için salt okunur mod otomatik olarak etkinleştirildi",
+    "clearInputTooltip": "Giriş içeriğini ve yüklenen dosyaları temizle",
+    "fileExported": "Dışa aktarılan dosya: {fileName}",
+    "exportSuccess": "Dışa aktarma başarılı: {fileName}",
+    "batchDownloaded": "İşlem tamamlandı, dosyalar otomatik olarak indirildi",
+    "sourceTextPlaceholder": "İşlenecek metni girin veya yapıştırın...",
+    "smartLineBreak": "Akıllı satır sonu",
+    "replaceText": "Metni değiştir",
+    "generateJson": "JSON Oluştur",
+    "gtxFreeAPIUnavailable": "Ücretsiz Google Translate API (GTX) şu anda kullanılamıyor. Lütfen ağ bağlantınızı kontrol edin.",
+    "translategemmaUnavailable": "TranslateGemma düğümü kullanılamıyor. Lütfen yerel sunucunun (LM Studio / llama.cpp / Ollama) çalıştığını ve URL'nin doğru olduğunu doğrulayın."
   },
-  "markdown": {
-    "title": "Online Markdown Çevirici - Formatı Koruyan Yapay Zeka",
-    "description": "Markdown belgelerini formatı ve kod bloklarını bozmadan çevirin. Frontmatter ve LaTeX formüllerini destekler. Teknik bloglar ve dokümantasyon için ideal.",
-    "clientTitle": "Markdown Çeviri",
+  "MDTranslator": {
     "clientDescription": "Markdown dosyalarını yükleyin veya metni yapıştırın. Formatı, kodu ve formülleri akıllıca korur. Tek tıkla birden fazla dile çeviri.",
     "translationOptions": "Çeviri Seçenekleri",
     "translateContentGroup": "Çevrilecek içerik",
@@ -132,13 +144,7 @@
     "rawTranslationMode": "Biçimlendirmeyi Yoksay",
     "contextTranslationRawNote": "Etkinleştirildiğinde, çeviri düz metin modunda çalışır ve Markdown biçimlendirmesi yok sayılır.",
     "tLinkText": "Bağlantılardaki Metni Çevir",
-    "textWithPlaceholders": "Orijinal Metin (yer tutucularla)",
-    "faq1q": "Markdown çevirirken kod blokları nasıl korunur?",
-    "faq1a": "Araç kod bloklarını, LaTeX formüllerini ve bağlantıları otomatik algılayıp atlar.",
-    "faq2q": "Teknik blog yazılarını toplu çeviren araç hangisi?",
-    "faq2a": "MDTranslator birden fazla Markdown dosyasını tek tıkla çevirir, Front Matter'ı korur.",
-    "faq3q": "En iyi ücretsiz Markdown çeviri aracı hangisi?",
-    "faq3a": "MDTranslator tamamen ücretsiz ve açık kaynaklıdır, Markdown sözdizimini akıllıca korur."
+    "textWithPlaceholders": "Orijinal Metin (yer tutucularla)"
   },
   "TranslationSettings": {
     "docs": "Belgeler",
@@ -189,7 +195,7 @@
     "presetUpdate": "Mevcut Ön Ayara Kaydet",
     "presetUpdated": "Mevcut ön ayara kaydedildi",
     "presetDeleteConfirm": "Bu ön ayarı silmek istiyor musunuz?",
-    "presetEmptyHint": "No presets yet — edit and click Save",
+    "presetEmptyHint": "Henüz ön ayar yok — düzenleyin ve Kaydet'e tıklayın",
     "qwenMtDomains": "Etki Alanı İpuçları (yalnızca İngilizce)",
     "sendSystemPrompt": "system istemini gönder",
     "sendSystemPromptExtra": "Yalnızca chat template system rolünü reddettiğinde kapatın — tipik hata \"Conversations must start with a user prompt\" (örn. Gemma ailesi).",
@@ -202,57 +208,46 @@
     "callParamsGroup": "Çağrı Parametreleri"
   },
   "tools": {
-    "subtitleTranslator": {
-      "title": "Altyazı Çevirici",
-      "description": "Toplu SRT, ASS, VTT, LRC çevirisi. 50+ dil."
-    },
-    "jsonTranslate": {
-      "title": "i18n JSON Çevirici",
-      "description": "Verimli çok dilli JSON çeviri aracı"
-    },
     "mdTranslator": {
       "title": "Markdown Çevirici",
-      "description": "Toplu Markdown çevirisi, format ve kodu korur"
-    },
-    "textSplitter": {
-      "title": "Metin Bölücü",
-      "description": "AI ve sosyal medya için akıllı uzun metin bölme"
-    },
-    "jsonValueExtractor": {
-      "title": "JSON Değer Çıkarıcı",
-      "description": "JSON değerlerini toplu çıkar, formatlı çıktı"
-    },
-    "jsonNodeEdit": {
-      "title": "Toplu JSON Düzenleme",
-      "description": "JSON düğümlerini toplu düzenle, önek/sonek/değiştir"
-    },
-    "jsonValueTransformer": {
-      "title": "JSON Değer Eşleyici",
-      "description": "JSONPath ile değer eşleme ve taşıma"
-    },
-    "jsonValueSwapper": {
-      "title": "JSON Değer Değiştirici",
-      "description": "Tek tıkla iki alanın değerlerini değiştir"
-    },
-    "jsonNodeInserter": {
-      "title": "JSON Düğüm Ekleyici",
-      "description": "Belirtilen konuma toplu yeni düğümler ekle"
-    },
-    "jsonSortClassify": {
-      "title": "JSON Sırala & Sınıflandır",
-      "description": "Dizileri sırala ve grupla, özel kurallar"
-    },
-    "jsonMatchUpdate": {
-      "title": "JSON Match Update",
-      "description": "Alan eşleşmesine dayalı toplu güncelleme"
-    },
-    "dataParserFlare": {
-      "title": "Flare Dönüştürücü",
-      "description": "Tarayıcı yer imleri ve Flare formatı dönüşümü"
-    },
-    "dataParserImgPrompt": {
-      "title": "IMGPrompt Veri Oluşturucu",
-      "description": "Toplu IMGPrompt JSON verileri oluştur"
+      "description": "Toplu Markdown çevirisi, format ve kodu korur",
+      "metaTitle": "Online Markdown Çevirici - Formatı Koruyan Yapay Zeka",
+      "metaDescription": "Belge çevirisi mi gerekiyor? Markdown belgelerini formatı ve kod bloklarını bozmadan çevirin. Frontmatter ve LaTeX formüllerini destekler.",
+      "faq": [
+        {
+          "q": "Markdown çevirirken kod blokları nasıl korunur?",
+          "a": "Araç kod bloklarını, LaTeX formüllerini ve bağlantıları otomatik algılayıp atlar."
+        },
+        {
+          "q": "Teknik blog yazılarını toplu çeviren araç hangisi?",
+          "a": "MDTranslator birden fazla Markdown dosyasını tek tıkla çevirir, Front Matter'ı korur."
+        },
+        {
+          "q": "En iyi ücretsiz Markdown çeviri aracı hangisi?",
+          "a": "MDTranslator tamamen ücretsiz ve açık kaynaklıdır, Markdown sözdizimini akıllıca korur."
+        }
+      ],
+      "howto": [
+        {
+          "name": "Markdown yükle",
+          "text": "Bir veya daha fazla .md dosyası yükleyin veya Markdown içeriği yapıştırın."
+        },
+        {
+          "name": "Seçenekleri yapılandır",
+          "text": "İhtiyaca göre Front Matter, kod blokları ve LaTeX formülü çevirisini seçin."
+        },
+        {
+          "name": "Çevir ve dışa aktar",
+          "text": "Hedef dili seçin. Biçim korunarak .md dosyalarını indirin."
+        }
+      ],
+      "features": [
+        "Kod bloğu, LaTeX, link koruması",
+        "İsteğe bağlı Front Matter çevirisi",
+        "Toplu Markdown yükleme",
+        "Hugo, Jekyll, Hexo uyumlu",
+        "Biçimsiz mod"
+      ]
     }
   },
   "navigation": {

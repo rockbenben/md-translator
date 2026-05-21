@@ -39,8 +39,7 @@
     "multiLanguageModeTooltip": "एक साथ कई भाषाओं में अनुवाद करें, अलग-अलग सहेजा गया",
     "translate": "अनुवाद करें",
     "totalLanguages": "कुल भाषाएं:",
-    "resetUpload": "साफ़ करें",
-    "resetUploadTooltip": "वर्तमान इनपुट और अपलोड की गई फ़ाइलों को साफ़ करें",
+    "resetUploadTooltip": "वर्तमान इनपुट और अपलोड की गई फ़ाइलें साफ़ करें",
     "resetUploadSuccess": "साफ़ किया गया",
     "extractText": "टेक्स्ट निकालें",
     "translationResult": "परिणाम",
@@ -94,8 +93,8 @@
     "settingsApplied": "सेटिंग्स लागू की गईं",
     "retryCount": "पुनः प्रयास गणना",
     "retryCountTooltip": "अनुवाद विफल होने पर पुनः प्रयासों की संख्या",
-    "retryTimeout": "समय सीमा",
-    "retryTimeoutTooltip": "प्रति अनुरोध अधिकतम प्रतीक्षा (सेकंड)। LLM सोचने में अधिक समय लेता है; 180 सेकंड या अधिक की सिफारिश की जाती है।",
+    "requestTimeoutSec": "समय सीमा",
+    "requestTimeoutSecTooltip": "प्रति अनुरोध अधिकतम प्रतीक्षा (सेकंड)। LLM सोचने में अधिक समय लेता है; 180 सेकंड या अधिक की सिफारिश की जाती है।",
     "customExportFilename": "निर्यात फ़ाइल नाम पैटर्न",
     "customExportFilenameTooltip": "'{'name'}' = मूल फ़ाइल नाम, '{'lang'}' = भाषा, '{'ext'}' = एक्सटेंशन, '{'date'}' = दिनांक, '{'time'}' = समय",
     "partialFailureTitle": "{count} पंक्तियाँ अनुवाद करने में विफल",
@@ -112,12 +111,25 @@
     "apiStatusConnected": "✓ कनेक्टेड",
     "apiStatusFailed": "कनेक्शन विफल",
     "testConnection": "कनेक्शन परीक्षण",
-    "moreProviderSettings": "अधिक Provider सेटिंग्स"
+    "moreProviderSettings": "अधिक Provider सेटिंग्स",
+    "format": "फ़ॉर्मेट करें",
+    "formatTooltip": "फ़ॉर्मेट: खाली लाइनें और आगे-पीछे के स्पेस हटाएं",
+    "resultToSource": "परिणाम ➔ स्रोत",
+    "resultToSourceTooltip": "इनपुट बॉक्स को परिणाम टेक्स्ट से बदलें",
+    "readOnlyMode": "केवल-पढ़ें मोड",
+    "readOnlyModeTooltip": "टेक्स्ट बहुत लंबा है, पृष्ठ प्रदर्शन सुनिश्चित करने के लिए स्वचालित रूप से केवल-पढ़ें मोड में स्विच किया गया",
+    "clearInputTooltip": "इनपुट सामग्री और अपलोड की गई फ़ाइलें साफ़ करें",
+    "fileExported": "फ़ाइल निर्यात हुई: {fileName}",
+    "exportSuccess": "निर्यात सफल: {fileName}",
+    "batchDownloaded": "प्रसंस्करण पूर्ण, फ़ाइल स्वचालित रूप से डाउनलोड हो गई",
+    "sourceTextPlaceholder": "प्रसंस्करण के लिए टेक्स्ट दर्ज करें या पेस्ट करें...",
+    "smartLineBreak": "स्मार्ट लाइन ब्रेक",
+    "replaceText": "टेक्स्ट बदलें",
+    "generateJson": "JSON बनाएं",
+    "gtxFreeAPIUnavailable": "मुफ्त Google Translate API (GTX) वर्तमान में अनुपलब्ध है। कृपया अपना नेटवर्क कनेक्शन जांचें।",
+    "translategemmaUnavailable": "TranslateGemma नोड अनुपलब्ध है। कृपया सुनिश्चित करें कि स्थानीय सर्वर (LM Studio / llama.cpp / Ollama) चल रहा है और URL सही है।"
   },
-  "markdown": {
-    "title": "मार्डाउन अनुवादक ऑनलाइन - प्रारूप सुरक्षित AI अनुवाद",
-    "description": "प्रारूप या कोड को तोड़े बिना मार्डाउन दस्तावेज़ों का अनुवाद करें। फ्रंटमैटर और LaTeX सूत्रों का समर्थन करता है। तकनीकी ब्लॉग और दस्तावेज़ीकरण के लिए आदर्श।",
-    "clientTitle": "Markdown अनुवाद",
+  "MDTranslator": {
     "clientDescription": "Markdown फ़ाइलें अपलोड करें या टेक्स्ट पेस्ट करें। प्रारूप, कोड और सूत्रों को बुद्धिमानी से संरक्षित करता है। कई भाषाओं में एक-क्लिक अनुवाद।",
     "translationOptions": "अनुवाद विकल्प",
     "translateContentGroup": "अनुवाद करने की सामग्री",
@@ -132,13 +144,7 @@
     "rawTranslationMode": "प्रारूपण की उपेक्षा करें",
     "contextTranslationRawNote": "सक्षम होने पर, अनुवाद सादा-पाठ मोड में चलता है और Markdown फ़ॉर्मेटिंग अनदेखी की जाती है।",
     "tLinkText": "लिंक में टेक्स्ट का अनुवाद करें",
-    "textWithPlaceholders": "मूल पाठ (प्लेसहोल्डर के साथ)",
-    "faq1q": "Markdown अनुवाद में कोड ब्लॉक कैसे सुरक्षित रखें?",
-    "faq1a": "टूल स्वचालित रूप से कोड ब्लॉक, LaTeX सूत्र और लिंक का पता लगाता है और छोड़ देता है, केवल सादे टेक्स्ट का अनुवाद करता है।",
-    "faq2q": "तकनीकी ब्लॉग पोस्ट का बैच अनुवाद कौन सा टूल करता है?",
-    "faq2a": "MDTranslator कई Markdown फाइलों के बैच अपलोड और एक-क्लिक अनुवाद का समर्थन करता है। Front Matter मेटाडेटा संरक्षित रहता है।",
-    "faq3q": "सबसे अच्छा मुफ्त Markdown अनुवाद टूल कौन सा है?",
-    "faq3a": "MDTranslator पूरी तरह मुफ्त और ओपन सोर्स है, Google और DeepSeek जैसे AI मॉडल समर्थित हैं।"
+    "textWithPlaceholders": "मूल पाठ (प्लेसहोल्डर के साथ)"
   },
   "TranslationSettings": {
     "docs": "दस्तावेज़",
@@ -189,7 +195,7 @@
     "presetUpdate": "वर्तमान प्रीसेट में सहेजें",
     "presetUpdated": "वर्तमान प्रीसेट में सहेजा गया",
     "presetDeleteConfirm": "क्या आप इस प्रीसेट को हटाना चाहते हैं?",
-    "presetEmptyHint": "No presets yet — edit and click Save",
+    "presetEmptyHint": "कोई प्रीसेट नहीं — संपादित करें और सहेजें पर क्लिक करें",
     "qwenMtDomains": "डोमेन प्रॉम्प्ट (केवल अंग्रेजी)",
     "sendSystemPrompt": "system प्रॉम्प्ट भेजें",
     "sendSystemPromptExtra": "केवल तब बंद करें जब chat template system भूमिका अस्वीकार करता है — सामान्य त्रुटि \"Conversations must start with a user prompt\" (जैसे Gemma परिवार)।",
@@ -202,57 +208,46 @@
     "callParamsGroup": "कॉल पैरामीटर"
   },
   "tools": {
-    "subtitleTranslator": {
-      "title": "उपशीर्षक अनुवादक",
-      "description": "बैच SRT, ASS, VTT, LRC अनुवाद। 50+ भाषाएं।"
-    },
-    "jsonTranslate": {
-      "title": "i18n JSON अनुवादक",
-      "description": "कुशल बहुभाषी JSON अनुवाद उपकरण"
-    },
     "mdTranslator": {
       "title": "Markdown अनुवादक",
-      "description": "बैच Markdown अनुवाद, प्रारूप और कोड संरक्षित करें"
-    },
-    "textSplitter": {
-      "title": "टेक्स्ट स्प्लिटर",
-      "description": "AI और सोशल मीडिया के लिए स्मार्ट लंबा टेक्स्ट विभाजन"
-    },
-    "jsonValueExtractor": {
-      "title": "JSON मान एक्सट्रैक्टर",
-      "description": "बैच JSON मान निकालें, स्वरूपित आउटपुट"
-    },
-    "jsonNodeEdit": {
-      "title": "बैच JSON संपादन",
-      "description": "बैच JSON नोड्स संपादित करें, उपसर्ग/प्रत्यय/बदलें"
-    },
-    "jsonValueTransformer": {
-      "title": "JSON मान मैपर",
-      "description": "JSONPath के साथ मान मैपिंग और प्रवासन"
-    },
-    "jsonValueSwapper": {
-      "title": "JSON मान स्वैपर",
-      "description": "एक क्लिक में दो फ़ील्ड मान स्वैप करें"
-    },
-    "jsonNodeInserter": {
-      "title": "JSON नोड इंसर्टर",
-      "description": "बैच में निर्दिष्ट स्थिति में नए नोड डालें"
-    },
-    "jsonSortClassify": {
-      "title": "JSON सॉर्ट और वर्गीकृत करें",
-      "description": "सरणियों को सॉर्ट और समूहबद्ध करें, कस्टम नियम"
-    },
-    "jsonMatchUpdate": {
-      "title": "JSON मैच अपडेट",
-      "description": "फ़ील्ड मिलान के आधार पर बैच अपडेट"
-    },
-    "dataParserFlare": {
-      "title": "फ्लेयर कन्वर्टर",
-      "description": "ब्राउज़र बुकमार्क और फ्लेयर प्रारूप रूपांतरण"
-    },
-    "dataParserImgPrompt": {
-      "title": "IMGPrompt डेटा जेनरेटर",
-      "description": "बैच IMGPrompt JSON डेटा उत्पन्न करें"
+      "description": "बैच Markdown अनुवाद, प्रारूप और कोड संरक्षित करें",
+      "metaTitle": "मार्डाउन अनुवादक ऑनलाइन - प्रारूप सुरक्षित AI अनुवाद",
+      "metaDescription": "दस्तावेज़ अनुवाद की ज़रूरत? Markdown दस्तावेज़ों का प्रारूप, कोड ब्लॉक और LaTeX सूत्र अक्षुण्ण रखकर अनुवाद। DeepSeek और अन्य AI मॉडल समर्थन।",
+      "faq": [
+        {
+          "q": "Markdown अनुवाद में कोड ब्लॉक कैसे सुरक्षित रखें?",
+          "a": "टूल स्वचालित रूप से कोड ब्लॉक, LaTeX सूत्र और लिंक का पता लगाता है और छोड़ देता है, केवल सादे टेक्स्ट का अनुवाद करता है।"
+        },
+        {
+          "q": "तकनीकी ब्लॉग पोस्ट का बैच अनुवाद कौन सा टूल करता है?",
+          "a": "MDTranslator कई Markdown फाइलों के बैच अपलोड और एक-क्लिक अनुवाद का समर्थन करता है। Front Matter मेटाडेटा संरक्षित रहता है।"
+        },
+        {
+          "q": "सबसे अच्छा मुफ्त Markdown अनुवाद टूल कौन सा है?",
+          "a": "MDTranslator पूरी तरह मुफ्त और ओपन सोर्स है, Google और DeepSeek जैसे AI मॉडल समर्थित हैं।"
+        }
+      ],
+      "howto": [
+        {
+          "name": "Markdown अपलोड करें",
+          "text": "एक या अधिक .md फ़ाइलें अपलोड करें या Markdown कंटेंट पेस्ट करें।"
+        },
+        {
+          "name": "विकल्प कॉन्फ़िगर करें",
+          "text": "आवश्यकतानुसार Front Matter, कोड ब्लॉक और LaTeX सूत्र अनुवाद चुनें।"
+        },
+        {
+          "name": "अनुवाद करें और निर्यात करें",
+          "text": "लक्ष्य भाषा चुनें। फ़ॉर्मेट संरक्षित .md डाउनलोड करें।"
+        }
+      ],
+      "features": [
+        "कोड ब्लॉक, LaTeX, लिंक संरक्षण",
+        "वैकल्पिक Front Matter अनुवाद",
+        "बैच Markdown अपलोड",
+        "Hugo, Jekyll, Hexo संगत",
+        "प्रारूप रहित मोड"
+      ]
     }
   },
   "navigation": {

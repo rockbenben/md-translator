@@ -39,7 +39,6 @@
     "multiLanguageModeTooltip": "একসাথে একাধিক ভাষায় অনুবাদ করুন, আলাদাভাবে সংরক্ষিত",
     "translate": "অনুবাদ করুন",
     "totalLanguages": "মোট ভাষা:",
-    "resetUpload": "মুছুন",
     "resetUploadTooltip": "বর্তমান ইনপুট এবং আপলোড করা ফাইল মুছুন",
     "resetUploadSuccess": "মুছে ফেলা হয়েছে",
     "extractText": "টেক্সট বের করুন",
@@ -94,8 +93,8 @@
     "settingsApplied": "সেটিংস প্রয়োগ করা হয়েছে",
     "retryCount": "পুনরায় চেষ্টার সংখ্যা",
     "retryCountTooltip": "অনুবাদ ব্যর্থ হলে পুনরায় চেষ্টার সংখ্যা",
-    "retryTimeout": "সময়সীমা",
-    "retryTimeoutTooltip": "প্রতি অনুরোধের সর্বাধিক অপেক্ষার সময় (সেকেন্ডে)। LLM চিন্তা করতে সময় নেয়; 180 সেকেন্ড বা তার বেশি সুপারিশ করা হয়।",
+    "requestTimeoutSec": "সময়সীমা",
+    "requestTimeoutSecTooltip": "প্রতি অনুরোধের সর্বাধিক অপেক্ষার সময় (সেকেন্ডে)। LLM চিন্তা করতে সময় নেয়; 180 সেকেন্ড বা তার বেশি সুপারিশ করা হয়।",
     "customExportFilename": "এক্সপোর্ট ফাইলের নাম বিন্যাস",
     "customExportFilenameTooltip": "'{'name'}' = মূল ফাইলের নাম, '{'lang'}' = ভাষা, '{'ext'}' = এক্সটেনশন, '{'date'}' = তারিখ, '{'time'}' = সময়",
     "partialFailureTitle": "{count}টি লাইন অনুবাদ করতে ব্যর্থ হয়েছে",
@@ -112,12 +111,25 @@
     "apiStatusConnected": "✓ সংযুক্ত",
     "apiStatusFailed": "সংযোগ ব্যর্থ",
     "testConnection": "সংযোগ পরীক্ষা",
-    "moreProviderSettings": "আরও Provider সেটিংস"
+    "moreProviderSettings": "আরও Provider সেটিংস",
+    "format": "ফরম্যাট করুন",
+    "formatTooltip": "ফরম্যাট: খালি লাইন এবং আগে-পরের স্পেস সরান",
+    "resultToSource": "ফলাফল ➔ উৎস",
+    "resultToSourceTooltip": "ইনপুট বাক্সে ফলাফল টেক্সট প্রতিস্থাপন করুন",
+    "readOnlyMode": "শুধুমাত্র-পঠন মোড",
+    "readOnlyModeTooltip": "টেক্সট অনেক দীর্ঘ, পৃষ্ঠার কার্যকারিতা নিশ্চিত করতে স্বয়ংক্রিয়ভাবে শুধুমাত্র-পঠন মোডে স্যুইচ করা হয়েছে",
+    "clearInputTooltip": "ইনপুট বিষয়বস্তু এবং আপলোড করা ফাইল মুছুন",
+    "fileExported": "ফাইল রপ্তানি হয়েছে: {fileName}",
+    "exportSuccess": "রপ্তানি সফল: {fileName}",
+    "batchDownloaded": "প্রক্রিয়াকরণ সম্পন্ন, ফাইল স্বয়ংক্রিয়ভাবে ডাউনলোড হয়েছে",
+    "sourceTextPlaceholder": "প্রক্রিয়াকরণের জন্য টেক্সট লিখুন বা পেস্ট করুন...",
+    "smartLineBreak": "স্মার্ট লাইন ব্রেক",
+    "replaceText": "টেক্সট প্রতিস্থাপন করুন",
+    "generateJson": "JSON তৈরি করুন",
+    "gtxFreeAPIUnavailable": "বিনামূল্যের Google Translate API (GTX) বর্তমানে উপলব্ধ নয়। অনুগ্রহ করে আপনার নেটওয়ার্ক সংযোগ পরীক্ষা করুন।",
+    "translategemmaUnavailable": "TranslateGemma নোড উপলব্ধ নয়। অনুগ্রহ করে নিশ্চিত করুন যে স্থানীয় সার্ভার (LM Studio / llama.cpp / Ollama) চলছে এবং URL সঠিক।"
   },
-  "markdown": {
-    "title": "Markdown অনুবাদক অনলাইন - ফরম্যাট ঠিক রেখে AI অনুবাদ",
-    "description": "ফরম্যাট বা কোড নষ্ট না করে Markdown নথি অনুবাদ করুন। ফ্রন্টম্যাটার এবং LaTeX সূত্র সমর্থন করে। প্রযুক্তিগত ব্লগ এবং নথিপত্রের জন্য আদর্শ।",
-    "clientTitle": "Markdown অনুবাদ",
+  "MDTranslator": {
     "clientDescription": "Markdown ফাইল আপলোড করুন বা টেক্সট পেস্ট করুন। ফরম্যাট, কোড এবং সূত্র বুদ্ধিমত্তার সাথে সংরক্ষণ করে। এক ক্লিকে একাধিক ভাষায় অনুবাদ।",
     "translationOptions": "অনুবাদ বিকল্প",
     "translateContentGroup": "অনুবাদ করার সামগ্রী",
@@ -132,13 +144,7 @@
     "rawTranslationMode": "ফরম্যাটিং উপেক্ষা করুন",
     "contextTranslationRawNote": "সক্রিয় হলে, অনুবাদ সাদা-টেক্সট মোডে চলে এবং Markdown ফরম্যাটিং উপেক্ষা করা হয়।",
     "tLinkText": "লিঙ্কে পাঠ্য অনুবাদ করুন",
-    "textWithPlaceholders": "আসল পাঠ্য (প্লেসহোল্ডার সহ)",
-    "faq1q": "Markdown অনুবাদে কোড ব্লক কিভাবে সংরক্ষণ করব?",
-    "faq1a": "টুল স্বয়ংক্রিয়ভাবে কোড ব্লক, LaTeX সূত্র এবং লিংক সনাক্ত করে এড়িয়ে যায়।",
-    "faq2q": "প্রযুক্তি ব্লগ পোস্ট ব্যাচ অনুবাদের টুল?",
-    "faq2a": "MDTranslator একাধিক Markdown ফাইল এক-ক্লিকে অনুবাদ করে, Front Matter সংরক্ষণ করে।",
-    "faq3q": "সেরা বিনামূল্যে Markdown অনুবাদ টুল?",
-    "faq3a": "MDTranslator সম্পূর্ণ বিনামূল্যে এবং ওপেন সোর্স, Markdown সিনট্যাক্স বুদ্ধিমত্তার সাথে সংরক্ষণ করে।"
+    "textWithPlaceholders": "আসল পাঠ্য (প্লেসহোল্ডার সহ)"
   },
   "TranslationSettings": {
     "docs": "ডকুমেন্টেশন",
@@ -189,7 +195,7 @@
     "presetUpdate": "বর্তমান প্রিসেটে সংরক্ষণ করুন",
     "presetUpdated": "বর্তমান প্রিসেটে সংরক্ষিত",
     "presetDeleteConfirm": "এই প্রিসেটটি মুছবেন?",
-    "presetEmptyHint": "No presets yet — edit and click Save",
+    "presetEmptyHint": "এখনও কোনো প্রিসেট নেই — সম্পাদনা করুন এবং সংরক্ষণে ক্লিক করুন",
     "qwenMtDomains": "ডোমেইন প্রম্পট (শুধুমাত্র ইংরেজি)",
     "sendSystemPrompt": "system প্রম্পট পাঠান",
     "sendSystemPromptExtra": "শুধুমাত্র যখন chat template system ভূমিকা প্রত্যাখ্যান করে তখনই বন্ধ করুন — সাধারণ ত্রুটি \"Conversations must start with a user prompt\" (যেমন Gemma পরিবার)।",
@@ -202,57 +208,46 @@
     "callParamsGroup": "কল প্যারামিটার"
   },
   "tools": {
-    "subtitleTranslator": {
-      "title": "সাবটাইটেল অনুবাদক",
-      "description": "ব্যাচ SRT, ASS, VTT, LRC অনুবাদ। 50+ ভাষা।"
-    },
-    "jsonTranslate": {
-      "title": "i18n JSON অনুবাদক",
-      "description": "দক্ষ বহুভাষিক JSON অনুবাদ টুল"
-    },
     "mdTranslator": {
       "title": "Markdown অনুবাদক",
-      "description": "ব্যাচ Markdown অনুবাদ, ফরম্যাট এবং কোড সংরক্ষণ করুন"
-    },
-    "textSplitter": {
-      "title": "টেক্সট স্প্লিটার",
-      "description": "AI এবং সোশ্যাল মিডিয়ার জন্য স্মার্ট দীর্ঘ টেক্সট বিভাজন"
-    },
-    "jsonValueExtractor": {
-      "title": "JSON মান এক্সট্র্যাক্টর",
-      "description": "ব্যাচ JSON মান বের করুন, ফরম্যাট করা আউটপুট"
-    },
-    "jsonNodeEdit": {
-      "title": "ব্যাচ JSON সম্পাদনা",
-      "description": "ব্যাচ JSON নোড সম্পাদনা করুন, প্রিফিক্স/সাফিক্স/প্রতিস্থাপন"
-    },
-    "jsonValueTransformer": {
-      "title": "JSON মান ম্যাপার",
-      "description": "JSONPath দিয়ে মান ম্যাপিং এবং মাইগ্রেশন"
-    },
-    "jsonValueSwapper": {
-      "title": "JSON মান সোয়্যাপার",
-      "description": "এক ক্লিকে দুই ফিল্ড মান সোয়্যাপ করুন"
-    },
-    "jsonNodeInserter": {
-      "title": "JSON নোড ইনসার্টার",
-      "description": "ব্যাচে নির্দিষ্ট অবস্থানে নতুন নোড ঢোকান"
-    },
-    "jsonSortClassify": {
-      "title": "JSON সাজান এবং শ্রেণীবদ্ধ করুন",
-      "description": "অ্যারে সাজান এবং গ্রুপ করুন, কাস্টম নিয়ম"
-    },
-    "jsonMatchUpdate": {
-      "title": "JSON ম্যাচ আপডেট",
-      "description": "ফিল্ড মিলের উপর ভিত্তি করে ব্যাচ আপডেট"
-    },
-    "dataParserFlare": {
-      "title": "ফ্লেয়ার কনভার্টার",
-      "description": "ব্রাউজার বুকমার্ক এবং ফ্লেয়ার ফরম্যাট রূপান্তর"
-    },
-    "dataParserImgPrompt": {
-      "title": "IMGPrompt ডেটা জেনারেটর",
-      "description": "ব্যাচ IMGPrompt JSON ডেটা তৈরি করুন"
+      "description": "ব্যাচ Markdown অনুবাদ, ফরম্যাট এবং কোড সংরক্ষণ করুন",
+      "metaTitle": "Markdown অনুবাদক অনলাইন - ফরম্যাট ঠিক রেখে AI অনুবাদ",
+      "metaDescription": "নথি অনুবাদ দরকার? ফরম্যাট বা কোড নষ্ট না করে Markdown নথি অনুবাদ করুন। ফ্রন্টম্যাটার এবং LaTeX সূত্র সমর্থন করে। প্রযুক্তিগত ব্লগ এবং নথিপত্রের জন্য আদর্শ।",
+      "faq": [
+        {
+          "q": "Markdown অনুবাদে কোড ব্লক কিভাবে সংরক্ষণ করব?",
+          "a": "টুল স্বয়ংক্রিয়ভাবে কোড ব্লক, LaTeX সূত্র, লিঙ্ক এবং অন্যান্য ফরম্যাটিং উপাদান সনাক্ত করে এড়িয়ে যায়, শুধুমাত্র প্লেইন টেক্সট অনুবাদ করে — যাতে আপনার প্রযুক্তিগত নথি অনুবাদের পরেও প্রকাশযোগ্য থাকে।"
+        },
+        {
+          "q": "প্রযুক্তি ব্লগ পোস্ট ব্যাচ অনুবাদের টুল?",
+          "a": "MDTranslator একাধিক Markdown ফাইল এক-ক্লিকে অনুবাদ করে, Front Matter সংরক্ষণ করে।"
+        },
+        {
+          "q": "সেরা বিনামূল্যে Markdown অনুবাদ টুল?",
+          "a": "MDTranslator সম্পূর্ণ বিনামূল্যে এবং ওপেন সোর্স, Markdown সিনট্যাক্স বুদ্ধিমত্তার সাথে সংরক্ষণ করে।"
+        }
+      ],
+      "howto": [
+        {
+          "name": "Markdown আপলোড করুন",
+          "text": "এক বা একাধিক .md ফাইল আপলোড করুন।"
+        },
+        {
+          "name": "অপশন কনফিগার করুন",
+          "text": "Front Matter, কোড ব্লক এবং LaTeX সূত্রের অনুবাদ নির্বাচন করুন।"
+        },
+        {
+          "name": "অনুবাদ ও রপ্তানি করুন",
+          "text": "ফরম্যাট সংরক্ষিত .md ডাউনলোড করুন।"
+        }
+      ],
+      "features": [
+        "কোড ব্লক, LaTeX, লিঙ্ক সংরক্ষণ",
+        "ঐচ্ছিক Front Matter অনুবাদ",
+        "ব্যাচ Markdown আপলোড",
+        "Hugo, Jekyll, Hexo সামঞ্জস্যপূর্ণ",
+        "ফরম্যাট ছাড়া মোড"
+      ]
     }
   },
   "navigation": {

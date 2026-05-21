@@ -39,7 +39,6 @@
     "multiLanguageModeTooltip": "Одновременный перевод на несколько языков, сохранение в виде отдельных файлов",
     "translate": "Перевести",
     "totalLanguages": "Всего языков:",
-    "resetUpload": "Очистить",
     "resetUploadTooltip": "Очистить текущий ввод и загруженные файлы",
     "resetUploadSuccess": "Очищено",
     "extractText": "Извлечь текст",
@@ -94,8 +93,8 @@
     "settingsApplied": "Настройки применены",
     "retryCount": "Количество повторов",
     "retryCountTooltip": "Количество попыток повтора при сбое перевода",
-    "retryTimeout": "Тайм-аут",
-    "retryTimeoutTooltip": "Максимальное ожидание на запрос (секунды). Рассуждение LLM занимает больше времени; рекомендуется 180 с и более.",
+    "requestTimeoutSec": "Тайм-аут",
+    "requestTimeoutSecTooltip": "Максимальное ожидание на запрос (секунды). Рассуждение LLM занимает больше времени; рекомендуется 180 с и более.",
     "customExportFilename": "Шаблон имени файла",
     "customExportFilenameTooltip": "'{'name'}' = имя оригинала, '{'lang'}' = язык, '{'ext'}' = расширение, '{'date'}' = дата, '{'time'}' = время",
     "partialFailureTitle": "Не удалось перевести {count} строк",
@@ -112,12 +111,25 @@
     "apiStatusConnected": "✓ Подключено",
     "apiStatusFailed": "Сбой соединения",
     "testConnection": "Тест подключения",
-    "moreProviderSettings": "Другие настройки Provider"
+    "moreProviderSettings": "Другие настройки Provider",
+    "format": "Форматировать",
+    "formatTooltip": "Форматировать: удалить пустые строки и пробелы в начале/конце",
+    "resultToSource": "Результат ➔ Источник",
+    "resultToSourceTooltip": "Заменить текст в поле ввода текстом результата",
+    "readOnlyMode": "Режим только для чтения",
+    "readOnlyModeTooltip": "Текст слишком длинный; режим только для чтения активирован автоматически для поддержания производительности страницы",
+    "clearInputTooltip": "Очистить введённый текст и загруженные файлы",
+    "fileExported": "Файл экспортирован: {fileName}",
+    "exportSuccess": "Экспорт успешен: {fileName}",
+    "batchDownloaded": "Обработка завершена, файлы загружены автоматически",
+    "sourceTextPlaceholder": "Введите или вставьте текст для обработки...",
+    "smartLineBreak": "Умный перенос строки",
+    "replaceText": "Заменить текст",
+    "generateJson": "Создать JSON",
+    "gtxFreeAPIUnavailable": "Бесплатный API Google Translate (GTX) в настоящее время недоступен. Пожалуйста, проверьте подключение к сети.",
+    "translategemmaUnavailable": "Узел TranslateGemma недоступен. Убедитесь, что локальный сервер (LM Studio / llama.cpp / Ollama) запущен и URL верен."
   },
-  "markdown": {
-    "title": "MDTranslator | Перевод Markdown и Документов",
-    "description": "Нужен перевод документации? MDTranslator сохраняет формат, код и LaTeX. Качественный перевод с DeepSeek. Быстро и open-source.",
-    "clientTitle": "Перевод Markdown",
+  "MDTranslator": {
     "clientDescription": "Загрузите файл Markdown или вставьте текст. Интеллектуально сохраняет формат, код и формулы, перевод на несколько языков одним кликом.",
     "translationOptions": "Опции перевода",
     "translateContentGroup": "Содержимое для перевода",
@@ -132,13 +144,7 @@
     "rawTranslationMode": "Игнорировать форматирование",
     "contextTranslationRawNote": "При включении перевод выполняется в режиме обычного текста, а форматирование Markdown игнорируется.",
     "tLinkText": "Переводить текст в ссылках",
-    "textWithPlaceholders": "Исходный текст (с заполнителями)",
-    "faq1q": "Как сохранить блоки кода при переводе Markdown?",
-    "faq1a": "Инструмент автоматически определяет и пропускает блоки кода, формулы LaTeX и ссылки, переводя только текст.",
-    "faq2q": "Какой инструмент переводит технические статьи пакетно?",
-    "faq2a": "MDTranslator поддерживает пакетную загрузку Markdown-файлов с переводом в один клик, сохраняя метаданные Front Matter.",
-    "faq3q": "Какой лучший бесплатный инструмент перевода Markdown?",
-    "faq3a": "MDTranslator — полностью бесплатный и открытый, поддерживает Google и ИИ-модели DeepSeek, интеллектуально сохраняя синтаксис Markdown."
+    "textWithPlaceholders": "Исходный текст (с заполнителями)"
   },
   "TranslationSettings": {
     "docs": "Документация",
@@ -189,7 +195,7 @@
     "presetUpdate": "Сохранить в текущий пресет",
     "presetUpdated": "Сохранено в текущий пресет",
     "presetDeleteConfirm": "Удалить этот пресет?",
-    "presetEmptyHint": "No presets yet — edit and click Save",
+    "presetEmptyHint": "Пресетов пока нет — отредактируйте и нажмите Сохранить",
     "qwenMtDomains": "Промпты домена (только на английском)",
     "sendSystemPrompt": "Отправлять system-промпт",
     "sendSystemPromptExtra": "Выключайте только если chat template отклоняет роль system — типичная ошибка \"Conversations must start with a user prompt\" (напр. семейство Gemma).",
@@ -202,57 +208,46 @@
     "callParamsGroup": "Параметры вызова"
   },
   "tools": {
-    "subtitleTranslator": {
-      "title": "Переводчик субтитров",
-      "description": "Пакетный перевод субтитров SRT, ASS, VTT, LRC, поддержка 50+ языков"
-    },
-    "jsonTranslate": {
-      "title": "i18n JSON Перевод",
-      "description": "Эффективный инструмент многоязычного перевода JSON"
-    },
     "mdTranslator": {
       "title": "Markdown Перевод",
-      "description": "Пакетный перевод документов Markdown, сохранение формата и кода"
-    },
-    "textSplitter": {
-      "title": "Разделение текста",
-      "description": "Умное разделение длинного текста, подходит для ввода ИИ и соцсетей"
-    },
-    "jsonValueExtractor": {
-      "title": "Извлечение значений JSON",
-      "description": "Пакетное извлечение значений полей JSON, поддержка форматированного вывода"
-    },
-    "jsonNodeEdit": {
-      "title": "Пакетное редактирование JSON",
-      "description": "Пакетное редактирование значений узлов JSON, поддержка префиксов/суффиксов и замены"
-    },
-    "jsonValueTransformer": {
-      "title": "Сопоставление ключей и значений JSON",
-      "description": "Сопоставление и миграция значений полей, поддержка определения местоположения JSONPath"
-    },
-    "jsonValueSwapper": {
-      "title": "Обмен значений ключей JSON",
-      "description": "Обмен значений двух полей одним кликом"
-    },
-    "jsonNodeInserter": {
-      "title": "Вставка узлов JSON",
-      "description": "Пакетная вставка новых узлов в указанную позицию"
-    },
-    "jsonSortClassify": {
-      "title": "Сортировка и классификация JSON",
-      "description": "Сортировка и группировка массивов, поддержка пользовательских правил"
-    },
-    "jsonMatchUpdate": {
-      "title": "Обновление сопоставления JSON",
-      "description": "Пакетное обновление данных на основе сопоставления полей"
-    },
-    "dataParserFlare": {
-      "title": "Преобразование закладок Flare",
-      "description": "Взаимное преобразование закладок браузера и формата Flare"
-    },
-    "dataParserImgPrompt": {
-      "title": "Генерация данных IMGPrompt",
-      "description": "Пакетная генерация данных JSON для IMGPrompt"
+      "description": "Пакетный перевод документов Markdown, сохранение формата и кода",
+      "metaTitle": "Переводчик Markdown | Сохраняет формат и код, многоязычный",
+      "metaDescription": "Нужен перевод документации? MDTranslator сохраняет формат, код и LaTeX. Качественный перевод с DeepSeek. Быстро и open-source.",
+      "faq": [
+        {
+          "q": "Как сохранить блоки кода при переводе Markdown?",
+          "a": "Инструмент автоматически определяет и пропускает блоки кода, формулы LaTeX и ссылки, переводя только текст."
+        },
+        {
+          "q": "Какой инструмент переводит технические статьи пакетно?",
+          "a": "MDTranslator поддерживает пакетную загрузку Markdown-файлов с переводом в один клик, сохраняя метаданные Front Matter."
+        },
+        {
+          "q": "Какой лучший бесплатный инструмент перевода Markdown?",
+          "a": "MDTranslator — полностью бесплатный и открытый, поддерживает Google и ИИ-модели DeepSeek, интеллектуально сохраняя синтаксис Markdown."
+        }
+      ],
+      "howto": [
+        {
+          "name": "Загрузить Markdown",
+          "text": "Загрузите один или несколько .md-файлов или вставьте Markdown."
+        },
+        {
+          "name": "Настроить параметры",
+          "text": "Выберите перевод Front Matter, блоков кода и формул LaTeX по необходимости."
+        },
+        {
+          "name": "Перевести и экспортировать",
+          "text": "Выберите язык и нажмите Перевести. Скачайте с сохранённым форматированием."
+        }
+      ],
+      "features": [
+        "Сохранение кода, LaTeX, ссылок",
+        "Опциональный перевод Front Matter",
+        "Пакетная загрузка Markdown",
+        "Совместимость с Hugo, Jekyll, Hexo",
+        "Режим без форматирования"
+      ]
     }
   },
   "navigation": {
@@ -267,8 +262,8 @@
   "Metadata": {
     "title": "ToolsByAI | Бесплатные ИИ-инструменты для Dev",
     "description": "20+ open-source инструментов: перевод субтитров, i18n, JSON, Markdown. DeepSeek, ChatGPT. Локально и безопасно для разработчиков.",
-    "homeTitle": "ToolsByAI Toolset",
-    "homeDescription": "20+ Tools для перевода, текста и JSON. Помощь разработчикам.",
+    "homeTitle": "Набор инструментов ToolsByAI",
+    "homeDescription": "20+ инструментов для перевода, обработки текста, JSON и преобразования данных. Повышайте эффективность разработчиков и креаторов.",
     "ogTitle": "ToolsByAI | Бесплатные ИИ-инструменты для Dev",
     "ogDescription": "20+ open-source инструментов: перевод субтитров, i18n, JSON, Markdown. DeepSeek, ChatGPT. Локально и безопасно для разработчиков."
   },

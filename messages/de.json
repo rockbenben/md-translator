@@ -39,7 +39,6 @@
     "multiLanguageModeTooltip": "Gleichzeitig in mehrere Sprachen übersetzen, als separate Dateien gespeichert",
     "translate": "Übersetzen",
     "totalLanguages": "Anzahl Zielsprachen:",
-    "resetUpload": "Leeren",
     "resetUploadTooltip": "Aktuelle Eingabe und hochgeladene Dateien löschen",
     "resetUploadSuccess": "Geleert",
     "extractText": "Text extrahieren",
@@ -49,6 +48,9 @@
     "exportFile": "Exportieren",
     "exportAllFile": "Alle exportieren",
     "exportedFile": "Exportiert",
+    "fileExported": "Datei exportiert: {fileName}",
+    "exportSuccess": "Export erfolgreich: {fileName}",
+    "batchDownloaded": "Verarbeitung abgeschlossen, Datei wurde automatisch heruntergeladen",
     "extractedText": "Extrahierter Text",
     "translating": "Übersetze...",
     "multiTranslating": "Übersetze, Zielsprachen gesamt:",
@@ -62,6 +64,7 @@
     "llmUnavailable": "LLM-Knoten vorübergehend nicht verfügbar, bitte Konfiguration in 'API-Einstellungen' prüfen",
     "noFileUploaded": "Bitte laden Sie zuerst eine Datei hoch",
     "translationExported": "Übersetzung abgeschlossen, Dateien exportiert",
+    "sourceTextPlaceholder": "Text zum Verarbeiten eingeben oder einfügen...",
     "noSourceText": "Bitte Text eingeben oder einfügen",
     "textExtracted": "Text extrahiert, ",
     "sourceArea": "Eingabebereich",
@@ -71,6 +74,16 @@
     "updateCount": "Aktualisierte Einträge",
     "startProcess": "Verarbeitung starten",
     "result": "Ergebnis",
+    "format": "Formatieren",
+    "formatTooltip": "Formatieren: Leerzeilen entfernen und führende/nachfolgende Leerzeichen bereinigen",
+    "resultToSource": "Ergebnis ➔ Quelle",
+    "resultToSourceTooltip": "Eingabefeld mit dem Ergebnistext überschreiben",
+    "readOnlyMode": "Nur-Lese-Modus",
+    "readOnlyModeTooltip": "Text zu lang; automatisch in den Nur-Lese-Modus gewechselt, um die Seitenleistung zu erhalten",
+    "clearInputTooltip": "Eingabe und hochgeladene Dateien löschen",
+    "smartLineBreak": "Intelligenter Zeilenumbruch",
+    "replaceText": "Text ersetzen",
+    "generateJson": "JSON generieren",
     "multiValueHint": "Mehrere Werte durch Leerzeichen trennen",
     "exportSettingTooltip": "Konfiguration in Datei exportieren",
     "importSettingTooltip": "Konfiguration aus Datei importieren",
@@ -94,8 +107,8 @@
     "settingsApplied": "Einstellungen angewendet",
     "retryCount": "Wiederholungsversuche",
     "retryCountTooltip": "Anzahl der Wiederholungen bei Übersetzungsfehlern",
-    "retryTimeout": "Zeitüberschreitung",
-    "retryTimeoutTooltip": "Maximale Wartezeit pro Anfrage (in Sekunden). Das Denken von LLMs dauert länger; 180 Sekunden oder mehr werden empfohlen.",
+    "requestTimeoutSec": "Zeitüberschreitung",
+    "requestTimeoutSecTooltip": "Maximale Wartezeit pro Anfrage (in Sekunden). Das Denken von LLMs dauert länger; 180 Sekunden oder mehr werden empfohlen.",
     "customExportFilename": "Dateinamenmuster",
     "customExportFilenameTooltip": "'{'name'}' = Originalname, '{'lang'}' = Sprache, '{'ext'}' = Endung, '{'date'}' = Datum, '{'time'}' = Zeit",
     "partialFailureTitle": "{count} Zeile(n) fehlgeschlagen",
@@ -112,12 +125,11 @@
     "apiStatusConnected": "✓ Verbunden",
     "apiStatusFailed": "Verbindung fehlgeschlagen",
     "testConnection": "Verbindung testen",
-    "moreProviderSettings": "Weitere Provider-Einstellungen"
+    "moreProviderSettings": "Weitere Provider-Einstellungen",
+    "gtxFreeAPIUnavailable": "Die kostenlose Google Translate API (GTX) ist derzeit nicht verfügbar. Bitte überprüfen Sie Ihre Netzwerkverbindung.",
+    "translategemmaUnavailable": "TranslateGemma-Knoten nicht verfügbar. Bitte stellen Sie sicher, dass der lokale Server (LM Studio / llama.cpp / Ollama) läuft und die URL korrekt ist."
   },
-  "markdown": {
-    "title": "MDTranslator | Markdown- & Doku-Übersetzer",
-    "description": "Doku-Übersetzung nervt? MDTranslator erhält Format, Code & LaTeX. Nutze DeepSeek für smarte Übersetzung. Schnell, lokal & open-source.",
-    "clientTitle": "Markdown-Übersetzung",
+  "MDTranslator": {
     "clientDescription": "Markdown-Dateien hochladen oder Text einfügen. Behält Format, Code und Formeln intelligent bei, Ein-Klick-Übersetzung in mehrere Sprachen.",
     "translationOptions": "Übersetzungsoptionen",
     "translateContentGroup": "Inhalte übersetzen",
@@ -132,13 +144,7 @@
     "rawTranslationMode": "Formatierung ignorieren",
     "contextTranslationRawNote": "Wenn aktiviert, läuft die Übersetzung im Nur-Text-Modus und die Markdown-Formatierung wird ignoriert.",
     "tLinkText": "Text in Links übersetzen",
-    "textWithPlaceholders": "Originaltext (mit Platzhaltern)",
-    "faq1q": "Wie bleiben Codeblöcke bei der Markdown-Übersetzung erhalten?",
-    "faq1a": "Das Tool erkennt automatisch Codeblöcke, LaTeX-Formeln und Links und überspringt sie, sodass nur reiner Text übersetzt wird.",
-    "faq2q": "Welches Tool kann technische Blogbeiträge im Stapel übersetzen?",
-    "faq2a": "MDTranslator unterstützt den Stapel-Upload mehrerer Markdown-Dateien mit Ein-Klick-Übersetzung. Front-Matter-Metadaten bleiben für direktes Deployment auf Hugo, Jekyll oder Hexo erhalten.",
-    "faq3q": "Was ist das beste kostenlose Markdown-Übersetzungstool?",
-    "faq3a": "MDTranslator ist komplett kostenlos und Open Source, unterstützt Google und KI-Modelle wie DeepSeek. Im Gegensatz zu generischen Übersetzern wird die Markdown-Syntax intelligent beibehalten."
+    "textWithPlaceholders": "Originaltext (mit Platzhaltern)"
   },
   "TranslationSettings": {
     "docs": "Dokumentation",
@@ -189,7 +195,7 @@
     "presetUpdate": "In aktueller Voreinstellung speichern",
     "presetUpdated": "In aktueller Voreinstellung gespeichert",
     "presetDeleteConfirm": "Diese Voreinstellung löschen?",
-    "presetEmptyHint": "No presets yet — edit and click Save",
+    "presetEmptyHint": "Noch keine Voreinstellungen — bearbeiten und Speichern klicken",
     "qwenMtDomains": "Domänen-Prompts (nur Englisch)",
     "sendSystemPrompt": "System-Prompt senden",
     "sendSystemPromptExtra": "Nur deaktivieren, wenn die Chat-Vorlage die System-Rolle ablehnt — typischer Fehler \"Conversations must start with a user prompt\" (z. B. Gemma-Familie).",
@@ -202,57 +208,46 @@
     "callParamsGroup": "Aufrufparameter"
   },
   "tools": {
-    "subtitleTranslator": {
-      "title": "Untertitel-Übersetzer",
-      "description": "Batch-Übersetzung für SRT, ASS, VTT, LRC. 50+ Sprachen."
-    },
-    "jsonTranslate": {
-      "title": "i18n JSON-Übersetzer",
-      "description": "Effizientes mehrsprachiges JSON-Übersetzungstool"
-    },
     "mdTranslator": {
       "title": "Markdown-Übersetzer",
-      "description": "Markdown-Batch-Übersetzung, Format und Code behalten"
-    },
-    "textSplitter": {
-      "title": "Text-Splitter",
-      "description": "Smarte Langtext-Teilung für KI und Social Media"
-    },
-    "jsonValueExtractor": {
-      "title": "JSON Wert-Extraktor",
-      "description": "JSON-Werte im Batch extrahieren, formatierte Ausgabe"
-    },
-    "jsonNodeEdit": {
-      "title": "JSON Batch Edit",
-      "description": "JSON-Knoten im Batch bearbeiten, Präfix/Suffix/Ersetzen"
-    },
-    "jsonValueTransformer": {
-      "title": "JSON Wert-Mapper",
-      "description": "Feldwert-Mapping und Migration mit JSONPath"
-    },
-    "jsonValueSwapper": {
-      "title": "JSON Wert-Tauscher",
-      "description": "Werte zweier Felder per Klick tauschen"
-    },
-    "jsonNodeInserter": {
-      "title": "JSON Knoten-Inserter",
-      "description": "Neue Knoten an Position im Batch einfügen"
-    },
-    "jsonSortClassify": {
-      "title": "JSON Sort & Classify",
-      "description": "Arrays sortieren und gruppieren, benutzerdefinierte Regeln"
-    },
-    "jsonMatchUpdate": {
-      "title": "JSON Match Update",
-      "description": "Daten basierend auf Feldabgleich im Batch aktualisieren"
-    },
-    "dataParserFlare": {
-      "title": "Flare Lesezeichen-Konverter",
-      "description": "Browser-Lesezeichen und Flare-Format konvertieren"
-    },
-    "dataParserImgPrompt": {
-      "title": "IMGPrompt Datengenerator",
-      "description": "IMGPrompt JSON-Daten im Batch generieren"
+      "description": "Markdown-Batch-Übersetzung, Format und Code behalten",
+      "metaTitle": "Markdown-Übersetzer | Format & Codeblöcke erhalten, mehrsprachig",
+      "metaDescription": "Doku-Übersetzung nervt? MDTranslator erhält Format, Code & LaTeX. Nutze DeepSeek für smarte Übersetzung. Schnell, lokal & open-source.",
+      "faq": [
+        {
+          "q": "Wie bleiben Codeblöcke bei der Markdown-Übersetzung erhalten?",
+          "a": "Das Tool erkennt automatisch Codeblöcke, LaTeX-Formeln und Links und überspringt sie, sodass nur reiner Text übersetzt wird."
+        },
+        {
+          "q": "Welches Tool kann technische Blogbeiträge im Stapel übersetzen?",
+          "a": "MDTranslator unterstützt den Stapel-Upload mehrerer Markdown-Dateien mit Ein-Klick-Übersetzung. Front-Matter-Metadaten bleiben für direktes Deployment auf Hugo, Jekyll oder Hexo erhalten."
+        },
+        {
+          "q": "Was ist das beste kostenlose Markdown-Übersetzungstool?",
+          "a": "MDTranslator ist komplett kostenlos und Open Source, unterstützt Google und KI-Modelle wie DeepSeek. Im Gegensatz zu generischen Übersetzern wird die Markdown-Syntax intelligent beibehalten."
+        }
+      ],
+      "howto": [
+        {
+          "name": "Markdown hochladen",
+          "text": "Laden Sie eine oder mehrere .md-Dateien hoch oder fügen Sie Markdown-Inhalte ein."
+        },
+        {
+          "name": "Optionen konfigurieren",
+          "text": "Wählen Sie, ob Front Matter, Codeblöcke und LaTeX-Formeln übersetzt werden sollen."
+        },
+        {
+          "name": "Übersetzen und exportieren",
+          "text": "Zielsprache wählen und auf Übersetzen klicken. Download mit erhaltener Formatierung."
+        }
+      ],
+      "features": [
+        "Erhalt von Codeblöcken, LaTeX-Formeln, Links",
+        "Optionale Front-Matter-Übersetzung",
+        "Stapel-Upload mehrerer Markdown-Dateien",
+        "Kompatibel mit Hugo, Jekyll, Hexo",
+        "Raw-Modus für Übersetzung ohne Formatierung"
+      ]
     }
   },
   "navigation": {
@@ -267,7 +262,7 @@
   "Metadata": {
     "title": "ToolsByAI | Kostenlose KI-Dev- & Übersetzungstools",
     "description": "20+ Open-Source-Tools: Untertitel-Übersetzung, i18n, JSON & Markdown. Mit DeepSeek & ChatGPT. Lokal, sicher & effizient für Entwickler.",
-    "homeTitle": "ToolsByAI Toolset",
+    "homeTitle": "ToolsByAI Werkzeugkasten",
     "homeDescription": "20+ Tools für Übersetzung, Text, JSON und Datenkonvertierung. Effizienzsteigerung für Entwickler und Creator.",
     "ogTitle": "ToolsByAI | Kostenlose KI-Dev- & Übersetzungstools",
     "ogDescription": "20+ Open-Source-Tools: Untertitel-Übersetzung, i18n, JSON & Markdown. Mit DeepSeek & ChatGPT. Lokal, sicher & effizient für Entwickler."

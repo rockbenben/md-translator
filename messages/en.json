@@ -39,7 +39,6 @@
     "multiLanguageModeTooltip": "Translate to multiple languages simultaneously, saved as separate files",
     "translate": "Translate",
     "totalLanguages": "Total Languages:",
-    "resetUpload": "Clear",
     "resetUploadTooltip": "Clear current input and uploaded files",
     "resetUploadSuccess": "Cleared",
     "extractText": "Extract Text",
@@ -49,6 +48,9 @@
     "exportFile": "Export",
     "exportAllFile": "Export All",
     "exportedFile": "Exported",
+    "fileExported": "File exported: {fileName}",
+    "exportSuccess": "Export successful: {fileName}",
+    "batchDownloaded": "Processing complete, file downloaded automatically",
     "extractedText": "Extracted Text",
     "translating": "Translating",
     "multiTranslating": "Translating, total target languages:",
@@ -62,6 +64,7 @@
     "llmUnavailable": "LLM node unavailable, please check configuration in 'API Settings'",
     "noFileUploaded": "Please upload a file to process first",
     "translationExported": "Translation complete, files exported",
+    "sourceTextPlaceholder": "Enter or paste text to process...",
     "noSourceText": "Please enter or paste text content",
     "textExtracted": "Text extracted,",
     "sourceArea": "Input Area",
@@ -71,6 +74,16 @@
     "updateCount": "Updated entries",
     "startProcess": "Start Processing",
     "result": "Result",
+    "format": "Format",
+    "formatTooltip": "Format: remove blank lines and trim leading/trailing spaces",
+    "resultToSource": "Result ➔ Source",
+    "resultToSourceTooltip": "Overwrite input area with result text",
+    "readOnlyMode": "Read-Only Mode",
+    "readOnlyModeTooltip": "Text is too long; automatically switched to read-only mode to maintain page performance",
+    "clearInputTooltip": "Clear input content and uploaded files",
+    "smartLineBreak": "Smart Line Break",
+    "replaceText": "Replace Text",
+    "generateJson": "Generate JSON",
     "multiValueHint": "Separate multiple values with spaces",
     "exportSettingTooltip": "Export configuration to file",
     "importSettingTooltip": "Import configuration from file",
@@ -94,8 +107,8 @@
     "settingsApplied": "Settings applied",
     "retryCount": "Retry Count",
     "retryCountTooltip": "Number of retry attempts when translation fails",
-    "retryTimeout": "Timeout",
-    "retryTimeoutTooltip": "Maximum wait per request (seconds). LLM thinking takes longer; 180s or more recommended.",
+    "requestTimeoutSec": "Timeout",
+    "requestTimeoutSecTooltip": "Maximum wait per request (seconds). LLM thinking takes longer; 180s or more recommended.",
     "customExportFilename": "Export Filename Pattern",
     "customExportFilenameTooltip": "'{'name'}' = original filename, '{'lang'}' = language, '{'ext'}' = extension, '{'date'}' = date, '{'time'}' = time",
     "partialFailureTitle": "{count} line(s) failed",
@@ -112,12 +125,11 @@
     "apiStatusConnected": "✓ Connected",
     "apiStatusFailed": "Connection Failed",
     "testConnection": "Test Connection",
-    "moreProviderSettings": "More Provider Settings"
+    "moreProviderSettings": "More Provider Settings",
+    "gtxFreeAPIUnavailable": "The free Google Translate API (GTX) is currently unavailable. Please check your network connection.",
+    "translategemmaUnavailable": "TranslateGemma node unavailable. Please verify the local server (LM Studio / llama.cpp / Ollama) is running and the URL is correct."
   },
-  "markdown": {
-    "title": "Markdown Translator | Preserve Format & Code for Docs",
-    "description": "Need to translate docs? MDTranslator keeps formatting, code blocks & LaTeX intact. Supports DeepSeek & AI models. Batch translate your knowledge base now!",
-    "clientTitle": "Markdown Translation",
+  "MDTranslator": {
     "clientDescription": "Upload Markdown files or paste text. Intelligently preserves format, code, and formulas. One-click translate to multiple languages.",
     "translationOptions": "Translation Options",
     "translateContentGroup": "Translate Content",
@@ -132,13 +144,7 @@
     "rawTranslationMode": "Ignore Formatting",
     "contextTranslationRawNote": "When enabled, translation runs in plain-text mode and Markdown formatting is ignored.",
     "tLinkText": "Translate Text in Links",
-    "textWithPlaceholders": "Original Text (with Placeholders)",
-    "faq1q": "How to preserve code blocks and formulas when translating Markdown?",
-    "faq1a": "The tool automatically detects and skips code blocks, LaTeX formulas, links, and other formatting elements, translating only plain text to keep your technical docs publishable after translation.",
-    "faq2q": "What tool can batch-translate technical blog posts?",
-    "faq2a": "MDTranslator supports batch uploading multiple Markdown files for one-click translation. It preserves Front Matter metadata so translated posts deploy directly to Hugo, Jekyll, Hexo, and other blog frameworks.",
-    "faq3q": "What is the best free Markdown translation tool?",
-    "faq3a": "MDTranslator is completely free and open source, supporting Google free translation and AI models like DeepSeek. Unlike generic translators, it intelligently preserves Markdown syntax so you never need to manually fix formatting after translation."
+    "textWithPlaceholders": "Original Text (with Placeholders)"
   },
   "TranslationSettings": {
     "docs": "Docs",
@@ -202,57 +208,46 @@
     "callParamsGroup": "Call Parameters"
   },
   "tools": {
-    "subtitleTranslator": {
-      "title": "Subtitle Translator",
-      "description": "Batch translate SRT, ASS, VTT, LRC subtitles. 50+ languages."
-    },
-    "jsonTranslate": {
-      "title": "i18n JSON Translator",
-      "description": "Efficient multi-language JSON translation tool"
-    },
     "mdTranslator": {
       "title": "Markdown Translator",
-      "description": "Batch translate Markdown, preserving format and code"
-    },
-    "textSplitter": {
-      "title": "Text Splitter",
-      "description": "Smart long text splitter for AI and social media"
-    },
-    "jsonValueExtractor": {
-      "title": "JSON Value Extractor",
-      "description": "Batch extract JSON fields with formatting"
-    },
-    "jsonNodeEdit": {
-      "title": "JSON Batch Edit",
-      "description": "Batch edit JSON nodes with prefix/suffix/replace"
-    },
-    "jsonValueTransformer": {
-      "title": "JSON Value Mapper",
-      "description": "Field value mapping and migration with JSONPath"
-    },
-    "jsonValueSwapper": {
-      "title": "JSON Value Swapper",
-      "description": "One-click swap of two field values"
-    },
-    "jsonNodeInserter": {
-      "title": "JSON Node Inserter",
-      "description": "Batch insert new nodes at specified position"
-    },
-    "jsonSortClassify": {
-      "title": "JSON Sort & Classify",
-      "description": "Sort and group arrays with custom rules"
-    },
-    "jsonMatchUpdate": {
-      "title": "JSON Match Update",
-      "description": "Batch update data by matching fields"
-    },
-    "dataParserFlare": {
-      "title": "Flare Bookmark Converter",
-      "description": "Convert bookmarks to/from Flare format"
-    },
-    "dataParserImgPrompt": {
-      "title": "IMGPrompt Data Gen",
-      "description": "Batch generate IMGPrompt JSON data"
+      "description": "Batch translate Markdown, preserving format and code",
+      "metaTitle": "Markdown Translator | Preserve Format, Code & LaTeX Online",
+      "metaDescription": "Need to translate docs? MDTranslator keeps formatting, code blocks & LaTeX intact. Supports DeepSeek & AI models. Batch translate your knowledge base now!",
+      "faq": [
+        {
+          "q": "How to preserve code blocks and formulas when translating Markdown?",
+          "a": "The tool automatically detects and skips code blocks, LaTeX formulas, links, and other formatting elements, translating only plain text to keep your technical docs publishable after translation."
+        },
+        {
+          "q": "What tool can batch-translate technical blog posts?",
+          "a": "MDTranslator supports batch uploading multiple Markdown files for one-click translation. It preserves Front Matter metadata so translated posts deploy directly to Hugo, Jekyll, Hexo, and other blog frameworks."
+        },
+        {
+          "q": "What is the best free Markdown translation tool?",
+          "a": "MDTranslator is completely free and open source, supporting Google free translation and AI models like DeepSeek. Unlike generic translators, it intelligently preserves Markdown syntax so you never need to manually fix formatting after translation."
+        }
+      ],
+      "howto": [
+        {
+          "name": "Upload Markdown",
+          "text": "Upload one or more .md files, or paste Markdown content into the input area."
+        },
+        {
+          "name": "Configure options",
+          "text": "Choose whether to translate Front Matter, code blocks, and LaTeX formulas based on your needs."
+        },
+        {
+          "name": "Translate and export",
+          "text": "Select target language and click Translate. Download translated .md files with formatting preserved."
+        }
+      ],
+      "features": [
+        "Preserves code blocks, LaTeX formulas, and links during translation",
+        "Optional Front Matter metadata translation",
+        "Batch Markdown file upload and translation",
+        "Compatible with Hugo, Jekyll, Hexo blog frameworks",
+        "Raw mode ignores Markdown formatting for plain translation"
+      ]
     }
   },
   "navigation": {

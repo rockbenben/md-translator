@@ -39,8 +39,7 @@
     "multiLanguageModeTooltip": "同時に複数の言語に翻訳し、それぞれ独立したファイルとして保存します",
     "translate": "翻訳開始",
     "totalLanguages": "翻訳先言語数：",
-    "resetUpload": "クリア",
-    "resetUploadTooltip": "現在の入力内容とアップロードされたファイルをクリア",
+    "resetUploadTooltip": "現在の入力内容とアップロードしたファイルをクリア",
     "resetUploadSuccess": "クリアしました",
     "extractText": "テキスト抽出",
     "translationResult": "翻訳結果",
@@ -94,8 +93,8 @@
     "settingsApplied": "設定が適用されました",
     "retryCount": "リトライ回数",
     "retryCountTooltip": "翻訳失敗時のリトライ試行回数",
-    "retryTimeout": "タイムアウト",
-    "retryTimeoutTooltip": "リクエストあたりの最大待機時間（秒）。LLMの思考時間は長いため、180秒以上を推奨します。",
+    "requestTimeoutSec": "タイムアウト",
+    "requestTimeoutSecTooltip": "リクエストあたりの最大待機時間（秒）。LLMの思考時間は長いため、180秒以上を推奨します。",
     "customExportFilename": "エクスポートファイル名の形式",
     "customExportFilenameTooltip": "'{'name'}' = 元のファイル名, '{'lang'}' = 言語, '{'ext'}' = 拡張子, '{'date'}' = 日付, '{'time'}' = 時間",
     "partialFailureTitle": "{count}行の翻訳に失敗しました",
@@ -112,12 +111,25 @@
     "apiStatusConnected": "✓ 接続済み",
     "apiStatusFailed": "接続失敗",
     "testConnection": "接続テスト",
-    "moreProviderSettings": "その他のProvider設定"
+    "moreProviderSettings": "その他のProvider設定",
+    "format": "フォーマット",
+    "formatTooltip": "フォーマット：空行および先頭・末尾の空白を除去",
+    "resultToSource": "結果 ➔ 原文",
+    "resultToSourceTooltip": "結果テキストを入力欄に上書き",
+    "readOnlyMode": "読み取り専用モード",
+    "readOnlyModeTooltip": "テキストが長すぎるため、ページのパフォーマンスを確保するため自動的に読み取り専用モードに切り替わりました",
+    "clearInputTooltip": "入力内容とアップロードされたファイルをクリア",
+    "fileExported": "ファイルをエクスポートしました：{fileName}",
+    "exportSuccess": "エクスポート成功：{fileName}",
+    "batchDownloaded": "処理完了、ファイルを自動ダウンロードしました",
+    "sourceTextPlaceholder": "処理するテキストを入力または貼り付けてください...",
+    "smartLineBreak": "スマート改行",
+    "replaceText": "テキスト置換",
+    "generateJson": "JSON生成",
+    "gtxFreeAPIUnavailable": "GTX Free API は現在利用できません。ネットワーク接続を確認してください。",
+    "translategemmaUnavailable": "TranslateGemma ノードが利用できません。ローカルサーバー（LM Studio / llama.cpp / Ollama）が起動し、URL が正しいことを確認してください。"
   },
-  "markdown": {
-    "title": "MDTranslator | 書式保持のMarkdown多言語翻訳",
-    "description": "ドキュメント翻訳の書式崩れに悩みですか？コードやLaTeX数式を保持して一括翻訳。DeepSeek等のAIに対応。技術ブログや知識ベースの国際化に最適。今すぐ試用！",
-    "clientTitle": "Markdown翻訳",
+  "MDTranslator": {
     "clientDescription": "Markdownファイルをアップロードまたはテキストを貼り付け。書式、コード、数式をスマートに保持し、ワンクリックで多言語に翻訳。",
     "translationOptions": "翻訳オプション",
     "translateContentGroup": "翻訳対象",
@@ -132,13 +144,7 @@
     "rawTranslationMode": "フォーマットを無視",
     "contextTranslationRawNote": "有効にすると、翻訳はプレーンテキストモードで実行され、Markdown の書式は無視されます。",
     "tLinkText": "リンク内のテキストを翻訳",
-    "textWithPlaceholders": "元のテキスト（プレースホルダー付き）",
-    "faq1q": "Markdown 翻訳時にコードブロックや数式を保持するには？",
-    "faq1a": "ツールがコードブロック・LaTeX 数式・リンクなどの書式要素を自動検出してスキップし、プレーンテキストのみを翻訳します。翻訳後もそのまま公開可能です。",
-    "faq2q": "技術ブログ記事を一括翻訳できるツールは？",
-    "faq2a": "MDTranslator は複数の Markdown ファイルを一括アップロードしてワンクリック翻訳に対応。Front Matter メタデータも保持され、Hugo・Jekyll・Hexo などにそのままデプロイできます。",
-    "faq3q": "最適な無料 Markdown 翻訳ツールは？",
-    "faq3a": "MDTranslator は完全無料・オープンソースで、Google 無料翻訳や DeepSeek 等の AI モデルに対応。汎用翻訳器と異なり Markdown 構文を賢く保持するため、翻訳後の書式修正が不要です。"
+    "textWithPlaceholders": "元のテキスト（プレースホルダー付き）"
   },
   "TranslationSettings": {
     "docs": "ドキュメント",
@@ -189,7 +195,7 @@
     "presetUpdate": "現在のプリセットに保存",
     "presetUpdated": "現在のプリセットに保存しました",
     "presetDeleteConfirm": "このプリセットを削除しますか？",
-    "presetEmptyHint": "No presets yet — edit and click Save",
+    "presetEmptyHint": "プリセットがありません — 編集して保存をクリック",
     "qwenMtDomains": "ドメインプロンプト（英語のみ）",
     "sendSystemPrompt": "system プロンプトを送信",
     "sendSystemPromptExtra": "chat template が system ロールを拒否する場合のみオフに — 典型的なエラー \"Conversations must start with a user prompt\"（Gemma 系列など）。",
@@ -202,57 +208,46 @@
     "callParamsGroup": "呼び出しパラメータ"
   },
   "tools": {
-    "subtitleTranslator": {
-      "title": "字幕翻訳機",
-      "description": "SRT、ASS、VTT、LRC字幕を一括翻訳、50以上の言語に対応"
-    },
-    "jsonTranslate": {
-      "title": "i18n JSON翻訳",
-      "description": "効率的な多言語JSON翻訳ツール"
-    },
     "mdTranslator": {
       "title": "Markdown翻訳",
-      "description": "Markdownドキュメントを一括翻訳、書式とコードを保持"
-    },
-    "textSplitter": {
-      "title": "テキスト分割",
-      "description": "長文をスマートに分割、AI入力とSNSに最適"
-    },
-    "jsonValueExtractor": {
-      "title": "JSON値抽出",
-      "description": "JSONフィールド値を一括抽出、フォーマット出力対応"
-    },
-    "jsonNodeEdit": {
-      "title": "JSON一括編集",
-      "description": "JSONノード値を一括編集、接頭辞/接尾辞と置換に対応"
-    },
-    "jsonValueTransformer": {
-      "title": "JSONキー値マッピング",
-      "description": "フィールド値のマッピングと移行、JSONPath位置特定に対応"
-    },
-    "jsonValueSwapper": {
-      "title": "JSONキー値交換",
-      "description": "2つのフィールドの値をワンクリックで交換"
-    },
-    "jsonNodeInserter": {
-      "title": "JSONノード挿入",
-      "description": "指定位置に新規ノードを一括挿入"
-    },
-    "jsonSortClassify": {
-      "title": "JSONソート分類",
-      "description": "配列のソートとグループ化、カスタムルールに対応"
-    },
-    "jsonMatchUpdate": {
-      "title": "JSONマッチング更新",
-      "description": "フィールドマッチングに基づいてデータを一括更新"
-    },
-    "dataParserFlare": {
-      "title": "Flareブックマーク変換",
-      "description": "ブラウザブックマークとFlare形式の相互変換"
-    },
-    "dataParserImgPrompt": {
-      "title": "IMGPromptデータ生成",
-      "description": "IMGPrompt JSONデータを一括生成"
+      "description": "Markdownドキュメントを一括翻訳、書式とコードを保持",
+      "metaTitle": "Markdown 翻訳ツール - 書式保持の多言語ドキュメント一括翻訳",
+      "metaDescription": "ドキュメント翻訳の書式崩れに悩みですか？コードやLaTeX数式を保持して一括翻訳。DeepSeek等のAIに対応。技術ブログや知識ベースの国際化に最適。今すぐ試用！",
+      "faq": [
+        {
+          "q": "Markdown 翻訳時にコードブロックや数式を保持するには？",
+          "a": "ツールがコードブロック・LaTeX 数式・リンクなどの書式要素を自動検出してスキップし、プレーンテキストのみを翻訳します。翻訳後もそのまま公開可能です。"
+        },
+        {
+          "q": "技術ブログ記事を一括翻訳できるツールは？",
+          "a": "MDTranslator は複数の Markdown ファイルを一括アップロードしてワンクリック翻訳に対応。Front Matter メタデータも保持され、Hugo・Jekyll・Hexo などにそのままデプロイできます。"
+        },
+        {
+          "q": "最適な無料 Markdown 翻訳ツールは？",
+          "a": "MDTranslator は完全無料・オープンソースで、Google 無料翻訳や DeepSeek 等の AI モデルに対応。汎用翻訳器と異なり Markdown 構文を賢く保持するため、翻訳後の書式修正が不要です。"
+        }
+      ],
+      "howto": [
+        {
+          "name": "Markdown をアップロード",
+          "text": "1つまたは複数の .md ファイルをアップロード、または入力エリアに Markdown をペースト。"
+        },
+        {
+          "name": "オプションを設定",
+          "text": "Front Matter、コードブロック、LaTeX 数式を翻訳するかどうかを必要に応じて選択。"
+        },
+        {
+          "name": "翻訳してエクスポート",
+          "text": "対象言語を選択して「翻訳」をクリック。書式を保持した翻訳済み .md ファイルをダウンロード。"
+        }
+      ],
+      "features": [
+        "コードブロック、LaTeX 数式、リンクを翻訳時に保持",
+        "Front Matter メタデータ翻訳オプション",
+        "複数 Markdown ファイル一括アップロード",
+        "Hugo、Jekyll、Hexo ブログフレームワーク対応",
+        "Markdown 書式を無視する Raw モード"
+      ]
     }
   },
   "navigation": {

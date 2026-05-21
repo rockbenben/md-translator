@@ -39,8 +39,7 @@
     "multiLanguageModeTooltip": "Terjemahkan ke beberapa bahasa sekaligus, disimpan secara terpisah",
     "translate": "Terjemahkan",
     "totalLanguages": "Total Bahasa:",
-    "resetUpload": "Bersihkan",
-    "resetUploadTooltip": "Bersihkan input saat ini dan file yang diunggah",
+    "resetUploadTooltip": "Bersihkan input dan file yang diunggah saat ini",
     "resetUploadSuccess": "Dibersihkan",
     "extractText": "Ekstrak Teks",
     "translationResult": "Hasil",
@@ -94,8 +93,8 @@
     "settingsApplied": "Pengaturan diterapkan",
     "retryCount": "Jumlah Percobaan Ulang",
     "retryCountTooltip": "Jumlah percobaan ulang saat terjemahan gagal",
-    "retryTimeout": "Batas Waktu",
-    "retryTimeoutTooltip": "Waktu tunggu maksimum per permintaan (detik). Pemikiran LLM membutuhkan waktu lebih lama; direkomendasikan 180 detik atau lebih.",
+    "requestTimeoutSec": "Batas Waktu",
+    "requestTimeoutSecTooltip": "Waktu tunggu maksimum per permintaan (detik). Pemikiran LLM membutuhkan waktu lebih lama; direkomendasikan 180 detik atau lebih.",
     "customExportFilename": "Pola Nama File Ekspor",
     "customExportFilenameTooltip": "'{'name'}' = nama file asli, '{'lang'}' = bahasa, '{'ext'}' = ekstensi, '{'date'}' = tanggal, '{'time'}' = waktu",
     "partialFailureTitle": "{count} baris gagal diterjemahkan",
@@ -112,12 +111,25 @@
     "apiStatusConnected": "✓ Terhubung",
     "apiStatusFailed": "Koneksi gagal",
     "testConnection": "Uji koneksi",
-    "moreProviderSettings": "Pengaturan Provider lain"
+    "moreProviderSettings": "Pengaturan Provider lain",
+    "format": "Format",
+    "formatTooltip": "Format: hapus baris kosong dan spasi di awal/akhir",
+    "resultToSource": "Hasil ➔ Sumber",
+    "resultToSourceTooltip": "Timpa kotak input dengan teks hasil",
+    "readOnlyMode": "Mode Hanya-Baca",
+    "readOnlyModeTooltip": "Teks terlalu panjang, otomatis beralih ke mode hanya-baca untuk menjaga performa halaman",
+    "clearInputTooltip": "Bersihkan konten input dan file yang diunggah",
+    "fileExported": "File diekspor: {fileName}",
+    "exportSuccess": "Ekspor berhasil: {fileName}",
+    "batchDownloaded": "Pemrosesan selesai, file diunduh otomatis",
+    "sourceTextPlaceholder": "Masukkan atau tempel teks yang akan diproses...",
+    "smartLineBreak": "Jeda Baris Cerdas",
+    "replaceText": "Ganti Teks",
+    "generateJson": "Hasilkan JSON",
+    "gtxFreeAPIUnavailable": "API Google Translate gratis (GTX) saat ini tidak tersedia. Silakan periksa koneksi jaringan Anda.",
+    "translategemmaUnavailable": "Node TranslateGemma tidak tersedia. Harap pastikan server lokal (LM Studio / llama.cpp / Ollama) berjalan dan URL benar."
   },
-  "markdown": {
-    "title": "Penerjemah Markdown Online - Terjemahan AI Pertahankan Format",
-    "description": "Terjemahkan dokumen Markdown tanpa merusak format atau kode. Mendukung frontmatter dan rumus LaTeX. Sempurna untuk blog teknis dan dokumentasi.",
-    "clientTitle": "Terjemahan Markdown",
+  "MDTranslator": {
     "clientDescription": "Unggah file Markdown atau tempel teks. Mempertahankan format, kode, dan rumus dengan cerdas. Terjemahan satu klik ke berbagai bahasa.",
     "translationOptions": "Opsi Terjemahan",
     "translateContentGroup": "Konten untuk diterjemahkan",
@@ -132,13 +144,7 @@
     "rawTranslationMode": "Abaikan Format",
     "contextTranslationRawNote": "Saat diaktifkan, terjemahan berjalan dalam mode teks biasa dan pemformatan Markdown diabaikan.",
     "tLinkText": "Terjemahkan Teks di Tautan",
-    "textWithPlaceholders": "Teks Asli (dengan placeholder)",
-    "faq1q": "Bagaimana menjaga blok kode saat menerjemahkan Markdown?",
-    "faq1a": "Alat mendeteksi dan melewati blok kode, rumus LaTeX dan tautan secara otomatis.",
-    "faq2q": "Alat apa yang menerjemahkan artikel teknis secara massal?",
-    "faq2a": "MDTranslator mendukung unggah massal file Markdown dengan terjemahan satu klik, mempertahankan Front Matter.",
-    "faq3q": "Alat terjemahan Markdown gratis terbaik?",
-    "faq3a": "MDTranslator sepenuhnya gratis dan open source, mempertahankan sintaks Markdown secara cerdas."
+    "textWithPlaceholders": "Teks Asli (dengan placeholder)"
   },
   "TranslationSettings": {
     "docs": "Dokumen",
@@ -189,7 +195,7 @@
     "presetUpdate": "Simpan ke Preset Saat Ini",
     "presetUpdated": "Disimpan ke preset saat ini",
     "presetDeleteConfirm": "Hapus preset ini?",
-    "presetEmptyHint": "No presets yet — edit and click Save",
+    "presetEmptyHint": "Belum ada preset — edit lalu klik Simpan",
     "qwenMtDomains": "Prompt Domain (hanya bahasa Inggris)",
     "sendSystemPrompt": "Kirim prompt system",
     "sendSystemPromptExtra": "Matikan hanya ketika chat template menolak peran system — kesalahan tipikal \"Conversations must start with a user prompt\" (mis. keluarga Gemma).",
@@ -202,57 +208,46 @@
     "callParamsGroup": "Parameter Panggilan"
   },
   "tools": {
-    "subtitleTranslator": {
-      "title": "Penerjemah Subtitle",
-      "description": "Terjemahan batch SRT, ASS, VTT, LRC. 50+ bahasa."
-    },
-    "jsonTranslate": {
-      "title": "Penerjemah JSON i18n",
-      "description": "Alat terjemahan JSON multi-bahasa yang efisien"
-    },
     "mdTranslator": {
       "title": "Penerjemah Markdown",
-      "description": "Terjemahan Markdown batch, pertahankan format dan kode"
-    },
-    "textSplitter": {
-      "title": "Pemisah Teks",
-      "description": "Pemisahan teks panjang cerdas untuk AI dan media sosial"
-    },
-    "jsonValueExtractor": {
-      "title": "Pengekstrak Nilai JSON",
-      "description": "Ekstrak nilai JSON batch, output terformat"
-    },
-    "jsonNodeEdit": {
-      "title": "Pengeditan JSON Batch",
-      "description": "Edit node JSON batch, awalan/akhiran/ganti"
-    },
-    "jsonValueTransformer": {
-      "title": "Pemeta Nilai JSON",
-      "description": "Pemetaan dan migrasi nilai dengan JSONPath"
-    },
-    "jsonValueSwapper": {
-      "title": "Penukar Nilai JSON",
-      "description": "Tukar nilai dua bidang dengan satu klik"
-    },
-    "jsonNodeInserter": {
-      "title": "Penyisip Node JSON",
-      "description": "Sisipkan node baru di posisi yang ditentukan secara batch"
-    },
-    "jsonSortClassify": {
-      "title": "Urutkan & Klasifikasikan JSON",
-      "description": "Urutkan dan kelompokkan array, aturan kustom"
-    },
-    "jsonMatchUpdate": {
-      "title": "Pembaruan JSON Match",
-      "description": "Pembaruan batch berdasarkan pencocokan bidang"
-    },
-    "dataParserFlare": {
-      "title": "Konverter Flare",
-      "description": "Konversi bookmark browser dan format Flare"
-    },
-    "dataParserImgPrompt": {
-      "title": "Generator Data IMGPrompt",
-      "description": "Hasilkan data JSON IMGPrompt secara batch"
+      "description": "Terjemahan Markdown batch, pertahankan format dan kode",
+      "metaTitle": "Penerjemah Markdown Online - Terjemahan AI Pertahankan Format",
+      "metaDescription": "Perlu terjemahkan dokumen? Terjemahkan Markdown tanpa merusak format atau kode. Mendukung frontmatter dan LaTeX. Sempurna untuk blog teknis!",
+      "faq": [
+        {
+          "q": "Bagaimana menjaga blok kode saat menerjemahkan Markdown?",
+          "a": "Alat secara otomatis mendeteksi dan melewati blok kode, rumus LaTeX, tautan, dan elemen pemformatan lainnya, hanya menerjemahkan teks biasa untuk menjaga dokumen teknis Anda tetap dapat dipublikasikan setelah diterjemahkan."
+        },
+        {
+          "q": "Alat apa yang menerjemahkan artikel teknis secara massal?",
+          "a": "MDTranslator mendukung unggah massal file Markdown dengan terjemahan satu klik, mempertahankan Front Matter."
+        },
+        {
+          "q": "Alat terjemahan Markdown gratis terbaik?",
+          "a": "MDTranslator sepenuhnya gratis dan open source, mempertahankan sintaks Markdown secara cerdas."
+        }
+      ],
+      "howto": [
+        {
+          "name": "Unggah Markdown",
+          "text": "Unggah satu atau lebih file .md atau tempel konten Markdown."
+        },
+        {
+          "name": "Konfigurasi opsi",
+          "text": "Pilih untuk menerjemahkan Front Matter, blok kode dan rumus LaTeX."
+        },
+        {
+          "name": "Terjemahkan dan ekspor",
+          "text": "Pilih bahasa. Unduh file .md dengan format terjaga."
+        }
+      ],
+      "features": [
+        "Preservasi blok kode, LaTeX, link",
+        "Terjemahan Front Matter opsional",
+        "Unggah batch Markdown",
+        "Kompatibel Hugo, Jekyll, Hexo",
+        "Mode tanpa format"
+      ]
     }
   },
   "navigation": {

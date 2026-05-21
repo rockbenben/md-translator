@@ -39,7 +39,6 @@
     "multiLanguageModeTooltip": "Traduci in più lingue contemporaneamente, salvate separatamente",
     "translate": "Traduci",
     "totalLanguages": "Totale Lingue:",
-    "resetUpload": "Pulisci",
     "resetUploadTooltip": "Pulisci input corrente e file caricati",
     "resetUploadSuccess": "Pulito",
     "extractText": "Estrai Testo",
@@ -94,8 +93,8 @@
     "settingsApplied": "Impostazioni applicate",
     "retryCount": "Tentativi di riprova",
     "retryCountTooltip": "Numero di tentativi quando la traduzione fallisce",
-    "retryTimeout": "Timeout",
-    "retryTimeoutTooltip": "Attesa massima per richiesta (secondi). Il pensiero LLM richiede più tempo; si consigliano 180 s o più.",
+    "requestTimeoutSec": "Timeout",
+    "requestTimeoutSecTooltip": "Attesa massima per richiesta (secondi). Il pensiero LLM richiede più tempo; si consigliano 180 s o più.",
     "customExportFilename": "Modello nome file",
     "customExportFilenameTooltip": "'{'name'}' = nome originale, '{'lang'}' = lingua, '{'ext'}' = estensione, '{'date'}' = data, '{'time'}' = ora",
     "partialFailureTitle": "{count} riga/righe non riuscite",
@@ -112,12 +111,25 @@
     "apiStatusConnected": "✓ Connesso",
     "apiStatusFailed": "Connessione fallita",
     "testConnection": "Testa connessione",
-    "moreProviderSettings": "Altre impostazioni Provider"
+    "moreProviderSettings": "Altre impostazioni Provider",
+    "format": "Formatta",
+    "formatTooltip": "Formatta: rimuovi righe vuote e spazi iniziali/finali",
+    "resultToSource": "Risultato ➔ Originale",
+    "resultToSourceTooltip": "Sostituire il testo nella casella di input con il testo del risultato",
+    "readOnlyMode": "Modalità Sola Lettura",
+    "readOnlyModeTooltip": "Testo troppo lungo; modalità sola lettura attivata automaticamente per garantire le prestazioni della pagina",
+    "clearInputTooltip": "Cancella contenuto di input e file caricati",
+    "fileExported": "File esportato: {fileName}",
+    "exportSuccess": "Esportazione riuscita: {fileName}",
+    "batchDownloaded": "Elaborazione completata, file scaricati automaticamente",
+    "sourceTextPlaceholder": "Inserisci o incolla il testo da elaborare...",
+    "smartLineBreak": "A capo automatico intelligente",
+    "replaceText": "Sostituisci testo",
+    "generateJson": "Genera JSON",
+    "gtxFreeAPIUnavailable": "L'API Google Translate gratuita (GTX) non è attualmente disponibile. Controlla la connessione di rete.",
+    "translategemmaUnavailable": "Nodo TranslateGemma non disponibile. Verifica che il server locale (LM Studio / llama.cpp / Ollama) sia in esecuzione e che l'URL sia corretto."
   },
-  "markdown": {
-    "title": "Traduttore Markdown Online - Traduzione IA con Formattazione",
-    "description": "Traduci documentazione Markdown preservando formattazione e codice. Supporta frontmatter e formule LaTeX. Ideale per blog tecnici, docs e README multilingua.",
-    "clientTitle": "Traduzione Markdown",
+  "MDTranslator": {
     "clientDescription": "Carica file Markdown o incolla testo. Preserva intelligentemente formato, codice e formule. Traduzione in un clic in più lingue.",
     "translationOptions": "Opzioni Traduzione",
     "translateContentGroup": "Contenuto da tradurre",
@@ -132,13 +144,7 @@
     "rawTranslationMode": "Ignora Formattazione",
     "contextTranslationRawNote": "Quando abilitato, la traduzione viene eseguita in modalità testo semplice e la formattazione Markdown viene ignorata.",
     "tLinkText": "Traduci testo nei link",
-    "textWithPlaceholders": "Testo Originale (con segnaposto)",
-    "faq1q": "Come preservare i blocchi di codice nella traduzione Markdown?",
-    "faq1a": "Lo strumento rileva e salta automaticamente blocchi di codice, formule LaTeX e link, traducendo solo il testo.",
-    "faq2q": "Quale strumento traduce articoli tecnici in batch?",
-    "faq2a": "MDTranslator supporta il caricamento batch di file Markdown con traduzione in un clic, preservando i metadati Front Matter.",
-    "faq3q": "Qual è il miglior strumento gratuito per tradurre Markdown?",
-    "faq3a": "MDTranslator è completamente gratuito e open source, preserva intelligentemente la sintassi Markdown."
+    "textWithPlaceholders": "Testo Originale (con segnaposto)"
   },
   "TranslationSettings": {
     "docs": "Docs",
@@ -189,7 +195,7 @@
     "presetUpdate": "Salva nel preset corrente",
     "presetUpdated": "Salvato nel preset corrente",
     "presetDeleteConfirm": "Eliminare questo preset?",
-    "presetEmptyHint": "No presets yet — edit and click Save",
+    "presetEmptyHint": "Nessun preset ancora — modifica e clicca Salva",
     "qwenMtDomains": "Prompt di dominio (solo in inglese)",
     "sendSystemPrompt": "Invia prompt system",
     "sendSystemPromptExtra": "Disattivare solo quando il chat template rifiuta il ruolo system — errore tipico \"Conversations must start with a user prompt\" (es. famiglia Gemma).",
@@ -202,57 +208,46 @@
     "callParamsGroup": "Parametri di chiamata"
   },
   "tools": {
-    "subtitleTranslator": {
-      "title": "Traduttore Sottotitoli",
-      "description": "Traduzione in batch SRT, ASS, VTT, LRC. 50+ lingue."
-    },
-    "jsonTranslate": {
-      "title": "Traduttore JSON i18n",
-      "description": "Strumento efficiente di traduzione JSON multilingua"
-    },
     "mdTranslator": {
       "title": "Traduttore Markdown",
-      "description": "Traduzione Markdown in batch, preserva formato e codice"
-    },
-    "textSplitter": {
-      "title": "Divisore Testo",
-      "description": "Divisione intelligente testo lungo per IA e social media"
-    },
-    "jsonValueExtractor": {
-      "title": "Estrattore Valore JSON",
-      "description": "Estrai valori JSON in batch, output formattato"
-    },
-    "jsonNodeEdit": {
-      "title": "Modifica JSON in Batch",
-      "description": "Modifica nodi JSON in batch, prefisso/suffisso/sostituisci"
-    },
-    "jsonValueTransformer": {
-      "title": "Mappatore Valore JSON",
-      "description": "Mappatura e migrazione valori con JSONPath"
-    },
-    "jsonValueSwapper": {
-      "title": "Scambiatore Valore JSON",
-      "description": "Scambia valori di due campi in un clic"
-    },
-    "jsonNodeInserter": {
-      "title": "Inseritore Nodo JSON",
-      "description": "Inserisci nuovi nodi in posizione specificata in batch"
-    },
-    "jsonSortClassify": {
-      "title": "Ordina & Classifica JSON",
-      "description": "Ordina e raggruppa array, regole personalizzate"
-    },
-    "jsonMatchUpdate": {
-      "title": "Aggiornamento Match JSON",
-      "description": "Aggiornamento in batch basato su corrispondenza campi"
-    },
-    "dataParserFlare": {
-      "title": "Convertitore Flare",
-      "description": "Conversione preferiti browser e formato Flare"
-    },
-    "dataParserImgPrompt": {
-      "title": "Generatore Dati IMGPrompt",
-      "description": "Genera dati JSON IMGPrompt in batch"
+      "description": "Traduzione Markdown in batch, preserva formato e codice",
+      "metaTitle": "Traduttore Markdown Online - Traduzione IA con Formattazione",
+      "metaDescription": "Devi tradurre documenti? Traduci documentazione Markdown preservando formattazione e codice. Supporta frontmatter e formule LaTeX.",
+      "faq": [
+        {
+          "q": "Come preservare i blocchi di codice nella traduzione Markdown?",
+          "a": "Lo strumento rileva e salta automaticamente blocchi di codice, formule LaTeX e link, traducendo solo il testo."
+        },
+        {
+          "q": "Quale strumento traduce articoli tecnici in batch?",
+          "a": "MDTranslator supporta il caricamento batch di file Markdown con traduzione in un clic, preservando i metadati Front Matter."
+        },
+        {
+          "q": "Qual è il miglior strumento gratuito per tradurre Markdown?",
+          "a": "MDTranslator è completamente gratuito e open source, preserva intelligentemente la sintassi Markdown."
+        }
+      ],
+      "howto": [
+        {
+          "name": "Carica Markdown",
+          "text": "Carica uno o più file .md o incolla contenuto Markdown."
+        },
+        {
+          "name": "Configura opzioni",
+          "text": "Scegli di tradurre Front Matter, blocchi di codice e formule LaTeX."
+        },
+        {
+          "name": "Traduci ed esporta",
+          "text": "Seleziona lingua. Scarica file .md con formattazione preservata."
+        }
+      ],
+      "features": [
+        "Conservazione blocchi codice, LaTeX, link",
+        "Traduzione Front Matter opzionale",
+        "Caricamento batch Markdown",
+        "Compatibile Hugo, Jekyll, Hexo",
+        "Modalità senza formato"
+      ]
     }
   },
   "navigation": {

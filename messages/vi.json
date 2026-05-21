@@ -39,8 +39,7 @@
     "multiLanguageModeTooltip": "Dịch sang nhiều ngôn ngữ cùng lúc, lưu thành các tệp riêng biệt",
     "translate": "Dịch",
     "totalLanguages": "Tổng số ngôn ngữ:",
-    "resetUpload": "Xóa",
-    "resetUploadTooltip": "Xóa đầu vào hiện tại và tệp đã tải lên",
+    "resetUploadTooltip": "Xóa nội dung hiện tại và các tệp đã tải lên",
     "resetUploadSuccess": "Đã xóa",
     "extractText": "Trích xuất văn bản",
     "translationResult": "Kết quả",
@@ -94,8 +93,8 @@
     "settingsApplied": "Đã áp dụng cài đặt",
     "retryCount": "Số lần thử lại",
     "retryCountTooltip": "Số lần thử lại khi dịch thất bại",
-    "retryTimeout": "Thời gian chờ",
-    "retryTimeoutTooltip": "Thời gian chờ tối đa mỗi yêu cầu (giây). LLM suy nghĩ mất nhiều thời gian hơn; khuyến nghị 180 giây trở lên.",
+    "requestTimeoutSec": "Thời gian chờ",
+    "requestTimeoutSecTooltip": "Thời gian chờ tối đa mỗi yêu cầu (giây). LLM suy nghĩ mất nhiều thời gian hơn; khuyến nghị 180 giây trở lên.",
     "customExportFilename": "Mẫu tên tệp xuất",
     "customExportFilenameTooltip": "'{'name'}' = tên tệp gốc, '{'lang'}' = ngôn ngữ, '{'ext'}' = phần mở rộng, '{'date'}' = ngày, '{'time'}' = thời gian",
     "partialFailureTitle": "{count} dòng dịch thất bại",
@@ -112,12 +111,25 @@
     "apiStatusConnected": "✓ Đã kết nối",
     "apiStatusFailed": "Kết nối thất bại",
     "testConnection": "Kiểm tra kết nối",
-    "moreProviderSettings": "Thêm cài đặt Provider"
+    "moreProviderSettings": "Thêm cài đặt Provider",
+    "format": "Định dạng",
+    "formatTooltip": "Định dạng: xóa dòng trống và khoảng trắng đầu/cuối",
+    "resultToSource": "Kết quả ➔ Nguồn",
+    "resultToSourceTooltip": "Ghi đè văn bản kết quả vào ô nhập liệu",
+    "readOnlyMode": "Chế độ chỉ đọc",
+    "readOnlyModeTooltip": "Văn bản quá dài, đã tự động chuyển sang chế độ chỉ đọc để đảm bảo hiệu suất trang",
+    "clearInputTooltip": "Xóa nội dung đã nhập và tệp đã tải lên",
+    "fileExported": "Đã xuất tệp: {fileName}",
+    "exportSuccess": "Xuất thành công: {fileName}",
+    "batchDownloaded": "Xử lý hoàn tất, tệp đã được tải xuống tự động",
+    "sourceTextPlaceholder": "Nhập hoặc dán văn bản cần xử lý...",
+    "smartLineBreak": "Xuống dòng thông minh",
+    "replaceText": "Thay thế văn bản",
+    "generateJson": "Tạo JSON",
+    "gtxFreeAPIUnavailable": "API Google Translate miễn phí (GTX) hiện không khả dụng. Vui lòng kiểm tra kết nối mạng của bạn.",
+    "translategemmaUnavailable": "Node TranslateGemma không khả dụng. Vui lòng xác minh máy chủ cục bộ (LM Studio / llama.cpp / Ollama) đang chạy và URL chính xác."
   },
-  "markdown": {
-    "title": "Dịch Giả Markdown Online - Dịch AI Giữ Nguyên Định Dạng",
-    "description": "Dịch tài liệu Markdown mà không làm hỏng định dạng hay mã nguồn. Hỗ trợ frontmatter và công thức LaTeX. Lý tưởng cho blog kỹ thuật và tài liệu dự án.",
-    "clientTitle": "Dịch Markdown",
+  "MDTranslator": {
     "clientDescription": "Tải lên tệp Markdown hoặc dán văn bản. Giữ nguyên định dạng, mã và công thức một cách thông minh. Dịch sang nhiều ngôn ngữ chỉ bằng một cú nhấp chuột.",
     "translationOptions": "Tùy chọn dịch",
     "translateContentGroup": "Nội dung cần dịch",
@@ -132,13 +144,7 @@
     "rawTranslationMode": "Bỏ qua định dạng",
     "contextTranslationRawNote": "Khi được bật, bản dịch chạy ở chế độ văn bản thuần túy và định dạng Markdown bị bỏ qua.",
     "tLinkText": "Dịch văn bản trong liên kết",
-    "textWithPlaceholders": "Văn bản gốc (với placeholder)",
-    "faq1q": "Cách giữ khối mã khi dịch Markdown?",
-    "faq1a": "Công cụ tự động phát hiện và bỏ qua khối mã, công thức LaTeX, chỉ dịch văn bản thuần.",
-    "faq2q": "Công cụ nào dịch hàng loạt bài blog kỹ thuật?",
-    "faq2a": "MDTranslator hỗ trợ tải hàng loạt file Markdown với dịch một click, giữ nguyên Front Matter.",
-    "faq3q": "Công cụ dịch Markdown miễn phí tốt nhất?",
-    "faq3a": "MDTranslator hoàn toàn miễn phí và mã nguồn mở, giữ thông minh cú pháp Markdown."
+    "textWithPlaceholders": "Văn bản gốc (với placeholder)"
   },
   "TranslationSettings": {
     "docs": "Tài liệu",
@@ -189,7 +195,7 @@
     "presetUpdate": "Lưu vào cài đặt sẵn hiện tại",
     "presetUpdated": "Đã lưu vào cài đặt sẵn hiện tại",
     "presetDeleteConfirm": "Xóa cài đặt sẵn này?",
-    "presetEmptyHint": "No presets yet — edit and click Save",
+    "presetEmptyHint": "Chưa có cài đặt sẵn — chỉnh sửa và nhấn Lưu",
     "qwenMtDomains": "Lời nhắc tên miền (chỉ tiếng Anh)",
     "sendSystemPrompt": "Gửi lời nhắc system",
     "sendSystemPromptExtra": "Chỉ tắt khi chat template từ chối vai trò system — lỗi điển hình \"Conversations must start with a user prompt\" (ví dụ họ Gemma).",
@@ -202,57 +208,46 @@
     "callParamsGroup": "Tham số gọi"
   },
   "tools": {
-    "subtitleTranslator": {
-      "title": "Dịch giả Phụ đề",
-      "description": "Dịch hàng loạt SRT, ASS, VTT, LRC. 50+ ngôn ngữ."
-    },
-    "jsonTranslate": {
-      "title": "Dịch giả JSON i18n",
-      "description": "Công cụ dịch JSON đa ngôn ngữ hiệu quả"
-    },
     "mdTranslator": {
       "title": "Dịch giả Markdown",
-      "description": "Dịch Markdown hàng loạt, giữ định dạng và mã"
-    },
-    "textSplitter": {
-      "title": "Bộ chia văn bản",
-      "description": "Chia văn bản dài thông minh cho AI và mạng xã hội"
-    },
-    "jsonValueExtractor": {
-      "title": "Trình trích xuất Giá trị JSON",
-      "description": "Trích xuất giá trị JSON hàng loạt, đầu ra có định dạng"
-    },
-    "jsonNodeEdit": {
-      "title": "Chỉnh sửa JSON Hàng loạt",
-      "description": "Chỉnh sửa nút JSON hàng loạt, tiền tố/hậu tố/thay thế"
-    },
-    "jsonValueTransformer": {
-      "title": "Trình ánh xạ Giá trị JSON",
-      "description": "Ánh xạ và di chuyển giá trị với JSONPath"
-    },
-    "jsonValueSwapper": {
-      "title": "Trình hoán đổi Giá trị JSON",
-      "description": "Hoán đổi giá trị hai trường bằng một cú nhấp chuột"
-    },
-    "jsonNodeInserter": {
-      "title": "Trình chèn Nút JSON",
-      "description": "Chèn nút mới tại vị trí được chỉ định hàng loạt"
-    },
-    "jsonSortClassify": {
-      "title": "Sắp xếp & Phân loại JSON",
-      "description": "Sắp xếp và nhóm mảng, quy tắc tùy chỉnh"
-    },
-    "jsonMatchUpdate": {
-      "title": "Cập nhật JSON Match",
-      "description": "Cập nhật hàng loạt dựa trên khớp trường"
-    },
-    "dataParserFlare": {
-      "title": "Trình chuyển đổi Flare",
-      "description": "Chuyển đổi bookmark trình duyệt và định dạng Flare"
-    },
-    "dataParserImgPrompt": {
-      "title": "Trình tạo dữ liệu IMGPrompt",
-      "description": "Tạo dữ liệu JSON IMGPrompt hàng loạt"
+      "description": "Dịch Markdown hàng loạt, giữ định dạng và mã",
+      "metaTitle": "Dịch Giả Markdown Online - Dịch AI Giữ Nguyên Định Dạng",
+      "metaDescription": "Cần dịch tài liệu? Dịch Markdown mà không làm hỏng định dạng hay mã. Hỗ trợ frontmatter và LaTeX. Lý tưởng cho blog kỹ thuật và tài liệu!",
+      "faq": [
+        {
+          "q": "Cách giữ khối mã khi dịch Markdown?",
+          "a": "Công cụ tự động phát hiện và bỏ qua khối mã, công thức LaTeX, chỉ dịch văn bản thuần."
+        },
+        {
+          "q": "Công cụ nào dịch hàng loạt bài blog kỹ thuật?",
+          "a": "MDTranslator hỗ trợ tải hàng loạt file Markdown với dịch một click, giữ nguyên Front Matter."
+        },
+        {
+          "q": "Công cụ dịch Markdown miễn phí tốt nhất?",
+          "a": "MDTranslator hoàn toàn miễn phí và mã nguồn mở, giữ thông minh cú pháp Markdown."
+        }
+      ],
+      "howto": [
+        {
+          "name": "Tải Markdown lên",
+          "text": "Tải một hoặc nhiều tệp .md hoặc dán nội dung Markdown."
+        },
+        {
+          "name": "Cấu hình tùy chọn",
+          "text": "Chọn dịch Front Matter, khối mã và công thức LaTeX theo nhu cầu."
+        },
+        {
+          "name": "Dịch và xuất",
+          "text": "Chọn ngôn ngữ. Tải xuống tệp .md đã dịch với định dạng được giữ nguyên."
+        }
+      ],
+      "features": [
+        "Bảo toàn khối mã, LaTeX, liên kết",
+        "Dịch Front Matter tùy chọn",
+        "Tải lên hàng loạt Markdown",
+        "Tương thích Hugo, Jekyll, Hexo",
+        "Chế độ không định dạng"
+      ]
     }
   },
   "navigation": {

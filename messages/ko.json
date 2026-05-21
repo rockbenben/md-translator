@@ -39,8 +39,7 @@
     "multiLanguageModeTooltip": "동시에 여러 언어로 번역하여 각각 독립된 파일로 저장",
     "translate": "번역 시작",
     "totalLanguages": "목표 언어 수:",
-    "resetUpload": "지우기",
-    "resetUploadTooltip": "현재 입력 내용 및 업로드된 파일 지우기",
+    "resetUploadTooltip": "현재 입력 내용과 업로드된 파일 지우기",
     "resetUploadSuccess": "지워짐",
     "extractText": "텍스트 추출",
     "translationResult": "번역 결과",
@@ -94,8 +93,8 @@
     "settingsApplied": "설정이 적용되었습니다",
     "retryCount": "재시도 횟수",
     "retryCountTooltip": "번역 실패 시 재시도 횟수",
-    "retryTimeout": "시간 초과",
-    "retryTimeoutTooltip": "요청당 최대 대기 시간(초). LLM 사고 시간이 길어지므로 180초 이상 권장합니다.",
+    "requestTimeoutSec": "시간 초과",
+    "requestTimeoutSecTooltip": "요청당 최대 대기 시간(초). LLM 사고 시간이 길어지므로 180초 이상 권장합니다.",
     "customExportFilename": "내보내기 파일명 패턴",
     "customExportFilenameTooltip": "'{'name'}' = 원본 파일명, '{'lang'}' = 언어, '{'ext'}' = 확장자, '{'date'}' = 날짜, '{'time'}' = 시간",
     "partialFailureTitle": "{count}개 줄 번역 실패",
@@ -112,12 +111,25 @@
     "apiStatusConnected": "✓ 연결됨",
     "apiStatusFailed": "연결 실패",
     "testConnection": "연결 테스트",
-    "moreProviderSettings": "더 많은 Provider 설정"
+    "moreProviderSettings": "더 많은 Provider 설정",
+    "format": "포맷",
+    "formatTooltip": "포맷: 빈 줄 및 앞뒤 공백 제거",
+    "resultToSource": "결과 ➔ 원문",
+    "resultToSourceTooltip": "결과 텍스트를 입력란에 덮어씁니다",
+    "readOnlyMode": "읽기 전용 모드",
+    "readOnlyModeTooltip": "텍스트가 너무 길어 페이지 성능을 위해 자동으로 읽기 전용 모드로 전환되었습니다",
+    "clearInputTooltip": "입력 내용 및 업로드된 파일 지우기",
+    "fileExported": "파일이 내보내졌습니다: {fileName}",
+    "exportSuccess": "내보내기 성공: {fileName}",
+    "batchDownloaded": "처리 완료, 파일이 자동으로 다운로드되었습니다",
+    "sourceTextPlaceholder": "처리할 텍스트를 입력하거나 붙여넣으세요...",
+    "smartLineBreak": "스마트 줄바꿈",
+    "replaceText": "텍스트 치환",
+    "generateJson": "JSON 생성",
+    "gtxFreeAPIUnavailable": "GTX Free API를 현재 사용할 수 없습니다. 네트워크 연결을 확인하세요.",
+    "translategemmaUnavailable": "TranslateGemma 노드를 사용할 수 없습니다. 로컬 서버(LM Studio / llama.cpp / Ollama)가 실행 중이고 URL이 올바른지 확인하세요."
   },
-  "markdown": {
-    "title": "MDTranslator | 서식 유지 Markdown 다국어 번역",
-    "description": "문서 번역 시 서식이 깨지나요? 코드와 LaTeX 수식을 유지하며 일괄 번역하세요. DeepSeek AI 지원. 기술 블로그 및 지식 베이스 국제화에 최적. 지금 무료로 시작하세요!",
-    "clientTitle": "Markdown 번역",
+  "MDTranslator": {
     "clientDescription": "Markdown 파일을 업로드하거나 텍스트를 붙여넣으세요. 서식, 코드, 수식을 지능적으로 유지하며 원클릭으로 여러 언어로 번역합니다.",
     "translationOptions": "번역 옵션",
     "translateContentGroup": "번역 내용",
@@ -132,13 +144,7 @@
     "rawTranslationMode": "서식 무시",
     "contextTranslationRawNote": "활성화하면 번역이 일반 텍스트 모드로 실행되며 Markdown 서식은 무시됩니다.",
     "tLinkText": "링크 텍스트 번역",
-    "textWithPlaceholders": "원본 텍스트 (플레이스홀더 포함)",
-    "faq1q": "Markdown 번역 시 코드 블록과 수식을 유지하려면?",
-    "faq1a": "도구가 코드 블록, LaTeX 수식, 링크 등의 서식 요소를 자동 감지하여 건너뛰고 순수 텍스트만 번역합니다. 번역 후에도 기술 문서를 바로 게시할 수 있습니다.",
-    "faq2q": "기술 블로그 글을 일괄 번역할 수 있는 도구는?",
-    "faq2a": "MDTranslator는 여러 Markdown 파일을 일괄 업로드하여 원클릭 번역을 지원합니다. Front Matter 메타데이터를 보존하여 Hugo, Jekyll, Hexo 등에 바로 배포할 수 있습니다.",
-    "faq3q": "최고의 무료 Markdown 번역 도구는?",
-    "faq3a": "MDTranslator는 완전 무료 오픈소스로 Google 무료 번역과 DeepSeek 등 AI 모델을 지원합니다. 일반 번역기와 달리 Markdown 구문을 지능적으로 보존하여 번역 후 서식 수정이 필요 없습니다."
+    "textWithPlaceholders": "원본 텍스트 (플레이스홀더 포함)"
   },
   "TranslationSettings": {
     "docs": "문서",
@@ -189,7 +195,7 @@
     "presetUpdate": "현재 프리셋에 저장",
     "presetUpdated": "현재 프리셋에 저장됨",
     "presetDeleteConfirm": "이 프리셋을 삭제하시겠습니까?",
-    "presetEmptyHint": "No presets yet — edit and click Save",
+    "presetEmptyHint": "프리셋이 없습니다 — 편집 후 저장을 클릭하세요",
     "qwenMtDomains": "도메인 프롬프트(영어로만 제공)",
     "sendSystemPrompt": "system 프롬프트 전송",
     "sendSystemPromptExtra": "chat template이 system 역할을 거부할 때만 끄세요 — 전형적인 오류 \"Conversations must start with a user prompt\" (예: Gemma 계열).",
@@ -202,57 +208,46 @@
     "callParamsGroup": "호출 매개변수"
   },
   "tools": {
-    "subtitleTranslator": {
-      "title": "자막 번역기",
-      "description": "SRT, ASS, VTT, LRC 자막 일괄 번역, 50개 이상 언어 지원"
-    },
-    "jsonTranslate": {
-      "title": "i18n JSON 번역",
-      "description": "효율적인 다국어 JSON 번역 도구"
-    },
     "mdTranslator": {
       "title": "Markdown 번역",
-      "description": "Markdown 문서 일괄 번역, 서식 및 코드 유지"
-    },
-    "textSplitter": {
-      "title": "텍스트 분할",
-      "description": "장문 스마트 분할, AI 입력 및 SNS에 최적"
-    },
-    "jsonValueExtractor": {
-      "title": "JSON 값 추출",
-      "description": "JSON 필드 값 일괄 추출, 포맷 출력 지원"
-    },
-    "jsonNodeEdit": {
-      "title": "JSON 일괄 편집",
-      "description": "JSON 노드 값 일괄 편집, 접두사/접미사 및 치환 지원"
-    },
-    "jsonValueTransformer": {
-      "title": "JSON 키 값 매핑",
-      "description": "필드 값 매핑 및 마이그레이션, JSONPath 위치 지정 지원"
-    },
-    "jsonValueSwapper": {
-      "title": "JSON 키 값 교환",
-      "description": "두 필드의 값 원클릭 교환"
-    },
-    "jsonNodeInserter": {
-      "title": "JSON 노드 삽입",
-      "description": "지정 위치에 새 노드 일괄 삽입"
-    },
-    "jsonSortClassify": {
-      "title": "JSON 정렬 분류",
-      "description": "배열 정렬 및 그룹화, 사용자 정의 규칙 지원"
-    },
-    "jsonMatchUpdate": {
-      "title": "JSON 매칭 업데이트",
-      "description": "필드 매칭 기반 데이터 일괄 업데이트"
-    },
-    "dataParserFlare": {
-      "title": "Flare 북마크 변환",
-      "description": "브라우저 북마크와 Flare 형식 상호 변환"
-    },
-    "dataParserImgPrompt": {
-      "title": "IMGPrompt 데이터 생성",
-      "description": "IMGPrompt JSON 데이터 일괄 생성"
+      "description": "Markdown 문서 일괄 번역, 서식 및 코드 유지",
+      "metaTitle": "Markdown 번역 도구 - 서식 유지 다국어 문서 일괄 번역",
+      "metaDescription": "문서 번역 시 서식이 깨지나요? 코드와 LaTeX 수식을 유지하며 일괄 번역. DeepSeek 지원, 기술 블로그·지식 베이스 국제화에 최적!",
+      "faq": [
+        {
+          "q": "Markdown 번역 시 코드 블록과 수식을 유지하려면?",
+          "a": "도구가 코드 블록, LaTeX 수식, 링크 등의 서식 요소를 자동 감지하여 건너뛰고 순수 텍스트만 번역합니다. 번역 후에도 기술 문서를 바로 게시할 수 있습니다."
+        },
+        {
+          "q": "기술 블로그 글을 일괄 번역할 수 있는 도구는?",
+          "a": "MDTranslator는 여러 Markdown 파일을 일괄 업로드하여 원클릭 번역을 지원합니다. Front Matter 메타데이터를 보존하여 Hugo, Jekyll, Hexo 등에 바로 배포할 수 있습니다."
+        },
+        {
+          "q": "최고의 무료 Markdown 번역 도구는?",
+          "a": "MDTranslator는 완전 무료 오픈소스로 Google 무료 번역과 DeepSeek 등 AI 모델을 지원합니다. 일반 번역기와 달리 Markdown 구문을 지능적으로 보존하여 번역 후 서식 수정이 필요 없습니다."
+        }
+      ],
+      "howto": [
+        {
+          "name": "Markdown 업로드",
+          "text": "하나 이상의 .md 파일을 업로드하거나 입력 영역에 Markdown 콘텐츠를 붙여넣습니다."
+        },
+        {
+          "name": "옵션 구성",
+          "text": "필요에 따라 Front Matter, 코드 블록 및 LaTeX 수식 번역 여부를 선택합니다."
+        },
+        {
+          "name": "번역 및 내보내기",
+          "text": "대상 언어를 선택하고 번역을 클릭. 서식이 보존된 번역된 .md 파일을 다운로드."
+        }
+      ],
+      "features": [
+        "번역 시 코드 블록, LaTeX 수식, 링크 보존",
+        "선택적 Front Matter 메타데이터 번역",
+        "여러 Markdown 파일 일괄 업로드",
+        "Hugo, Jekyll, Hexo 블로그 프레임워크 호환",
+        "Markdown 서식을 무시하는 Raw 모드"
+      ]
     }
   },
   "navigation": {

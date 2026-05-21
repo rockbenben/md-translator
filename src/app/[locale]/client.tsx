@@ -19,7 +19,7 @@ const TranslationSettings = dynamic(() => import("@/app/components/TranslationSe
 });
 
 const ClientPage = () => {
-  const tMarkdown = useTranslations("markdown");
+  const tMarkdown = useTranslations("MDTranslator");
   const t = useTranslations("common");
   const locale = useLocale();
   const userGuideUrl = getDocUrl("guide/translation/md-translator/index.html", locale);
@@ -45,8 +45,8 @@ const ClientPage = () => {
 
   return (
     <TranslationProvider>
-      <ToolPage icon={<FileMarkdownOutlined />} title={tMarkdown("clientTitle")} description={tMarkdown("clientDescription")} guideUrl={userGuideUrl}>
-        <Tabs activeKey={activeKey} onChange={handleTabChange} items={items} type="card" className="w-full" animated={{ inkBar: true, tabPane: true }} />
+      <ToolPage icon={<FileMarkdownOutlined />} toolKey="mdTranslator" description={tMarkdown("clientDescription")} guideUrl={userGuideUrl}>
+        <Tabs activeKey={activeKey} onChange={handleTabChange} items={items} type="card" className="w-full" animated={false} />
       </ToolPage>
     </TranslationProvider>
   );
