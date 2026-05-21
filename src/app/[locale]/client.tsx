@@ -1,53 +1,25 @@
 "use client";
 
-import React, { useState } from "react";
-import dynamic from "next/dynamic";
-import { Tabs, TabsProps, Spin } from "antd";
+import React from "react";
 import { FileMarkdownOutlined } from "@ant-design/icons";
 import MDTranslator from "./MDTranslator";
 import { useTranslations, useLocale } from "next-intl";
 import { TranslationProvider } from "@/app/components/TranslationContext";
 import { getDocUrl } from "@/app/utils";
 import ToolPage from "@/app/components/styled/ToolPage";
-
-const TranslationSettings = dynamic(() => import("@/app/components/TranslationSettings"), {
-  loading: () => (
-    <div className="flex justify-center items-center py-20">
-      <Spin size="large" />
-    </div>
-  ),
-});
+import ApiSettingsDrawer from "@/app/components/ApiSettingsDrawer";
 
 const ClientPage = () => {
   const tMarkdown = useTranslations("MDTranslator");
-  const t = useTranslations("common");
   const locale = useLocale();
   const userGuideUrl = getDocUrl("guide/translation/md-translator/index.html", locale);
-  // 使用时间戳来强制重新渲染
-  const [activeKey, setActiveKey] = useState("basic");
-
-  const handleTabChange = (key: string) => {
-    setActiveKey(key);
-  };
-
-  const items: TabsProps["items"] = [
-    {
-      key: "basic",
-      label: t("basicTab"),
-      children: <MDTranslator onOpenApiSettings={() => setActiveKey("advanced")} />,
-    },
-    {
-      key: "advanced",
-      label: t("advancedTab"),
-      children: <TranslationSettings />,
-    },
-  ];
 
   return (
     <TranslationProvider>
       <ToolPage icon={<FileMarkdownOutlined />} toolKey="mdTranslator" description={tMarkdown("clientDescription")} guideUrl={userGuideUrl}>
-        <Tabs activeKey={activeKey} onChange={handleTabChange} items={items} type="card" className="w-full" animated={false} />
+        <MDTranslator />
       </ToolPage>
+      <ApiSettingsDrawer />
     </TranslationProvider>
   );
 };
