@@ -24,7 +24,7 @@ import { useLocalStorage } from "@/app/hooks/useLocalStorage";
 import { useTextStats } from "@/app/hooks/useTextStats";
 import { useExportFilename } from "@/app/hooks/useExportFilename";
 
-import { splitTextIntoLines, downloadFile, splitBySpaces, getErrorMessage, getFileTypePresetConfig } from "@/app/utils";
+import { splitTextIntoLines, downloadFile, splitBySpaces, getErrorMessage, isAbortError, isCascadedAbort, isNetworkError, getFileTypePresetConfig } from "@/app/utils";
 import { filterMarkdownLines, PLACEHOLDER_SPLIT_REGEX, PLACEHOLDER_TEST_REGEX, PLACEHOLDER_REPLACE_REGEX, restorePlaceholders } from "./markdownUtils";
 import { LLM_MODELS } from "@/app/lib/translation";
 import { delay } from "@/app/hooks/translation";
@@ -254,7 +254,10 @@ const MDTranslator = () => {
           await delay(500);
         }
       } catch (error: unknown) {
-        const messageText = [getErrorMessage(error), sourceOptions.find((o) => o.value === currentTargetLang)?.label || currentTargetLang, t("translationError")].join(" ");
+        if (isCascadedAbort(error)) continue;
+        const friendly = isNetworkError(error) ? t("networkUnavailable") : isAbortError(error) ? t("translationTimeout") : null;
+        const langLabel = sourceOptions.find((o) => o.value === currentTargetLang)?.label || currentTargetLang;
+        const messageText = friendly ? `${friendly} (${langLabel})` : [getErrorMessage(error), langLabel, t("translationError")].join(" ");
         message.error(messageText, 60);
       }
     }
