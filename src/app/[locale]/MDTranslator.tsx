@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Flex, Card, Button, Typography, Input, Upload, Form, Space, App, Tooltip, Spin, Row, Col, Divider, Switch, Collapse, theme } from "antd";
 import {
   CopyOutlined,
@@ -122,6 +122,13 @@ const MDTranslator = () => {
   const [multiLangModalOpen, setMultiLangModalOpen] = useState(false);
   // 提取出的纯文本预览 — tool-local,不放在共享 TranslationContext 里。
   const [extractedText, setExtractedText] = useState("");
+  // 批量翻译时统计失败文件数;handleMultipleTranslate 开始时重置,结束时读取以决定汇总消息。
+  // 单文件模式(runTranslation 路径)下也会被写,但不会被读,无副作用。
+  const batchFailedCountRef = useRef(0);
+  // 记录 translatedText 对应的目标语种,handleExportFile 用它生成文件名;
+  // 多语言模式下 translatedText 是 targetLangs[0] 而非主 targetLanguage,
+  // 不记录的话导出文件名会标错语种(主 targetLanguage 跟 translatedText 内容不匹配)
+  const [translatedTextLang, setTranslatedTextLang] = useState<string | null>(null);
   const { customFileName, setCustomFileName, generateFileName } = useExportFilename("md-translator");
 
   // 源文本变化时复位 extracted/translated 预览。render-time pattern 而非
@@ -131,6 +138,7 @@ const MDTranslator = () => {
     setPrevSourceText(sourceText);
     setExtractedText("");
     setTranslatedText("");
+    setTranslatedTextLang(null);
   }
 
   /**
@@ -141,10 +149,11 @@ const MDTranslator = () => {
    */
   const performTranslation = async (sourceText: string, fileNameSet?: string, fileIndex?: number, totalFiles?: number) => {
     // Determine target languages to translate to
-    const targetLanguagesToUse = multiLanguageMode ? targetLanguages : [targetLanguage];
+    const targetLangs = multiLanguageMode ? targetLanguages : [targetLanguage];
     // If no target languages selected in multi-language mode, show error
-    if (multiLanguageMode && targetLanguagesToUse.length === 0) {
+    if (multiLanguageMode && targetLangs.length === 0) {
       message.error(t("noTargetLanguage"));
+      batchFailedCountRef.current++;
       return;
     }
     const lines = splitTextIntoLines(sourceText);
@@ -162,8 +171,11 @@ const MDTranslator = () => {
       htmlPlaceholders,
     } = filterMarkdownLines(lines, mdOptions);
 
+    // 跟踪当前文件是否有任何 lang 翻译失败;末尾合并到 batchFailedCountRef
+    let hasFailedLang = false;
+
     // For each target language, perform translation
-    for (const currentTargetLang of targetLanguagesToUse) {
+    for (const currentTargetLang of targetLangs) {
       let translatedTextWithPlaceholders = "";
       try {
         if (!rawMode) {
@@ -246,21 +258,25 @@ const MDTranslator = () => {
           await downloadFile(translatedTextWithPlaceholders, downloadFileName);
         }
 
-        if (!multiLanguageMode || (multiLanguageMode && currentTargetLang === targetLanguagesToUse[0])) {
+        if (!multiLanguageMode || (multiLanguageMode && currentTargetLang === targetLangs[0])) {
           setTranslatedText(translatedTextWithPlaceholders);
+          setTranslatedTextLang(currentTargetLang);
         }
 
-        if (multiLanguageMode && currentTargetLang !== targetLanguagesToUse[targetLanguagesToUse.length - 1]) {
+        if (multiLanguageMode && currentTargetLang !== targetLangs[targetLangs.length - 1]) {
           await delay(500);
         }
       } catch (error: unknown) {
         if (isCascadedAbort(error)) continue;
+        hasFailedLang = true;
         const friendly = isNetworkError(error) ? t("networkUnavailable") : isAbortError(error) ? t("translationTimeout") : null;
         const langLabel = sourceOptions.find((o) => o.value === currentTargetLang)?.label || currentTargetLang;
         const messageText = friendly ? `${friendly} (${langLabel})` : [getErrorMessage(error), langLabel, t("translationError")].join(" ");
         message.error(messageText, 60);
       }
     }
+
+    if (hasFailedLang) batchFailedCountRef.current++;
   };
 
   const handleMultipleTranslate = async () => {
@@ -273,6 +289,7 @@ const MDTranslator = () => {
     // 让 progress modal 在 test ping → 文件循环之间保持连续可见。
     setIsTranslating(true);
     setProgressPercent(0);
+    batchFailedCountRef.current = 0;
 
     try {
       const isValid = await validate();
@@ -289,7 +306,16 @@ const MDTranslator = () => {
         });
       }
 
-      message.success(t("translationExported"), 10);
+      // 部分/全失败时不报"已导出"(per-file error toast 已经告知细节),只在有成功时显示汇总
+      const total = multipleFiles.length;
+      const failed = batchFailedCountRef.current;
+      const succeeded = total - failed;
+      if (failed === 0) {
+        message.success(t("translationExported"), 10);
+      } else if (succeeded > 0) {
+        message.warning(`${t("translationExported")} (${succeeded}/${total})`, 10);
+      }
+      // 全失败:per-file error toast 已显示,无需再叠加 message
     } finally {
       setIsTranslating(false);
     }
@@ -297,7 +323,10 @@ const MDTranslator = () => {
 
   const handleExportFile = () => {
     const uploadFileName = multipleFiles[0]?.name || "markdown.md";
-    const fileName = generateFileName(uploadFileName, targetLanguage);
+    // ResultCard 只在 translatedText 非空时渲染,而 translatedText 写入必伴随 lang 同帧 setState,
+    // 所以 handleExportFile 触发时 translatedTextLang 必非 null —— ?? 仅作类型收窄兜底
+    const langLabel = translatedTextLang ?? targetLanguage;
+    const fileName = generateFileName(uploadFileName, langLabel);
     downloadFile(translatedText, fileName);
     return fileName;
   };
@@ -338,6 +367,7 @@ const MDTranslator = () => {
                   onClick={() => {
                     resetUpload();
                     setTranslatedText("");
+                    setTranslatedTextLang(null);
                     message.success(t("resetUploadSuccess"));
                   }}
                   icon={<ClearOutlined />}
