@@ -86,8 +86,10 @@ const MDTranslator = () => {
     setMultiLanguageMode,
     translatedText,
     setTranslatedText,
-    translateFailedCount,
-    translateFailedLines,
+    failedCount,
+    failedLines,
+    failedLangs,
+    setFailedLangs,
     isTranslating,
     setIsTranslating,
     progressPercent,
@@ -124,7 +126,7 @@ const MDTranslator = () => {
   const [extractedText, setExtractedText] = useState("");
   // 批量翻译时统计失败文件数;handleMultipleTranslate 开始时重置,结束时读取以决定汇总消息。
   // 单文件模式(runTranslation 路径)下也会被写,但不会被读,无副作用。
-  const batchFailedCountRef = useRef(0);
+  const failedFilesRef = useRef(0);
   // 记录 translatedText 对应的目标语种,handleExportFile 用它生成文件名;
   // 多语言模式下 translatedText 是 targetLangs[0] 而非主 targetLanguage,
   // 不记录的话导出文件名会标错语种(主 targetLanguage 跟 translatedText 内容不匹配)
@@ -148,12 +150,10 @@ const MDTranslator = () => {
    * 3. 组装翻译后的行，并最终将占位符还原为原始内容。
    */
   const performTranslation = async (sourceText: string, fileNameSet?: string, fileIndex?: number, totalFiles?: number) => {
-    // Determine target languages to translate to
     const targetLangs = multiLanguageMode ? targetLanguages : [targetLanguage];
-    // If no target languages selected in multi-language mode, show error
     if (multiLanguageMode && targetLangs.length === 0) {
       message.error(t("noTargetLanguage"));
-      batchFailedCountRef.current++;
+      failedFilesRef.current++;
       return;
     }
     const lines = splitTextIntoLines(sourceText);
@@ -171,10 +171,9 @@ const MDTranslator = () => {
       htmlPlaceholders,
     } = filterMarkdownLines(lines, mdOptions);
 
-    // 跟踪当前文件是否有任何 lang 翻译失败;末尾合并到 batchFailedCountRef
+    // 跟踪当前文件是否有任何 lang 翻译失败;末尾合并到 failedFilesRef
     let hasFailedLang = false;
 
-    // For each target language, perform translation
     for (const currentTargetLang of targetLangs) {
       let translatedTextWithPlaceholders = "";
       try {
@@ -269,6 +268,8 @@ const MDTranslator = () => {
       } catch (error: unknown) {
         if (isCascadedAbort(error)) continue;
         hasFailedLang = true;
+        // De-duped: multi-file batch can fire catch for the same lang per file.
+        setFailedLangs((prev) => (prev.includes(currentTargetLang) ? prev : [...prev, currentTargetLang]));
         const friendly = isNetworkError(error) ? t("networkUnavailable") : isAbortError(error) ? t("translationTimeout") : null;
         const langLabel = sourceOptions.find((o) => o.value === currentTargetLang)?.label || currentTargetLang;
         const messageText = friendly ? `${friendly} (${langLabel})` : [getErrorMessage(error), langLabel, t("translationError")].join(" ");
@@ -276,7 +277,7 @@ const MDTranslator = () => {
       }
     }
 
-    if (hasFailedLang) batchFailedCountRef.current++;
+    if (hasFailedLang) failedFilesRef.current++;
   };
 
   const handleMultipleTranslate = async () => {
@@ -289,7 +290,9 @@ const MDTranslator = () => {
     // 让 progress modal 在 test ping → 文件循环之间保持连续可见。
     setIsTranslating(true);
     setProgressPercent(0);
-    batchFailedCountRef.current = 0;
+    failedFilesRef.current = 0;
+    // Batch path doesn't go through runTranslation — reset lang-failure manually.
+    setFailedLangs([]);
 
     try {
       const isValid = await validate();
@@ -308,7 +311,7 @@ const MDTranslator = () => {
 
       // 部分/全失败时不报"已导出"(per-file error toast 已经告知细节),只在有成功时显示汇总
       const total = multipleFiles.length;
-      const failed = batchFailedCountRef.current;
+      const failed = failedFilesRef.current;
       const succeeded = total - failed;
       if (failed === 0) {
         message.success(t("translationExported"), 10);
@@ -630,8 +633,9 @@ const MDTranslator = () => {
 
       {/* Partial-failure panel: auto-retried once, still-failed lines kept originals */}
       <TranslateFailurePanel
-        count={translateFailedCount}
-        lines={translateFailedLines}
+        count={failedCount}
+        lines={failedLines}
+        failedLangs={failedLangs}
         disabled={isTranslating}
         onRetry={() => (uploadMode === "single" ? runTranslation(performTranslation, sourceText) : handleMultipleTranslate())}
       />
