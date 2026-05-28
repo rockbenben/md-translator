@@ -48,7 +48,7 @@
     "resultToSource": "結果 ➔ 原文",
     "resultToSourceTooltip": "將結果文字覆蓋到輸入框",
     "readOnlyMode": "只讀模式",
-    "readOnlyModeTooltip": "文字過長，為保證頁面性能已自動切換為只讀模式",
+    "readOnlyModeTooltip": "文字過長，編輯框暫為唯讀、僅顯示部分預覽；完整內容不受影響，處理與匯出仍按全文進行",
     "exportFile": "匯出",
     "exportAllFile": "匯出所有檔案",
     "exportedFile": "已匯出",
@@ -143,10 +143,11 @@
     "langPresetIndian": "印度系",
     "selectedCount": "已選 {count} 種",
     "recentLanguages": "最近使用",
-    "langGroupAmericasOceania": "美洲及大洋洲"
+    "langGroupAmericasOceania": "美洲及大洋洲",
+    "relatedTools": "相關工具"
   },
   "MDTranslator": {
-    "clientDescription": "上傳 Markdown 文件或粘貼文本，智能保留格式、代碼及公式，一鍵翻譯為多種語言。",
+    "clientDescription": "上傳 Markdown 檔案或粘貼文本，智能保留格式、代碼及公式，一鍵翻譯為多種語言。",
     "translationOptions": "翻譯選項",
     "translateContentGroup": "翻譯內容",
     "formatModeGroup": "格式模式",
@@ -228,20 +229,40 @@
     "mdTranslator": {
       "title": "Markdown 翻譯",
       "description": "批次翻譯 Markdown 文檔，保留格式和代碼",
-      "metaTitle": "Markdown 翻譯工具 - 保留程式碼區塊與公式，多語言批次翻譯",
-      "metaDescription": "文檔翻譯格式總亂？MDTranslator 智慧保留代碼塊與 LaTeX 公式，支援 DeepSeek 等主流 AI 模型。一鍵批次翻譯技術文檔或博客，完美保留元資料，立即免費試用！",
+      "metaTitle": "Markdown 翻譯工具 - 保留程式碼、公式、Front Matter 的 AI 批次翻譯",
+      "metaDescription": "Markdown 檔案翻譯，保留程式碼區塊、LaTeX、連結與 Front Matter，適配 Hugo、Jekyll、Docusaurus 檔案站。",
       "faq": [
         {
-          "q": "翻譯 Markdown 文檔時如何保留代碼塊和公式？",
-          "a": "工具會自動識別並跳過代碼塊、LaTeX 公式、連結等格式元素，只翻譯純文字部分，確保技術文檔翻譯後格式完好可直接發布。"
-        },
-        {
-          "q": "有什麼工具可以批次翻譯技術博客文章？",
-          "a": "MDTranslator 支援批次上傳多個 Markdown 檔案，一鍵翻譯爲目標語言。保留 Front Matter 元資料，翻譯後的文章可直接部署到 Hugo、Jekyll、Hexo 等博客框架。"
-        },
-        {
           "q": "免費的 Markdown 翻譯工具哪個好用？",
-          "a": "MDTranslator 完全免費且開源，支援 Google 免費翻譯和 DeepSeek 等 AI 模型。相比手動翻譯或通用翻譯器，能智慧保留 Markdown 語法，無需翻譯後再手動修復格式。"
+          "a": "MDTranslator 是免費開源的瀏覽器端 Markdown 翻譯工具：原文不經伺服器、API Key 僅存本地 localStorage。支援 Google 免費翻譯和 DeepSeek、Claude、GPT、Gemini、DeepL 等 25+ 引擎，覆蓋 120+ 種目標語言。自動跳過程式碼區塊、LaTeX 公式、連結 URL 和 Front Matter，翻譯後無需手動修復格式，可直接發布到 Hugo、Jekyll、Hexo、VitePress、Docusaurus。"
+        },
+        {
+          "q": "翻譯 Markdown 檔案時如何保留程式碼區塊和公式？",
+          "a": "用佔位符保護策略：程式碼區塊（```圍欄程式碼```）、行內程式碼（`code`）、LaTeX 公式（$...$、$$...$$）、連結 URL、圖片路徑、HTML/JSX 標籤先替換成 `<<<MULTILINE_CODE_x>>>`、`<<<HTML_x>>>` 等佔位符送翻譯引擎，翻譯完原樣還原。Frontmatter 預設整塊跳過，可在「翻譯內容」勾選「翻譯 frontmatter」一併處理；同樣的開關可單獨控制程式碼區塊、LaTeX、連結文字。技術檔案翻譯後格式完整，無需手動修復。"
+        },
+        {
+          "q": "翻譯技術檔案用機器翻譯還是 AI 翻譯？哪個最合適？",
+          "a": "技術檔案強烈推薦 AI 大模型，機器翻譯只適合快速預覽。AI 大模型能識別上下文裡的函式庫名、函式名、變數名不亂譯——首選 Claude Sonnet（API 檔案術語精度最高），DeepSeek 性價比極高（中文技術部落格標配），Gemini 3 Pro 適合整本書級長檔案（1M token 上下文）。機器翻譯（Google 免費版、DeepL）只適合快速預覽：長 Markdown 檔案會被截斷、技術術語容易被誤譯成日常詞。引擎設定可與 [字幕翻譯](../subtitle-translator)、[JSON 翻譯](../json-translate) 共享。"
+        },
+        {
+          "q": "怎麼翻譯 GitHub README 或整個 VitePress、Docusaurus 檔案站？",
+          "a": "整個 docs/ 目錄批次上傳，Front Matter 裡的 title、description 欄位勾選「翻譯 Front Matter」一併處理，slug 和 permalink 欄位不會被翻譯。程式碼區塊、命令列範例、API 端點會自動跳過——只翻譯註解和說明文字。翻譯完直接放回原目錄即可讓框架按 i18n.locales 多語言路由識別。VitePress 用 zh/、en/ 子目錄，Docusaurus 用 i18n/{locale}/ 結構。"
+        },
+        {
+          "q": "支援 GFM、MDX、Astro 這些 Markdown 方言嗎？",
+          "a": "標準 CommonMark 和 GFM（GitHub Flavored Markdown）全支援，包括表格、任務清單、刪除線、圍欄程式碼區塊。MDX（帶 JSX 元件的 Markdown）和 Astro Components：元件標籤作為整塊跳過，標籤內的純文字屬性（如 <Alert>這段會被翻譯</Alert>）會翻譯，帶表達式的屬性（title={var}）原樣保留以避免破壞程式碼。複雜 MDX 想完全跳過格式可在「格式模式」裡開啟「忽略格式」開關，按純文字翻譯。"
+        },
+        {
+          "q": "有什麼工具可以批次翻譯技術部落格文章？",
+          "a": "MDTranslator 支援批次上傳多個 Markdown 檔案，一鍵翻譯爲目標語言。保留 Front Matter 元資料，翻譯後的文章可直接部署到 Hugo、Jekyll、Hexo 等部落格框架。"
+        },
+        {
+          "q": "要翻譯的不是 Markdown，是字幕或 JSON 設定檔怎麼辦？",
+          "a": "字幕檔案（SRT/ASS/VTT/LRC）請用 [字幕翻譯器](../subtitle-translator)，保留時間軸和 ASS 樣式標籤；JSON 國際化檔案（i18next、next-intl、vue-i18n 那種 key-value 結構）請用 [JSON 翻譯](../json-translate)，按 Key 路徑選擇性翻譯，可保護佔位符 {name}、{count} 不被破壞。"
+        },
+        {
+          "q": "翻譯後的 Markdown 會上傳到伺服器嗎？開源嗎？",
+          "a": "完全前端處理：Markdown 檔案讀取、解析、翻譯請求都在瀏覽器內完成，原文不經過我們的伺服器儲存。LLM 引擎的請求直接從你的瀏覽器發往你設定的 API 端點（OpenAI、DeepSeek 等），API Key 僅儲存在本地 localStorage。翻譯快取使用瀏覽器 IndexedDB。原始碼在 GitHub 開源（rockbenben/md-translator），可自行部署或審查實作。"
         }
       ],
       "howto": [
@@ -262,7 +283,7 @@
         "翻譯時保留代碼塊、LaTeX 公式和連結",
         "可選翻譯 Front Matter 元資料",
         "批次上傳 Markdown 檔案翻譯",
-        "兼容 Hugo、Jekyll、Hexo 博客框架",
+        "相容 Hugo、Jekyll、Hexo 部落格框架",
         "Raw 模式忽略 Markdown 格式"
       ]
     }
@@ -278,11 +299,11 @@
   },
   "Metadata": {
     "title": "ToolsByAI | 免費開源的 AI 翻譯與資料處理工具集",
-    "description": "尋找高效開發工具？ToolsByAI 匯集字幕翻譯、i18n 處理等 20+ 款免費開源應用。接入 DeepSeek 等主流模型，支援批次處理且資料隱私安全，立即開啟 AI 提效之旅！",
+    "description": "ToolsByAI 集合 17 款免費工具：字幕、Markdown、JSON i18n 翻譯，文字/JSON 批次處理。25+ AI 引擎，全前端處理。",
     "homeTitle": "ToolsByAI 工具集",
     "homeDescription": "20+ 實用工具，涵蓋多語言翻譯、文字處理、JSON 編輯和資料轉換，助力開發者和創作者提升效率。",
     "ogTitle": "ToolsByAI | 免費開源的 AI 翻譯與資料處理工具集",
-    "ogDescription": "尋找高效開發工具？ToolsByAI 匯集字幕翻譯、i18n 處理等 20+ 款免費開源應用。接入 DeepSeek 等主流模型，支援批次處理且資料隱私安全，立即開啟 AI 提效之旅！"
+    "ogDescription": "ToolsByAI 集合 17 款免費工具：字幕、Markdown、JSON i18n 翻譯，文字/JSON 批次處理。25+ AI 引擎，全前端處理。"
   },
   "languages": {
     "auto": "自動檢測",
@@ -423,6 +444,12 @@
     "reaction2": "有點酷",
     "reaction3": "啥玩意",
     "reaction4": "看不懂",
-    "placeholder": "請留言，無需登錄（填寫郵箱可獲回復提醒）"
+    "placeholder": "請留言，無需登錄（填寫郵箱可獲回復提醒）",
+    "metaDescription": "意見回饋頁：回報使用問題、提交功能建議、參與工具改進。基於 Waline 評論系統，匿名也可發言。"
+  },
+  "NotFound": {
+    "title": "頁面未找到",
+    "description": "你訪問的頁面不存在或已移動。",
+    "goHome": "返回首頁"
   }
 }

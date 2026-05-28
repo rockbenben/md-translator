@@ -77,7 +77,7 @@
     "resultToSource": "Résultat ➔ Source",
     "resultToSourceTooltip": "Écraser la zone de saisie avec le texte du résultat",
     "readOnlyMode": "Mode lecture seule",
-    "readOnlyModeTooltip": "Texte trop long ; basculé automatiquement en mode lecture seule pour maintenir les performances",
+    "readOnlyModeTooltip": "Texte trop long : l'éditeur est temporairement en lecture seule et n'affiche qu'un aperçu partiel. Votre contenu complet n'est pas affecté — le traitement et l'export utilisent toujours l'intégralité du texte.",
     "clearInputTooltip": "Effacer le contenu saisi et les fichiers téléchargés",
     "smartLineBreak": "Saut de ligne intelligent",
     "replaceText": "Remplacer le texte",
@@ -143,7 +143,8 @@
     "langPresetIndian": "Sous-continent indien",
     "selectedCount": "{count} sélectionnées",
     "recentLanguages": "Récentes",
-    "langGroupAmericasOceania": "Amériques et Océanie"
+    "langGroupAmericasOceania": "Amériques et Océanie",
+    "relatedTools": "Outils associés"
   },
   "MDTranslator": {
     "clientDescription": "Téléchargez des fichiers Markdown ou collez du texte. Préserve intelligemment le format, le code et les formules. Traduction en un clic vers plusieurs langues.",
@@ -228,20 +229,40 @@
     "mdTranslator": {
       "title": "Traducteur Markdown",
       "description": "Traduction Markdown par lot, format et code préservés",
-      "metaTitle": "Traducteur Markdown | Préserve format et code, multilingue",
-      "metaDescription": "Besoin de traduire une doc ? MDTranslator préserve le format, le code et LaTeX. Intègre DeepSeek pour une qualité pro. Rapide et open source.",
+      "metaTitle": "Traducteur Markdown | Préserve code, LaTeX & Front Matter",
+      "metaDescription": "Traducteur Markdown préservant code, LaTeX, liens, Front Matter. 25+ moteurs IA: DeepSeek, Claude, GPT. Pour Hugo, Jekyll, Docusaurus.",
       "faq": [
         {
-          "q": "Comment préserver les blocs de code lors de la traduction Markdown ?",
-          "a": "L'outil détecte et ignore automatiquement les blocs de code, formules LaTeX et liens, ne traduisant que le texte brut pour garder vos documents techniques publiables."
+          "q": "Quel outil gratuit de traduction Markdown fonctionne le mieux ?",
+          "a": "MDTranslator est un traducteur Markdown gratuit, open-source et côté navigateur : la source ne quitte jamais votre machine, la clé API reste dans localStorage. Prend en charge Google free translate plus DeepSeek, Claude, GPT, Gemini, DeepL — 25+ moteurs au total, couvrant 120+ langues cibles. Saute automatiquement les blocs de code, formules LaTeX, URLs et Front Matter, vous pouvez publier directement vers Hugo, Jekyll, Hexo, VitePress ou Docusaurus sans réparation manuelle."
+        },
+        {
+          "q": "Comment préserver les blocs de code et formules lors de la traduction Markdown ?",
+          "a": "L'outil utilise une stratégie de protection par placeholders : blocs de code (```code clôturé```), code inline (`code`), formules LaTeX ($...$, $$...$$), URLs, chemins d'image et balises HTML/JSX sont remplacés par `<<<MULTILINE_CODE_x>>>`, `<<<HTML_x>>>` etc. avant envoi au traducteur, puis restaurés tels quels. Le Front Matter est ignoré par défaut ; activez « Traduire Frontmatter » pour l'inclure. Des interrupteurs séparés contrôlent blocs de code, LaTeX et texte de lien. Les docs techniques sortent au format parfait sans réparation manuelle."
+        },
+        {
+          "q": "Documentation technique : faut-il utiliser la traduction automatique ou la traduction IA?",
+          "a": "L'IA/LLM est fortement recommandée pour le contenu technique ; la traduction automatique ne convient qu'aux aperçus rapides. Les modèles IA/LLM reconnaissent noms de bibliothèques, de fonctions et variables en contexte sans les mal traduire — Claude Sonnet mène sur la précision terminologique des docs API, DeepSeek offre un excellent rapport qualité-prix (standard de fait pour les blogs techniques chinois), Gemini 3 Pro convient à la documentation de la taille d'un livre (contexte 1M tokens). La traduction automatique (Google free, DeepL) ne convient qu'aux aperçus rapides…"
+        },
+        {
+          "q": "Comment traduire un README GitHub ou un site de docs VitePress / Docusaurus complet ?",
+          "a": "Importez en lot votre répertoire docs/. Les champs Front Matter comme title et description peuvent être traduits en activant 'Traduire le Front Matter' ; les champs slug et permalink sont préservés. Les blocs de code, exemples CLI et endpoints API sont ignorés automatiquement — seuls commentaires et prose sont traduits. Replacez les fichiers traduits dans le répertoire d'origine et votre framework les reconnaîtra via sa configuration i18n.locales. VitePress utilise les sous-dossiers zh/, en/ ; Docusaurus utilise la structure i18n/{locale}/."
+        },
+        {
+          "q": "Prend-il en charge les dialectes Markdown GFM, MDX ou Astro ?",
+          "a": "Prise en charge complète de CommonMark standard et GFM (GitHub Flavored Markdown) y compris tableaux, listes de tâches, barré et blocs de code clôturés. Pour MDX (Markdown avec composants JSX) et Astro Components, les balises de composants sont traitées comme des blocs opaques ; les attributs en texte brut comme <Alert>ceci est traduit</Alert> sont traduits, tandis que les attributs d'expression (title={var}) sont préservés à l'identique pour ne pas casser le code. Pour du MDX complexe où vous voulez ignorer entièrement l'analyse Markdown, activez l'interrupteur « Ignorer…"
         },
         {
           "q": "Quel outil permet de traduire en lot des articles de blog techniques ?",
           "a": "MDTranslator prend en charge l'import groupé de fichiers Markdown avec traduction en un clic. Il préserve les métadonnées Front Matter pour un déploiement direct sur Hugo, Jekyll ou Hexo."
         },
         {
-          "q": "Quel est le meilleur outil gratuit de traduction Markdown ?",
-          "a": "MDTranslator est entièrement gratuit et open source, compatible avec Google et les modèles IA comme DeepSeek. Contrairement aux traducteurs génériques, il préserve intelligemment la syntaxe Markdown."
+          "q": "Et si je dois traduire des sous-titres ou des fichiers de configuration JSON plutôt que du Markdown ?",
+          "a": "Pour les fichiers de sous-titres (SRT/ASS/VTT/LRC), utilisez le [Traducteur de Sous-titres](../subtitle-translator) — il préserve les timecodes et les balises de style ASS. Pour les fichiers i18n JSON (structure clé-valeur i18next, next-intl, vue-i18n), utilisez le [Traducteur JSON](../json-translate) — traduction sélective par chemin de Key avec protection des espaces réservés {name}, {count}, etc. Les trois outils de traduction partagent les mêmes configurations de moteurs et API keys, donc passer de l'un à l'autre ne nécessite aucune nouvelle configuration."
+        },
+        {
+          "q": "Le Markdown traduit est-il envoyé sur votre serveur ? Est-ce open source ?",
+          "a": "Entièrement côté client : la lecture, l'analyse et les requêtes de traduction Markdown se font dans votre navigateur — les contenus originaux ne touchent jamais nos serveurs. Les requêtes des moteurs LLM vont directement de votre navigateur à votre endpoint API configuré (OpenAI, DeepSeek, etc.), et les API keys sont stockées uniquement dans le localStorage local. Le cache de traduction utilise l'IndexedDB du navigateur. Le code source est open source sur GitHub (rockbenben/md-translator), pour l'auto-hébergement ou l'audit de l'implémentation."
         }
       ],
       "howto": [
@@ -278,11 +299,11 @@
   },
   "Metadata": {
     "title": "ToolsByAI | Outils de Traduction & Dev IA Gratuits",
-    "description": "Suite de 20+ outils open source : traduction de sous-titres, i18n, JSON & Markdown. Supporte DeepSeek & ChatGPT. Données locales et sécurisées.",
+    "description": "ToolsByAI: 17 outils open source gratuits pour la traduction de sous-titres, Markdown, JSON i18n et le traitement par lots. 25+ moteurs IA.",
     "homeTitle": "Suite ToolsByAI",
     "homeDescription": "20+ outils pour traduction, texte, JSON et conversion de données. Boostez l'efficacité des développeurs et créateurs.",
     "ogTitle": "ToolsByAI | Outils de Traduction & Dev IA Gratuits",
-    "ogDescription": "Suite de 20+ outils open source : traduction de sous-titres, i18n, JSON & Markdown. Supporte DeepSeek & ChatGPT. Données locales et sécurisées."
+    "ogDescription": "ToolsByAI: 17 outils open source gratuits pour la traduction de sous-titres, Markdown, JSON i18n et le traitement par lots. 25+ moteurs IA."
   },
   "languages": {
     "auto": "Détection auto",
@@ -416,13 +437,19 @@
   },
   "feedback": {
     "feedback1": "Commentaires & Suggestions",
-    "feedback2": "Si vous rencontrez des problèmes ou avez des suggestions, dites-le moi ! Votre feedback influence le développement futur et nous aide à créer de meilleurs outils.",
+    "feedback2": "Si vous rencontrez des problèmes ou avez des suggestions, dites-le moi!",
     "feedback3": "Décrivez votre cas d'usage, problème ou idée. Je lis chaque message et répondrai/optimiserai dès que possible.",
     "reaction0": "J'aime",
     "reaction1": "Soutien",
     "reaction2": "Cool",
     "reaction3": "Quoi ?",
     "reaction4": "Confus",
-    "placeholder": "Laissez un message (pas de connexion requise, email optionnel pour réponse)"
+    "placeholder": "Laissez un message (pas de connexion requise, email optionnel pour réponse)",
+    "metaDescription": "Page de retours pour Tools By AI : signalez bugs, suggérez fonctionnalités, partagez cas d'usage. Basée sur Waline, publication anonyme."
+  },
+  "NotFound": {
+    "title": "Page introuvable",
+    "description": "La page que vous avez visitée n'existe pas ou a été déplacée.",
+    "goHome": "Retour à l'accueil"
   }
 }

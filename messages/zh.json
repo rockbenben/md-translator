@@ -48,7 +48,7 @@
     "resultToSource": "结果 ➔ 原文",
     "resultToSourceTooltip": "将结果文本覆盖到输入框",
     "readOnlyMode": "只读模式",
-    "readOnlyModeTooltip": "文本过长，为保证页面性能已自动切换为只读模式",
+    "readOnlyModeTooltip": "文本过长，编辑框暂为只读、仅显示部分预览；完整内容不受影响，处理与导出仍按全文进行",
     "exportFile": "导出",
     "exportAllFile": "导出所有文件",
     "exportedFile": "已导出",
@@ -143,7 +143,8 @@
     "langPresetIndian": "印度系",
     "selectedCount": "已选 {count} 种",
     "recentLanguages": "最近使用",
-    "langGroupAmericasOceania": "美洲及大洋洲"
+    "langGroupAmericasOceania": "美洲及大洋洲",
+    "relatedTools": "相关工具"
   },
   "MDTranslator": {
     "clientDescription": "上传 Markdown 文件或粘贴文本，智能保留格式、代码及公式，一键翻译为多种语言。",
@@ -228,20 +229,40 @@
     "mdTranslator": {
       "title": "Markdown 翻译",
       "description": "批量翻译 Markdown 文档，保留格式和代码",
-      "metaTitle": "Markdown 翻译工具 - 保留代码块与公式，多语言批量翻译",
-      "metaDescription": "文档翻译格式总乱？MDTranslator 智能保留代码块与 LaTeX 公式，支持 DeepSeek 等主流 AI 模型。一键批量翻译技术文档或博客，完美保留元数据，立即免费试用！",
+      "metaTitle": "Markdown 翻译工具 - 保留代码块、公式、Front Matter 的 AI 批量翻译",
+      "metaDescription": "Markdown 文档翻译，保留代码块、LaTeX、链接与 Front Matter，适配 Hugo、Jekyll、Docusaurus 文档站。",
       "faq": [
         {
+          "q": "免费的 Markdown 翻译工具哪个好用？",
+          "a": "MDTranslator 是免费开源的浏览器端 Markdown 翻译工具：原文不经服务器、API Key 仅存本地 localStorage。支持 Google 免费翻译和 DeepSeek、Claude、GPT、Gemini、DeepL 等 25+ 引擎，覆盖 120+ 种目标语言。自动跳过代码块、LaTeX 公式、链接 URL 和 Front Matter，翻译后无需手动修复格式，可直接发布到 Hugo、Jekyll、Hexo、VitePress、Docusaurus。"
+        },
+        {
           "q": "翻译 Markdown 文档时如何保留代码块和公式？",
-          "a": "工具会自动识别并跳过代码块、LaTeX 公式、链接等格式元素，只翻译纯文本部分，确保技术文档翻译后格式完好可直接发布。"
+          "a": "用占位符保护策略：代码块（```围栏代码```）、内联代码（`code`）、LaTeX 公式（$...$、$$...$$）、链接 URL、图片路径、HTML/JSX 标签先替换成 `<<<MULTILINE_CODE_x>>>`、`<<<HTML_x>>>` 等占位符送翻译引擎，翻译完原样还原。Frontmatter 默认整块跳过，可在「翻译内容」勾选「翻译 frontmatter」一并处理；同样的开关可单独控制代码块、LaTeX、链接文本。技术文档翻译后格式完整，无需手动修复。"
+        },
+        {
+          "q": "翻译技术文档用机器翻译还是 AI 翻译？哪个最合适？",
+          "a": "技术文档强烈推荐 AI 大模型，机器翻译只适合快速预览。AI 大模型能识别上下文里的库名、函数名、变量名不乱译——首选 Claude Sonnet（API 文档术语精度最高），DeepSeek 性价比极高（中文技术博客标配），Gemini 3 Pro 适合整本书级长文档（1M token 上下文）。机器翻译（Google 免费版、DeepL）只适合快速预览：长 Markdown 文档会被截断、技术术语容易被误译成日常词。引擎配置可与 [字幕翻译](../subtitle-translator)、[JSON 翻译](../json-translate) 共享。"
+        },
+        {
+          "q": "怎么翻译 GitHub README 或整个 VitePress、Docusaurus 文档站？",
+          "a": "整个 docs/ 目录批量上传，Front Matter 里的 title、description 字段勾选「翻译 Front Matter」一并处理，slug 和 permalink 字段不会被翻译。代码块、命令行示例、API 端点会自动跳过——只翻译注释和说明文本。翻译完直接放回原目录即可让框架按 i18n.locales 多语言路由识别。VitePress 用 zh/、en/ 子目录，Docusaurus 用 i18n/{locale}/ 结构。"
+        },
+        {
+          "q": "支持 GFM、MDX、Astro 这些 Markdown 方言吗？",
+          "a": "标准 CommonMark 和 GFM（GitHub Flavored Markdown）全支持，包括表格、任务列表、删除线、围栏代码块。MDX（带 JSX 组件的 Markdown）和 Astro Components：组件标签（如 `<Alert>`、`</Alert>`、带属性的 `<Alert title={var}>`）会作为整块占位符保护起来不参与翻译，而标签之间的纯文本会照常翻译（如 `<Alert>这段会被翻译</Alert>`）。复杂 MDX 想完全跳过格式可在「格式模式」里打开「忽略格式」开关，按纯文本翻译。"
         },
         {
           "q": "有什么工具可以批量翻译技术博客文章？",
           "a": "MDTranslator 支持批量上传多个 Markdown 文件，一键翻译为目标语言。保留 Front Matter 元数据，翻译后的文章可直接部署到 Hugo、Jekyll、Hexo 等博客框架。"
         },
         {
-          "q": "免费的 Markdown 翻译工具哪个好用？",
-          "a": "MDTranslator 完全免费且开源，支持 Google 免费翻译和 DeepSeek 等 AI 模型。相比手动翻译或通用翻译器，能智能保留 Markdown 语法，无需翻译后再手动修复格式。"
+          "q": "要翻译的不是 Markdown，是字幕或 JSON 配置文件怎么办？",
+          "a": "字幕文件（SRT/ASS/VTT/LRC）请用 [字幕翻译器](../subtitle-translator)，保留时间轴和 ASS 样式标签；JSON 国际化文件（i18next、next-intl、vue-i18n 那种 key-value 结构）请用 [JSON 翻译](../json-translate)，按 Key 路径选择性翻译，可保护占位符 {name}、{count} 不被破坏。三个翻译工具共享同一套引擎配置和 API Key，跨工具切换无需重复设置。"
+        },
+        {
+          "q": "翻译后的 Markdown 会上传到服务器吗？开源吗？",
+          "a": "完全前端处理：Markdown 文档读取、解析、翻译请求都在浏览器内完成，原文不经过我们的服务器存储。LLM 引擎的请求直接从你的浏览器发往你配置的 API 端点（OpenAI、DeepSeek 等），API Key 仅保存在本地 localStorage。翻译缓存使用浏览器 IndexedDB。源代码在 GitHub 开源（rockbenben/md-translator），可自部署或审查实现。"
         }
       ],
       "howto": [
@@ -278,11 +299,11 @@
   },
   "Metadata": {
     "title": "ToolsByAI | 免费开源的 AI 翻译与数据处理工具集",
-    "description": "寻找高效开发工具？ToolsByAI 汇集字幕翻译、i18n 处理等 20+ 款免费开源应用。接入 DeepSeek 等主流模型，支持批量处理且数据隐私安全，立即开启 AI 提效之旅！",
+    "description": "ToolsByAI 集合 17 款免费工具：字幕、Markdown、JSON i18n 翻译，文本/JSON 批处理。25+ AI 引擎，全前端处理。",
     "homeTitle": "ToolsByAI 工具集",
     "homeDescription": "20+ 实用工具，涵盖多语言翻译、文本处理、JSON 编辑和数据转换，助力开发者和创作者提升效率。",
     "ogTitle": "ToolsByAI | 免费开源的 AI 翻译与数据处理工具集",
-    "ogDescription": "寻找高效开发工具？ToolsByAI 汇集字幕翻译、i18n 处理等 20+ 款免费开源应用。接入 DeepSeek 等主流模型，支持批量处理且数据隐私安全，立即开启 AI 提效之旅！"
+    "ogDescription": "ToolsByAI 集合 17 款免费工具：字幕、Markdown、JSON i18n 翻译，文本/JSON 批处理。25+ AI 引擎，全前端处理。"
   },
   "languages": {
     "auto": "自动检测",
@@ -423,6 +444,12 @@
     "reaction2": "有点酷",
     "reaction3": "啥玩意",
     "reaction4": "看不懂",
-    "placeholder": "请留言，无需登录（填写邮箱可获回复提醒）"
+    "placeholder": "请留言，无需登录（填写邮箱可获回复提醒）",
+    "metaDescription": "意见反馈页：报告使用问题、提交功能建议、参与工具改进。基于 Waline 评论系统，匿名也可发言。"
+  },
+  "NotFound": {
+    "title": "页面未找到",
+    "description": "你访问的页面不存在或已移动。",
+    "goHome": "返回首页"
   }
 }

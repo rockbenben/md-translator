@@ -117,7 +117,7 @@
     "resultToSource": "Sonuç ➔ Kaynak",
     "resultToSourceTooltip": "Giriş kutusunun içeriğini sonuç metniyle değiştir",
     "readOnlyMode": "Salt Okunur Mod",
-    "readOnlyModeTooltip": "Metin çok uzun; sayfa performansını korumak için salt okunur mod otomatik olarak etkinleştirildi",
+    "readOnlyModeTooltip": "Metin çok uzun: düzenleyici geçici olarak salt okunur ve yalnızca kısmi bir önizleme gösteriyor. Tüm içeriğiniz etkilenmez; işleme ve dışa aktarma hâlâ metnin tamamını kullanır.",
     "clearInputTooltip": "Giriş içeriğini ve yüklenen dosyaları temizle",
     "fileExported": "Dışa aktarılan dosya: {fileName}",
     "exportSuccess": "Dışa aktarma başarılı: {fileName}",
@@ -143,7 +143,8 @@
     "langPresetIndian": "Hint alt kıtası",
     "selectedCount": "{count} seçildi",
     "recentLanguages": "Son kullanılanlar",
-    "langGroupAmericasOceania": "Amerika & Okyanusya"
+    "langGroupAmericasOceania": "Amerika & Okyanusya",
+    "relatedTools": "İlgili Araçlar"
   },
   "MDTranslator": {
     "clientDescription": "Markdown dosyalarını yükleyin veya metni yapıştırın. Formatı, kodu ve formülleri akıllıca korur. Tek tıkla birden fazla dile çeviri.",
@@ -228,20 +229,40 @@
     "mdTranslator": {
       "title": "Markdown Çevirici",
       "description": "Toplu Markdown çevirisi, format ve kodu korur",
-      "metaTitle": "Online Markdown Çevirici - Formatı Koruyan Yapay Zeka",
-      "metaDescription": "Belge çevirisi mi gerekiyor? Markdown belgelerini formatı ve kod bloklarını bozmadan çevirin. Frontmatter ve LaTeX formüllerini destekler.",
+      "metaTitle": "Markdown Çevirici | Kodu, LaTeX ve Front Matter'ı Korur",
+      "metaDescription": "Markdown çevirmeni: kod blokları, LaTeX, bağlantılar, Front Matter korunur. 25+ AI motoru: DeepSeek, Claude, GPT. Hugo, Jekyll, Docusaurus için.",
       "faq": [
         {
-          "q": "Markdown çevirirken kod blokları nasıl korunur?",
-          "a": "Araç kod bloklarını, LaTeX formüllerini ve bağlantıları otomatik algılayıp atlar."
+          "q": "Hangi ücretsiz Markdown çeviri aracı en iyi çalışır?",
+          "a": "MDTranslator, ücretsiz, açık kaynaklı, tarayıcı tarafı bir Markdown çeviricidir: kaynak makinenizden hiç ayrılmaz, API anahtarı localStorage'da kalır. Google ücretsiz çeviriyi plus DeepSeek, Claude, GPT, Gemini, DeepL destekler — toplam 25+ motor, 120+ hedef dili kapsar. Kod bloklarını, LaTeX formüllerini, URL bağlantılarını ve Front Matter'ı otomatik olarak atlar, manuel format onarımı olmadan doğrudan Hugo, Jekyll, Hexo, VitePress veya Docusaurus'a yayınlayabilirsiniz."
+        },
+        {
+          "q": "Markdown çevirirken kod blokları ve formüller nasıl korunur?",
+          "a": "Araç bir placeholder koruma stratejisi kullanır: kod blokları (```çitli kod```), satır içi kod (`code`), LaTeX formülleri ($...$, $$...$$), URL'ler, görüntü yolları ve HTML/JSX etiketleri çeviriciye gönderilmeden önce `<<<MULTILINE_CODE_x>>>`, `<<<HTML_x>>>` vb. ile değiştirilir, sonra olduğu gibi geri yüklenir. Front Matter varsayılan olarak atlanır; eklemek için «Frontmatter Çevir» anahtarını açın. Ayrı anahtarlar kod bloklarını, LaTeX'i ve bağlantı metnini kontrol eder. Teknik belgeler manuel onarım olmadan mükemmel formatta çıkar."
+        },
+        {
+          "q": "Teknik dokümantasyon: makine çevirisi mi AI/LLM çevirisi mi en uygun?",
+          "a": "Teknik içerik için AI/LLM şiddetle önerilir; makine çevirisi yalnızca hızlı önizleme için uygundur. AI/LLM modelleri bağlam içindeki kütüphane adlarını, fonksiyon adlarını ve değişkenleri yanlış çevirmeden tanır — Claude Sonnet API doküman terminoloji doğruluğunda öncüdür, DeepSeek mükemmel değer sunar (Çince teknik blog çevirisinin fiili standardı), Gemini 3 Pro kitap boyutundaki dokümantasyona uyar (1M token bağlam). Makine çevirisi (Google ücretsiz, DeepL) yalnızca hızlı önizleme için uygundur — uzun Markdown belgeleri kesilir, teknik terimler günlük kelimelere çevrilir.…"
+        },
+        {
+          "q": "Bir GitHub README'yi veya tüm bir VitePress / Docusaurus belge sitesini nasıl çeviririm?",
+          "a": "docs/ dizininizi toplu yükleyin. Front Matter'daki title, description gibi alanlar 'Front Matter'ı çevir' seçeneği açılarak çevrilebilir; slug ve permalink alanları korunur. Kod blokları, CLI örnekleri ve API uç noktaları otomatik atlanır — yalnızca yorumlar ve düz metin çevrilir. Çevrilen dosyaları orijinal dizine geri bırakın ve çerçeve, i18n.locales yapılandırması üzerinden bunları algılar. VitePress zh/, en/ alt klasörlerini kullanır; Docusaurus ise i18n/{locale}/ yapısını kullanır."
+        },
+        {
+          "q": "GFM, MDX veya Astro Markdown lehçelerini destekliyor mu?",
+          "a": "Standart CommonMark ve GFM (GitHub Flavored Markdown) tam destek — tablolar, görev listeleri, üstü çizili metin ve çitli kod blokları dahil. MDX (JSX bileşenli Markdown) ve Astro Components için bileşen etiketleri opak blok olarak işlenir; <Alert>bu çevrilir</Alert> gibi düz metin öznitelikleri çevrilir, ifade öznitelikleri (title={var}) ise kodu bozmamak için aynen korunur. Karmaşık MDX'te Markdown ayrıştırmasını tamamen atlamak isterseniz «Biçimlendirmeyi Yoksay» anahtarını açın — her şey düz metin olarak çevrilir."
         },
         {
           "q": "Teknik blog yazılarını toplu çeviren araç hangisi?",
           "a": "MDTranslator birden fazla Markdown dosyasını tek tıkla çevirir, Front Matter'ı korur."
         },
         {
-          "q": "En iyi ücretsiz Markdown çeviri aracı hangisi?",
-          "a": "MDTranslator tamamen ücretsiz ve açık kaynaklıdır, Markdown sözdizimini akıllıca korur."
+          "q": "Markdown yerine altyazı veya JSON yapılandırma dosyası çevirmem gerekirse ne yapmalıyım?",
+          "a": "Altyazı dosyaları (SRT/ASS/VTT/LRC) için [Altyazı Çevirici](../subtitle-translator) kullanın — zaman kodlarını ve ASS stil etiketlerini korur. JSON i18n dosyaları (i18next, next-intl, vue-i18n gibi key-value yapıları) için [JSON Çevirici](../json-translate) kullanın — Key yoluna göre seçici çeviri ve {name}, {count} gibi yer tutucuları koruma desteği vardır. Üç çeviri aracı aynı motor yapılandırmasını ve API Key'leri paylaşır, aralarında geçiş yapmak yeniden yapılandırma gerektirmez."
+        },
+        {
+          "q": "Çevrilen Markdown sunucuya yükleniyor mu? Açık kaynak mı?",
+          "a": "Tamamen istemci tarafı: Markdown okuma, ayrıştırma ve çeviri istekleri tarayıcınızda gerçekleşir — orijinal içerik sunucularımıza hiç ulaşmaz. LLM motor istekleri doğrudan tarayıcınızdan yapılandırdığınız API uç noktasına gider (OpenAI, DeepSeek vb.) ve API Key'ler yalnızca yerel localStorage'da saklanır. Çeviri önbelleği tarayıcı IndexedDB'sini kullanır. Kaynak kod GitHub'da açıktır (rockbenben/md-translator), self-host veya inceleme yapabilirsiniz."
         }
       ],
       "howto": [
@@ -278,11 +299,11 @@
   },
   "Metadata": {
     "title": "ToolsByAI - Geliştiriciler İçin Yapay Zeka ve Veri Araçları",
-    "description": "Geliştiriciler için ücretsiz AI araç seti: Altyazı çevirisi, i18n, Markdown ve JSON düzenleme. Güvenli, yerel işlem ve açık kaynaklı çözüm.",
+    "description": "ToolsByAI: altyazı, Markdown, JSON i18n çevirisi ve metin/JSON toplu işleme için 17 ücretsiz açık kaynak araç. 25+ AI motoru.",
     "homeTitle": "ToolsByAI Paketi",
     "homeDescription": "Çeviri, metin, JSON ve veri dönüşümü için 20+ araç. Geliştirici ve yaratıcı verimliliğini artırın.",
     "ogTitle": "ToolsByAI - Ücretsiz ve Açık Kaynak Geliştirici Araçları",
-    "ogDescription": "Çeviri, veri işleme ve JSON düzenleme için 20+ araç. Yerel işlem gücüyle gizliliğinizi koruyan açık kaynaklı platform."
+    "ogDescription": "ToolsByAI: altyazı, Markdown, JSON i18n çevirisi ve metin/JSON toplu işleme için 17 ücretsiz açık kaynak araç. 25+ AI motoru."
   },
   "languages": {
     "auto": "Otomatik Algılama",
@@ -416,13 +437,19 @@
   },
   "feedback": {
     "feedback1": "Geri Bildirim & Öneriler",
-    "feedback2": "Sorun yaşarsanız veya önerileriniz varsa, bana bildirin! Geri bildiriminiz gelecekteki geliştirmeleri etkiler ve daha iyi araçlar oluşturmamıza yardımcı olur.",
+    "feedback2": "Sorun yaşarsanız veya önerileriniz varsa, bana bildirin!Geri bildiriminiz gelecekteki geliştirmeleri etkiler ve daha iyi araçlar oluşturmamıza yardımcı ol…",
     "feedback3": "Kullanım durumunuzu, sorunu veya fikri açıklayın. Her mesajı okuyorum ve en kısa sürede yanıtlayacağım/optimize edeceğim.",
     "reaction0": "Beğen",
     "reaction1": "Destek",
     "reaction2": "Harika",
     "reaction3": "Ne?",
     "reaction4": "Kafam Karıştı",
-    "placeholder": "Mesaj bırakın (giriş gerekmez, yanıt için e-posta isteğe bağlı)"
+    "placeholder": "Mesaj bırakın (giriş gerekmez, yanıt için e-posta isteğe bağlı)",
+    "metaDescription": "Tools By AI geri bildirim sayfası: hata bildir, özellik öner veya kullanım örneklerini paylaş. Waline tabanlı, anonim gönderim mümkün, ücretsiz."
+  },
+  "NotFound": {
+    "title": "Sayfa Bulunamadı",
+    "description": "Ziyaret ettiğiniz sayfa mevcut değil veya taşınmış.",
+    "goHome": "Ana Sayfaya Dön"
   }
 }

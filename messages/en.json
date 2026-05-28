@@ -77,7 +77,7 @@
     "resultToSource": "Result ➔ Source",
     "resultToSourceTooltip": "Overwrite input area with result text",
     "readOnlyMode": "Read-Only Mode",
-    "readOnlyModeTooltip": "Text is too long; automatically switched to read-only mode to maintain page performance",
+    "readOnlyModeTooltip": "Text is too long: the editor is temporarily read-only and shows a partial preview only. Your full content is unaffected — processing and export still use the entire text.",
     "clearInputTooltip": "Clear input content and uploaded files",
     "smartLineBreak": "Smart Line Break",
     "replaceText": "Replace Text",
@@ -143,7 +143,8 @@
     "langPresetIndian": "Indian Subcontinent",
     "selectedCount": "{count} selected",
     "recentLanguages": "Recent",
-    "langGroupAmericasOceania": "Americas & Oceania"
+    "langGroupAmericasOceania": "Americas & Oceania",
+    "relatedTools": "Related Tools"
   },
   "MDTranslator": {
     "clientDescription": "Upload Markdown files or paste text. Intelligently preserves format, code, and formulas. One-click translate to multiple languages.",
@@ -228,20 +229,40 @@
     "mdTranslator": {
       "title": "Markdown Translator",
       "description": "Batch translate Markdown, preserving format and code",
-      "metaTitle": "Markdown Translator | Preserve Format, Code & LaTeX Online",
-      "metaDescription": "Need to translate docs? MDTranslator keeps formatting, code blocks & LaTeX intact. Supports DeepSeek & AI models. Batch translate your knowledge base now!",
+      "metaTitle": "Markdown Translator | Preserve Code, LaTeX & Front Matter",
+      "metaDescription": "Markdown translator preserving code, LaTeX, links, Front Matter. 25+ AI engines: DeepSeek, Claude, GPT. For Hugo, Jekyll, Docusaurus.",
       "faq": [
         {
-          "q": "How to preserve code blocks and formulas when translating Markdown?",
-          "a": "The tool automatically detects and skips code blocks, LaTeX formulas, links, and other formatting elements, translating only plain text to keep your technical docs publishable after translation."
+          "q": "Which free Markdown translation tool works best?",
+          "a": "MDTranslator is a free, open-source, browser-side Markdown translator: source never leaves your machine, API key stays in localStorage. Supports Google free translate plus DeepSeek, Claude, GPT, Gemini, DeepL — 25+ engines total, covering 120+ target languages. Auto-skips code blocks, LaTeX formulas, link URLs, and Front Matter, so you can publish straight to Hugo, Jekyll, Hexo, VitePress, or Docusaurus with no manual format repair."
+        },
+        {
+          "q": "How do I preserve code blocks and formulas when translating Markdown?",
+          "a": "The tool uses a placeholder-protection strategy: code fences (```fenced code```), inline code (`code`), LaTeX formulas ($...$, $$...$$), link URLs, image paths, and HTML/JSX tags are replaced with `<<<MULTILINE_CODE_x>>>`, `<<<HTML_x>>>` etc. before being sent to the translator, then restored verbatim. Front Matter is skipped by default; flip the 'Translate Frontmatter' toggle to include it. Separate toggles control code blocks, LaTeX, and link text. Technical docs come out format-perfect with no manual repair."
+        },
+        {
+          "q": "Should I use machine translation or AI/LLM for technical documentation? Which is best?",
+          "a": "AI/LLM is strongly recommended for technical content; machine translation is only good for quick previews. AI/LLM models recognize library names, function names, and variables in context without mistranslating them — Claude Sonnet leads on API doc terminology accuracy, DeepSeek delivers excellent value (de facto standard for Chinese technical blogs), Gemini 3 Pro fits book-length documentation (1M-token context). Machine translation (Google free, DeepL) is only suitable for quick previews — long Markdown docs get truncated and technical terms slip into everyday words. Engine…"
+        },
+        {
+          "q": "How do I translate a GitHub README or an entire VitePress / Docusaurus doc site?",
+          "a": "Batch upload your docs/ directory. Front Matter fields like title and description can be translated by enabling 'Translate Front Matter'; slug and permalink fields are preserved. Code blocks, CLI examples, and API endpoints are skipped automatically — only comments and prose are translated. Drop translated files back into the original directory and your framework will pick them up via its i18n.locales config. VitePress uses zh/, en/ subfolders; Docusaurus uses the i18n/{locale}/ structure."
+        },
+        {
+          "q": "Does it support GFM, MDX, or Astro Markdown dialects?",
+          "a": "Full support for standard CommonMark and GFM (GitHub Flavored Markdown) including tables, task lists, strikethrough, and fenced code blocks. For MDX (Markdown with JSX components) and Astro Components, component tags are treated as opaque blocks; plain-text attributes like <Alert>this gets translated</Alert> are translated, while expression attributes (title={var}) are preserved verbatim to avoid breaking code. For complex MDX where you want to skip Markdown parsing entirely, flip the 'Ignore Formatting' toggle to translate everything as plain text."
         },
         {
           "q": "What tool can batch-translate technical blog posts?",
           "a": "MDTranslator supports batch uploading multiple Markdown files for one-click translation. It preserves Front Matter metadata so translated posts deploy directly to Hugo, Jekyll, Hexo, and other blog frameworks."
         },
         {
-          "q": "What is the best free Markdown translation tool?",
-          "a": "MDTranslator is completely free and open source, supporting Google free translation and AI models like DeepSeek. Unlike generic translators, it intelligently preserves Markdown syntax so you never need to manually fix formatting after translation."
+          "q": "What if I need to translate subtitles or JSON config files instead of Markdown?",
+          "a": "For subtitle files (SRT/ASS/VTT/LRC), use [Subtitle Translator](../subtitle-translator) — it preserves timecodes and ASS style tags. For JSON i18n files (i18next, next-intl, vue-i18n key-value structure), use [JSON Translator](../json-translate) — selective translation by Key path, with placeholder protection for {name}, {count}, etc. All three translation tools share the same engine configurations and API keys, so switching between them needs no re-setup."
+        },
+        {
+          "q": "Is the translated Markdown uploaded to your server? Is it open source?",
+          "a": "Fully client-side: Markdown reading, parsing, and translation requests all happen in your browser — original content never touches our servers. LLM engine requests go directly from your browser to your configured API endpoint (OpenAI, DeepSeek, etc.), and API keys are stored only in local browser storage. Translation cache uses browser IndexedDB. Source code is open on GitHub (rockbenben/md-translator) for self-hosting or auditing."
         }
       ],
       "howto": [
@@ -278,11 +299,11 @@
   },
   "Metadata": {
     "title": "ToolsByAI | Free Open Source AI Translation & Data Tools",
-    "description": "Looking for efficient dev tools? ToolsByAI offers 20+ free apps like Subtitle Translator & JSON Editor. Powered by DeepSeek & AI, secure & local. Start now!",
+    "description": "ToolsByAI: 17 free open-source tools for subtitle, Markdown, JSON i18n translation and text/JSON batch processing. 25+ AI engines.",
     "homeTitle": "ToolsByAI Toolset",
     "homeDescription": "20+ tools for translation, text, JSON, and data conversion. Boost efficiency for developers and creators.",
     "ogTitle": "ToolsByAI | Free Open Source AI Translation & Data Tools",
-    "ogDescription": "Looking for efficient dev tools? ToolsByAI offers 20+ free apps like Subtitle Translator & JSON Editor. Powered by DeepSeek & AI, secure & local. Start now!"
+    "ogDescription": "ToolsByAI: 17 free open-source tools for subtitle, Markdown, JSON i18n translation and text/JSON batch processing. 25+ AI engines."
   },
   "languages": {
     "auto": "Auto Detect",
@@ -423,6 +444,12 @@
     "reaction2": "Cool",
     "reaction3": "What?",
     "reaction4": "Confused",
-    "placeholder": "Leave a message (no login required, email optional for reply)"
+    "placeholder": "Leave a message (no login required, email optional for reply)",
+    "metaDescription": "Feedback for Tools By AI: report bugs, suggest features, share use-case ideas. Built on Waline, anonymous posting allowed, free."
+  },
+  "NotFound": {
+    "title": "Page Not Found",
+    "description": "The page you visited doesn't exist or has been moved.",
+    "goHome": "Back to Home"
   }
 }

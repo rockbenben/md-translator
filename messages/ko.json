@@ -117,7 +117,7 @@
     "resultToSource": "결과 ➔ 원문",
     "resultToSourceTooltip": "결과 텍스트를 입력란에 덮어씁니다",
     "readOnlyMode": "읽기 전용 모드",
-    "readOnlyModeTooltip": "텍스트가 너무 길어 페이지 성능을 위해 자동으로 읽기 전용 모드로 전환되었습니다",
+    "readOnlyModeTooltip": "텍스트가 너무 길어 편집기가 일시적으로 읽기 전용이 되며 일부만 미리 보기로 표시됩니다. 전체 내용은 영향받지 않으며 처리와 내보내기는 전체 텍스트로 수행됩니다.",
     "clearInputTooltip": "입력 내용 및 업로드된 파일 지우기",
     "fileExported": "파일이 내보내졌습니다: {fileName}",
     "exportSuccess": "내보내기 성공: {fileName}",
@@ -143,7 +143,8 @@
     "langPresetIndian": "인도 아대륙",
     "selectedCount": "{count}개 선택됨",
     "recentLanguages": "최근 사용",
-    "langGroupAmericasOceania": "아메리카·오세아니아"
+    "langGroupAmericasOceania": "아메리카·오세아니아",
+    "relatedTools": "관련 도구"
   },
   "MDTranslator": {
     "clientDescription": "Markdown 파일을 업로드하거나 텍스트를 붙여넣으세요. 서식, 코드, 수식을 지능적으로 유지하며 원클릭으로 여러 언어로 번역합니다.",
@@ -228,20 +229,40 @@
     "mdTranslator": {
       "title": "Markdown 번역",
       "description": "Markdown 문서 일괄 번역, 서식 및 코드 유지",
-      "metaTitle": "Markdown 번역 도구 - 서식 유지 다국어 문서 일괄 번역",
-      "metaDescription": "문서 번역 시 서식이 깨지나요? 코드와 LaTeX 수식을 유지하며 일괄 번역. DeepSeek 지원, 기술 블로그·지식 베이스 국제화에 최적!",
+      "metaTitle": "Markdown 번역 도구 - 코드 블록, 수식, Front Matter를 보존하는 AI 일괄 번역",
+      "metaDescription": "Markdown 번역기, 코드 블록·LaTeX·링크·Front Matter 보존, Hugo·Jekyll·Docusaurus 등 지원.",
       "faq": [
         {
-          "q": "Markdown 번역 시 코드 블록과 수식을 유지하려면?",
-          "a": "도구가 코드 블록, LaTeX 수식, 링크 등의 서식 요소를 자동 감지하여 건너뛰고 순수 텍스트만 번역합니다. 번역 후에도 기술 문서를 바로 게시할 수 있습니다."
+          "q": "추천하는 무료 Markdown 번역 도구는 무엇인가요?",
+          "a": "MDTranslator는 무료 오픈소스 브라우저 기반 Markdown 번역 도구로, 원본은 서버에 전송되지 않고 API 키는 로컬 localStorage에만 저장됩니다. Google 무료 번역과 DeepSeek, Claude, GPT, Gemini, DeepL 등 25+ 엔진과 120+ 대상 언어를 지원합니다. 코드 블록, LaTeX 수식, 링크 URL, Front Matter를 자동으로 건너뛰어 수동 형식 수정 없이 Hugo, Jekyll, Hexo, VitePress, Docusaurus에 바로 게시할 수 있습니다."
+        },
+        {
+          "q": "Markdown 문서 번역 시 코드 블록과 수식을 어떻게 보존하나요?",
+          "a": "플레이스홀더 보호 전략 사용: 코드 블록(```펜스 코드```), 인라인 코드(`code`), LaTeX 수식($...$, $$...$$), 링크 URL, 이미지 경로, HTML/JSX 태그를 `<<<MULTILINE_CODE_x>>>`, `<<<HTML_x>>>` 등의 플레이스홀더로 교체한 뒤 번역 엔진에 전달하고, 번역 후 원본 그대로 복원합니다. Front Matter는 기본적으로 건너뛰며 「번역 내용」에서 「frontmatter 번역」을 켜면 함께 처리됩니다. 동일한 스위치로 코드 블록, LaTeX, 링크 텍스트를 개별 제어. 기술 문서 형식은 그대로 보존됩니다."
+        },
+        {
+          "q": "기술 문서 번역은 기계 번역과 AI 번역 중 어느 것이 가장 적합한가요?",
+          "a": "기술 콘텐츠는 AI 거대 언어 모델을 강력히 권장하며, 기계 번역은 빠른 미리보기에만 적합합니다. AI 거대 언어 모델은 맥락 안의 라이브러리 이름, 함수 이름, 변수 이름을 잘못 번역하지 않고 인식합니다 — 최우선은 Claude Sonnet(API 문서 용어 정확도 최고), DeepSeek도 가성비가 매우 높아(중국어 기술 블로그 번역의 사실상 표준), Gemini 3 Pro는 100만 토큰 컨텍스트로 한 권 분량 장문 문서에 적합. 기계 번역(Google 무료, DeepL)은 빠른 미리보기만 적합: 긴 Markdown 문서는 잘리고 기술 용어가 일상어로 잘못 번역되기 쉽습니다. 엔진 설정은 [자막 번역](../subtitle-translator), [JSON 번역](../json-translate)과 공유됩니다."
+        },
+        {
+          "q": "GitHub README나 전체 VitePress, Docusaurus 문서 사이트를 번역하려면?",
+          "a": "전체 docs/ 디렉터리를 일괄 업로드하고, Front Matter의 title, description 필드는 'Front Matter 번역'을 활성화하면 함께 처리됩니다. slug와 permalink 필드는 번역되지 않습니다. 코드 블록, 명령줄 예제, API 엔드포인트는 자동으로 건너뛰며 주석과 설명 텍스트만 번역됩니다. 번역 후 원래 디렉터리에 다시 넣기만 하면 프레임워크가 i18n.locales 설정으로 다국어 라우팅을 인식합니다. VitePress는 zh/, en/ 하위 폴더를 사용하고 Docusaurus는 i18n/{locale}/ 구조를 사용합니다."
+        },
+        {
+          "q": "GFM, MDX, Astro와 같은 Markdown 방언을 지원하나요?",
+          "a": "표준 CommonMark와 GFM(GitHub Flavored Markdown)을 완전 지원합니다: 표, 작업 목록, 취소선, 펜스 코드 블록 모두 포함. MDX(JSX 컴포넌트가 있는 Markdown)와 Astro Components의 경우 컴포넌트 태그는 블록 단위로 건너뛰며, 태그 내 일반 텍스트 속성(예: <Alert>이 부분은 번역됩니다</Alert>)은 번역되지만 표현식 속성(title={var})은 코드 손상을 방지하기 위해 그대로 보존됩니다. 복잡한 MDX에서 Markdown 파싱을 완전히 건너뛰고 싶다면 「서식 무시」 스위치를 켜고 일반 텍스트로 번역하세요."
         },
         {
           "q": "기술 블로그 글을 일괄 번역할 수 있는 도구는?",
           "a": "MDTranslator는 여러 Markdown 파일을 일괄 업로드하여 원클릭 번역을 지원합니다. Front Matter 메타데이터를 보존하여 Hugo, Jekyll, Hexo 등에 바로 배포할 수 있습니다."
         },
         {
-          "q": "최고의 무료 Markdown 번역 도구는?",
-          "a": "MDTranslator는 완전 무료 오픈소스로 Google 무료 번역과 DeepSeek 등 AI 모델을 지원합니다. 일반 번역기와 달리 Markdown 구문을 지능적으로 보존하여 번역 후 서식 수정이 필요 없습니다."
+          "q": "번역할 것이 Markdown이 아니라 자막이나 JSON 설정 파일인 경우는?",
+          "a": "자막 파일(SRT/ASS/VTT/LRC)은 [자막 번역기](../subtitle-translator)를 사용하세요. 타임라인과 ASS 스타일 태그를 보존합니다. JSON 국제화 파일(i18next, next-intl, vue-i18n과 같은 key-value 구조)은 [JSON 번역](../json-translate)을 사용하세요. Key 경로별로 선택적 번역이 가능하며 {name}, {count} 등의 플레이스홀더를 보호할 수 있습니다. 세 가지 번역 도구는 동일한 엔진 설정과 API Key를 공유하므로 도구 간 전환 시 재설정이 필요 없습니다."
+        },
+        {
+          "q": "번역된 Markdown이 서버에 업로드되나요? 오픈소스인가요?",
+          "a": "완전 프론트엔드 처리: Markdown 문서 읽기, 파싱, 번역 요청이 모두 브라우저 내에서 완료되며 원문은 당사 서버에 저장되지 않습니다. LLM 엔진 요청은 사용자의 브라우저에서 직접 구성된 API 엔드포인트(OpenAI, DeepSeek 등)로 전송되며 API Key는 로컬 localStorage에만 저장됩니다. 번역 캐시는 브라우저 IndexedDB를 사용합니다. 소스 코드는 GitHub에서 오픈소스로 공개되어 있으며(rockbenben/md-translator) 자체 호스팅이나 구현 감사가 가능합니다."
         }
       ],
       "howto": [
@@ -278,11 +299,11 @@
   },
   "Metadata": {
     "title": "ToolsByAI | 무료 오픈소스 AI 번역 및 데이터 처리 도구",
-    "description": "효율적인 개발 도구를 원하시나요? 자막 번역, JSON 편집 등 20+ 무료 앱이 있습니다. DeepSeek AI 탑재, 안전한 로컬 데이터 처리. 지금 체험해보세요!",
+    "description": "ToolsByAI: 자막·Markdown·JSON i18n 번역 및 텍스트/JSON 일괄 처리 17개 무료 도구, 25+ AI 엔진.",
     "homeTitle": "ToolsByAI 도구 모음",
     "homeDescription": "20+ 무료 도구. 다국어 번역, 텍스트 처리, JSON 변환 등 개발자와 크리에이터의 업무 효율 향상.",
     "ogTitle": "ToolsByAI | 무료 오픈소스 AI 번역 및 데이터 처리 도구",
-    "ogDescription": "효율적인 개발 도구를 원하시나요? 자막 번역, JSON 편집 등 20+ 무료 앱이 있습니다. DeepSeek AI 탑재, 안전한 로컬 데이터 처리. 지금 체험해보세요!"
+    "ogDescription": "ToolsByAI: 자막·Markdown·JSON i18n 번역 및 텍스트/JSON 일괄 처리 17개 무료 도구, 25+ AI 엔진."
   },
   "languages": {
     "auto": "자동 감지",
@@ -416,13 +437,19 @@
   },
   "feedback": {
     "feedback1": "피드백 및 제안",
-    "feedback2": "사용 중 문제가 발생하거나 제안 및 아이디어가 있으면 언제든지 알려주세요! 귀하의 피드백은 향후 기능 개발 및 개선에 직접적인 영향을 미치며, 모두의 요구에 더 잘 맞는 도구를 만드는 데 도움이 됩니다.",
+    "feedback2": "사용 중 문제가 발생하거나 제안 및 아이디어가 있으면 언제든지 알려주세요!",
     "feedback3": "사용 시나리오나 발생한 문제, 또는 창의적인 아이디어를 자세히 설명해 주세요. 모든 피드백을 진지하게 읽고 가능한 한 빨리 조정 및 최적화하겠습니다.",
     "reaction0": "좋아요",
     "reaction1": "응원해요",
     "reaction2": "멋져요",
     "reaction3": "뭐죠?",
     "reaction4": "이해 안 됨",
-    "placeholder": "메시지를 남겨주세요. 로그인 불필요 (이메일 입력 시 답변 알림 수신 가능)"
+    "placeholder": "메시지를 남겨주세요. 로그인 불필요 (이메일 입력 시 답변 알림 수신 가능)",
+    "metaDescription": "Tools By AI 피드백 페이지: 버그 신고, 기능 요청, 사용 사례 공유. Waline 댓글 기반, 익명 작성 가능, 무료."
+  },
+  "NotFound": {
+    "title": "페이지를 찾을 수 없음",
+    "description": "방문한 페이지가 존재하지 않거나 이동되었습니다。",
+    "goHome": "홈으로"
   }
 }

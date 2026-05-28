@@ -117,7 +117,7 @@
     "resultToSource": "Kết quả ➔ Nguồn",
     "resultToSourceTooltip": "Ghi đè văn bản kết quả vào ô nhập liệu",
     "readOnlyMode": "Chế độ chỉ đọc",
-    "readOnlyModeTooltip": "Văn bản quá dài, đã tự động chuyển sang chế độ chỉ đọc để đảm bảo hiệu suất trang",
+    "readOnlyModeTooltip": "Văn bản quá dài: trình soạn thảo tạm thời ở chế độ chỉ đọc và chỉ hiển thị bản xem trước một phần. Toàn bộ nội dung của bạn không bị ảnh hưởng — xử lý và xuất vẫn dùng toàn bộ văn bản.",
     "clearInputTooltip": "Xóa nội dung đã nhập và tệp đã tải lên",
     "fileExported": "Đã xuất tệp: {fileName}",
     "exportSuccess": "Xuất thành công: {fileName}",
@@ -143,7 +143,8 @@
     "langPresetIndian": "Tiểu lục địa Ấn Độ",
     "selectedCount": "Đã chọn {count}",
     "recentLanguages": "Gần đây",
-    "langGroupAmericasOceania": "Châu Mỹ và Châu Đại Dương"
+    "langGroupAmericasOceania": "Châu Mỹ và Châu Đại Dương",
+    "relatedTools": "Công cụ liên quan"
   },
   "MDTranslator": {
     "clientDescription": "Tải lên tệp Markdown hoặc dán văn bản. Giữ nguyên định dạng, mã và công thức một cách thông minh. Dịch sang nhiều ngôn ngữ chỉ bằng một cú nhấp chuột.",
@@ -228,20 +229,40 @@
     "mdTranslator": {
       "title": "Dịch giả Markdown",
       "description": "Dịch Markdown hàng loạt, giữ định dạng và mã",
-      "metaTitle": "Dịch Giả Markdown Online - Dịch AI Giữ Nguyên Định Dạng",
-      "metaDescription": "Cần dịch tài liệu? Dịch Markdown mà không làm hỏng định dạng hay mã. Hỗ trợ frontmatter và LaTeX. Lý tưởng cho blog kỹ thuật và tài liệu!",
+      "metaTitle": "Dịch Markdown | Giữ Code, LaTeX và Front Matter",
+      "metaDescription": "Trình dịch Markdown giữ nguyên code block, LaTeX, link và Front Matter. 25+ engine AI: DeepSeek, Claude, GPT. Cho Hugo, Jekyll, Docusaurus.",
       "faq": [
         {
-          "q": "Cách giữ khối mã khi dịch Markdown?",
-          "a": "Công cụ tự động phát hiện và bỏ qua khối mã, công thức LaTeX, chỉ dịch văn bản thuần."
+          "q": "Công cụ dịch Markdown miễn phí nào hoạt động tốt nhất?",
+          "a": "MDTranslator là trình dịch Markdown miễn phí, mã nguồn mở, phía trình duyệt: nguồn không bao giờ rời máy bạn, API key vẫn ở localStorage. Hỗ trợ Google free translate cùng DeepSeek, Claude, GPT, Gemini, DeepL — tổng cộng 25+ engine, bao phủ 120+ ngôn ngữ đích. Tự động bỏ qua khối mã, công thức LaTeX, URL và Front Matter, bạn có thể xuất bản trực tiếp lên Hugo, Jekyll, Hexo, VitePress hoặc Docusaurus mà không cần sửa định dạng thủ công."
+        },
+        {
+          "q": "Làm thế nào để giữ nguyên khối mã và công thức khi dịch Markdown?",
+          "a": "Công cụ sử dụng chiến lược bảo vệ bằng placeholder: khối mã (```mã hàng rào```), mã inline (`code`), công thức LaTeX ($...$, $$...$$), URL, đường dẫn ảnh và thẻ HTML/JSX được thay bằng `<<<MULTILINE_CODE_x>>>`, `<<<HTML_x>>>` v.v. trước khi gửi đến trình dịch, sau đó khôi phục nguyên xi. Front Matter bị bỏ qua mặc định; bật «Dịch Frontmatter» để bao gồm. Các công tắc riêng kiểm soát khối mã, LaTeX và văn bản liên kết. Tài liệu kỹ thuật ra với định dạng hoàn hảo, không cần sửa thủ công."
+        },
+        {
+          "q": "Tài liệu kỹ thuật: dùng dịch máy hay dịch AI/LLM? Cái nào phù hợp nhất?",
+          "a": "AI/LLM được khuyến nghị mạnh mẽ cho nội dung kỹ thuật; dịch máy chỉ phù hợp cho xem nhanh. Mô hình AI/LLM nhận diện tên thư viện, hàm và biến trong ngữ cảnh mà không dịch sai — Claude Sonnet dẫn đầu về độ chính xác thuật ngữ tài liệu API, DeepSeek cho giá trị tuyệt vời (tiêu chuẩn thực tế cho blog kỹ thuật tiếng Trung), Gemini 3 Pro phù hợp với tài liệu cỡ một cuốn sách (ngữ cảnh 1M token). Dịch máy (Google miễn phí, DeepL) chỉ phù hợp xem nhanh — tài liệu Markdown dài bị cắt, thuật ngữ kỹ thuật dễ bị dịch nhầm thành từ thường ngày."
+        },
+        {
+          "q": "Cách dịch README trên GitHub hoặc cả một trang tài liệu VitePress / Docusaurus?",
+          "a": "Tải hàng loạt thư mục docs/. Các trường Front Matter như title, description có thể được dịch khi bật 'Dịch Front Matter'; các trường slug và permalink được giữ nguyên. Khối mã, ví dụ CLI và endpoint API được tự động bỏ qua — chỉ bình luận và nội dung văn bản được dịch. Đặt các tệp đã dịch trở lại thư mục gốc và framework sẽ nhận diện qua cấu hình i18n.locales. VitePress dùng thư mục con zh/, en/; Docusaurus dùng cấu trúc i18n/{locale}/."
+        },
+        {
+          "q": "Có hỗ trợ các phương ngữ Markdown như GFM, MDX, Astro không?",
+          "a": "Hỗ trợ đầy đủ CommonMark chuẩn và GFM (GitHub Flavored Markdown) gồm bảng, danh sách công việc, gạch ngang và khối mã có rào. Với MDX (Markdown có thành phần JSX) và Astro Components, thẻ thành phần được coi như khối đặc; thuộc tính văn bản thuần như <Alert>cái này sẽ được dịch</Alert> sẽ được dịch, còn thuộc tính dạng biểu thức (title={var}) được giữ nguyên để không phá vỡ mã. Với MDX phức tạp khi muốn bỏ qua hoàn toàn việc phân tích Markdown, hãy bật công tắc «Bỏ qua định dạng» để dịch toàn bộ dưới dạng văn bản thuần."
         },
         {
           "q": "Công cụ nào dịch hàng loạt bài blog kỹ thuật?",
           "a": "MDTranslator hỗ trợ tải hàng loạt file Markdown với dịch một click, giữ nguyên Front Matter."
         },
         {
-          "q": "Công cụ dịch Markdown miễn phí tốt nhất?",
-          "a": "MDTranslator hoàn toàn miễn phí và mã nguồn mở, giữ thông minh cú pháp Markdown."
+          "q": "Nếu cần dịch phụ đề hoặc tệp cấu hình JSON thay vì Markdown thì sao?",
+          "a": "Với tệp phụ đề (SRT/ASS/VTT/LRC), dùng [Dịch giả Phụ đề](../subtitle-translator) — giữ timecode và thẻ kiểu ASS. Với tệp i18n JSON (cấu trúc key-value như i18next, next-intl, vue-i18n), dùng [Dịch JSON](../json-translate) — dịch chọn lọc theo đường dẫn Key, bảo vệ placeholder {name}, {count}, v.v. Cả ba công cụ dịch dùng chung cùng cấu hình engine và API Key, nên chuyển qua lại giữa chúng không cần cài đặt lại."
+        },
+        {
+          "q": "Markdown đã dịch có được tải lên máy chủ không? Có mã nguồn mở không?",
+          "a": "Hoàn toàn phía client: đọc Markdown, phân tích cú pháp và yêu cầu dịch đều diễn ra trong trình duyệt của bạn — nội dung gốc không bao giờ đi qua máy chủ của chúng tôi. Yêu cầu engine LLM đi thẳng từ trình duyệt đến endpoint API bạn đã cấu hình (OpenAI, DeepSeek, v.v.), và API Key chỉ lưu trong localStorage cục bộ. Bộ nhớ đệm dịch dùng IndexedDB của trình duyệt. Mã nguồn mở trên GitHub (rockbenben/md-translator) để tự host hoặc kiểm tra."
         }
       ],
       "howto": [
@@ -278,11 +299,11 @@
   },
   "Metadata": {
     "title": "ToolsByAI - Bộ Công Cụ Dịch Thuật & Dữ Liệu AI Online",
-    "description": "Bộ công cụ AI miễn phí cho nhà phát triển: dịch phụ đề, i18n, Markdown và chỉnh sửa JSON. Xử lý cục bộ an toàn, mã nguồn mở và hỗ trợ xử lý hàng loạt.",
+    "description": "ToolsByAI: 17 công cụ mã nguồn mở miễn phí cho dịch phụ đề, Markdown, JSON i18n và xử lý văn bản/JSON. 25+ engine AI.",
     "homeTitle": "Bộ ToolsByAI",
     "homeDescription": "20+ công cụ cho dịch, văn bản, JSON và chuyển đổi dữ liệu. Tăng cường hiệu quả cho nhà phát triển và người sáng tạo.",
     "ogTitle": "ToolsByAI - Công Cụ Dev AI Miễn Phí & Mã Nguồn Mở",
-    "ogDescription": "20+ tiện ích cho nhà phát triển: dịch thuật, xử lý dữ liệu và JSON. Bảo vệ quyền riêng tư với xử lý cục bộ ngay trên trình duyệt."
+    "ogDescription": "ToolsByAI: 17 công cụ mã nguồn mở miễn phí cho dịch phụ đề, Markdown, JSON i18n và xử lý văn bản/JSON. 25+ engine AI."
   },
   "languages": {
     "auto": "Tự động phát hiện",
@@ -416,13 +437,19 @@
   },
   "feedback": {
     "feedback1": "Phản hồi & Gợi ý",
-    "feedback2": "Nếu bạn gặp vấn đề hoặc có gợi ý, hãy cho tôi biết! Phản hồi của bạn ảnh hưởng đến sự phát triển trong tương lai và giúp chúng tôi tạo ra các công cụ tốt hơn.",
+    "feedback2": "Nếu bạn gặp vấn đề hoặc có gợi ý, hãy cho tôi biết!Phản hồi của bạn ảnh hưởng đến sự phát triển trong tương lai và giúp chúng tôi tạo ra các công cụ tốt h…",
     "feedback3": "Mô tả trường hợp sử dụng, vấn đề hoặc ý tưởng của bạn. Tôi đọc từng tin nhắn và sẽ phản hồi/tối ưu hóa sớm nhất có thể.",
     "reaction0": "Thích",
     "reaction1": "Ủng hộ",
     "reaction2": "Tuyệt",
     "reaction3": "Cái gì?",
     "reaction4": "Bối rối",
-    "placeholder": "Để lại tin nhắn (không cần đăng nhập, email tùy chọn để trả lời)"
+    "placeholder": "Để lại tin nhắn (không cần đăng nhập, email tùy chọn để trả lời)",
+    "metaDescription": "Trang phản hồi Tools By AI: báo lỗi, đề xuất tính năng, chia sẻ tình huống sử dụng. Dựa trên Waline, đăng ẩn danh được phép, miễn phí."
+  },
+  "NotFound": {
+    "title": "Không tìm thấy trang",
+    "description": "Trang bạn truy cập không tồn tại hoặc đã được di chuyển.",
+    "goHome": "Về trang chủ"
   }
 }

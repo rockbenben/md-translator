@@ -117,7 +117,7 @@
     "resultToSource": "結果 ➔ 原文",
     "resultToSourceTooltip": "結果テキストを入力欄に上書き",
     "readOnlyMode": "読み取り専用モード",
-    "readOnlyModeTooltip": "テキストが長すぎるため、ページのパフォーマンスを確保するため自動的に読み取り専用モードに切り替わりました",
+    "readOnlyModeTooltip": "テキストが長すぎるため、エディターは一時的に読み取り専用となり、一部のみをプレビュー表示しています。完全な内容は影響を受けず、処理と書き出しは全文に対して行われます。",
     "clearInputTooltip": "入力内容とアップロードされたファイルをクリア",
     "fileExported": "ファイルをエクスポートしました：{fileName}",
     "exportSuccess": "エクスポート成功：{fileName}",
@@ -143,7 +143,8 @@
     "langPresetIndian": "インド亜大陸",
     "selectedCount": "{count} 言語選択中",
     "recentLanguages": "最近使用",
-    "langGroupAmericasOceania": "アメリカ・オセアニア"
+    "langGroupAmericasOceania": "アメリカ・オセアニア",
+    "relatedTools": "関連ツール"
   },
   "MDTranslator": {
     "clientDescription": "Markdownファイルをアップロードまたはテキストを貼り付け。書式、コード、数式をスマートに保持し、ワンクリックで多言語に翻訳。",
@@ -228,20 +229,40 @@
     "mdTranslator": {
       "title": "Markdown翻訳",
       "description": "Markdownドキュメントを一括翻訳、書式とコードを保持",
-      "metaTitle": "Markdown 翻訳ツール - 書式保持の多言語ドキュメント一括翻訳",
-      "metaDescription": "ドキュメント翻訳の書式崩れに悩みですか？コードやLaTeX数式を保持して一括翻訳。DeepSeek等のAIに対応。技術ブログや知識ベースの国際化に最適。今すぐ試用！",
+      "metaTitle": "Markdown 翻訳 - コード、LaTeX、Front Matter を保持する AI 翻訳",
+      "metaDescription": "Markdown 翻訳、コード・LaTeX・リンク・Front Matter を保持、Hugo・Jekyll・Docusaurus 等に対応。",
       "faq": [
         {
-          "q": "Markdown 翻訳時にコードブロックや数式を保持するには？",
-          "a": "ツールがコードブロック・LaTeX 数式・リンクなどの書式要素を自動検出してスキップし、プレーンテキストのみを翻訳します。翻訳後もそのまま公開可能です。"
+          "q": "おすすめの無料 Markdown 翻訳ツールは？",
+          "a": "MDTranslator は無料・オープンソースのブラウザ内 Markdown 翻訳ツール。原文はサーバーに送信されず、API キーはローカル localStorage のみに保存。Google 無料翻訳に加え、DeepSeek、Claude、GPT、Gemini、DeepL など 25+ エンジンに対応し、120+ 言語をカバー。コードブロック、LaTeX 数式、リンク URL、Front Matter を自動スキップし、翻訳後の手動修正なしで Hugo、Jekyll、Hexo、VitePress、Docusaurus に直接公開できます。"
+        },
+        {
+          "q": "Markdown 文書を翻訳するとき、コードブロックや数式を保持するには？",
+          "a": "プレースホルダ保護戦略を使用：コードブロック（```フェンスコード```）、インラインコード（`code`）、LaTeX 数式（$...$、$$...$$）、リンク URL、画像パス、HTML/JSX タグを `<<<MULTILINE_CODE_x>>>`、`<<<HTML_x>>>` などのプレースホルダに置換して翻訳エンジンに送り、翻訳後にそのまま復元します。Front Matter はデフォルトでスキップ；「翻訳内容」の「frontmatter を翻訳」をオンにすれば一緒に処理可能。同じスイッチでコードブロック、LaTeX、リンクテキストを個別制御。技術ドキュメントの形式は完全に保持されます。"
+        },
+        {
+          "q": "技術ドキュメントの翻訳には機械翻訳と AI 翻訳のどちらが最適？",
+          "a": "技術コンテンツには AI 大規模言語モデルを強く推奨し、機械翻訳はクイックプレビュー用途のみ。AI 大規模言語モデルはコンテキスト内のライブラリ名・関数名・変数名を誤訳せずに認識——第一候補は Claude Sonnet（API ドキュメントの用語精度が最高）、DeepSeek もコストパフォーマンスが極めて高く（中国語技術ブログ翻訳の事実上の標準）、Gemini 3 Pro は 100 万 token コンテキストで本一冊規模の長文ドキュメントに最適。"
+        },
+        {
+          "q": "GitHub README や VitePress、Docusaurus のドキュメントサイト全体を翻訳するには？",
+          "a": "docs/ ディレクトリ全体を一括アップロードし、Front Matter の title・description フィールドは「Front Matter 翻訳」を有効にすると一緒に処理されます。slug と permalink フィールドは翻訳されません。コードブロック、コマンド例、API エンドポイントは自動的にスキップされ、コメントと説明文のみが翻訳されます。翻訳後はそのまま元のディレクトリに戻すだけで、フレームワークが i18n.locales 設定で多言語ルーティングを認識します。VitePress は zh/、en/ サブフォルダ、Docusaurus は i18n/{locale}/ 構造を使用します。"
+        },
+        {
+          "q": "GFM、MDX、Astro などの Markdown 方言に対応していますか？",
+          "a": "標準 CommonMark と GFM（GitHub Flavored Markdown）に完全対応：テーブル、タスクリスト、取り消し線、フェンスドコードブロックすべてサポート。MDX（JSX コンポーネント付き Markdown）と Astro Components ではコンポーネントタグはブロック単位でスキップされ、タグ内のプレーンテキスト属性（<Alert>この部分は翻訳される</Alert> など）は翻訳されますが、式属性（title={var}）はコードを壊さないようそのまま保持されます。Markdown 解析を完全にスキップしたい複雑な MDX の場合は、「フォーマット無視」スイッチをオンにしてプレーンテキストとして翻訳できます。"
         },
         {
           "q": "技術ブログ記事を一括翻訳できるツールは？",
           "a": "MDTranslator は複数の Markdown ファイルを一括アップロードしてワンクリック翻訳に対応。Front Matter メタデータも保持され、Hugo・Jekyll・Hexo などにそのままデプロイできます。"
         },
         {
-          "q": "最適な無料 Markdown 翻訳ツールは？",
-          "a": "MDTranslator は完全無料・オープンソースで、Google 無料翻訳や DeepSeek 等の AI モデルに対応。汎用翻訳器と異なり Markdown 構文を賢く保持するため、翻訳後の書式修正が不要です。"
+          "q": "翻訳したいのが Markdown ではなく字幕や JSON 設定ファイルの場合は？",
+          "a": "字幕ファイル（SRT/ASS/VTT/LRC）には [字幕翻訳器](../subtitle-translator) を使用してください。タイムラインと ASS スタイルタグを保持します。JSON 国際化ファイル（i18next、next-intl、vue-i18n のような key-value 構造）には [JSON 翻訳](../json-translate) を使用してください。Key パスごとに選択的翻訳でき、{name}、{count} などのプレースホルダーを保護できます。3 つの翻訳ツールは同じエンジン設定と API Key を共有するため、ツール間の切り替え時に再設定は不要です。"
+        },
+        {
+          "q": "翻訳された Markdown はサーバーにアップロードされますか？オープンソースですか？",
+          "a": "完全にフロントエンドで処理：Markdown の読み込み・解析・翻訳リクエストはすべてブラウザ内で完結し、原文は当方のサーバーに保存されません。LLM エンジンへのリクエストはあなたのブラウザから直接、設定した API エンドポイント（OpenAI、DeepSeek など）に送信され、API Key はローカルの localStorage のみに保存されます。翻訳キャッシュはブラウザの IndexedDB を使用。ソースコードは GitHub（rockbenben/md-translator）でオープンソース公開されており、セルフホスティングや実装の監査が可能です。"
         }
       ],
       "howto": [
@@ -278,11 +299,11 @@
   },
   "Metadata": {
     "title": "ToolsByAI | 無料で使えるAI翻訳＆データ処理ツール集",
-    "description": "効率的な開発ツールをお探しですか？ToolsByAIは字幕翻訳やJSON編集など20+の無料アプリを提供。DeepSeekなどのAI搭載、安全なローカル処理。今すぐ体験！",
+    "description": "ToolsByAI、17 個の無料ツール：字幕・Markdown・JSON i18n 翻訳、テキストや JSON 一括処理。25+ AI エンジン。",
     "homeTitle": "ToolsByAI ツールセット",
     "homeDescription": "20+ ツール。多言語翻訳、テキスト処理、JSONデータ変換など、開発者とクリエイターの効率向上を支援。",
     "ogTitle": "ToolsByAI | 無料で使えるAI翻訳＆データ処理ツール集",
-    "ogDescription": "効率的な開発ツールをお探しですか？ToolsByAIは字幕翻訳やJSON編集など20+の無料アプリを提供。DeepSeekなどのAI搭載、安全なローカル処理。今すぐ体験！"
+    "ogDescription": "ToolsByAI、17 個の無料ツール：字幕・Markdown・JSON i18n 翻訳、テキストや JSON 一括処理。25+ AI エンジン。"
   },
   "languages": {
     "auto": "自動検出",
@@ -416,13 +437,19 @@
   },
   "feedback": {
     "feedback1": "フィードバックと提案",
-    "feedback2": "使用中に問題が発生した場合、または提案やアイデアがある場合は、いつでもお知らせください！あなたのフィードバックは将来の機能開発と改善に直接影響し、みんなのニーズにより合ったツールを作るのに役立ちます。",
+    "feedback2": "使用中に問題が発生した場合、または提案やアイデアがある場合は、いつでもお知らせください！",
     "feedback3": "使用シーンや遭遇した問題、または創造的なアイデアを詳しく説明してください。すべてのフィードバックを真剣に読み、できるだけ早く調整と最適化を行います。",
     "reaction0": "いいね",
     "reaction1": "応援",
     "reaction2": "クール",
     "reaction3": "なにこれ",
     "reaction4": "不明",
-    "placeholder": "メッセージを残してください。ログインは不要です（メールアドレスを入力すると返信通知を受け取れます）"
+    "placeholder": "メッセージを残してください。ログインは不要です（メールアドレスを入力すると返信通知を受け取れます）",
+    "metaDescription": "Tools By AI のフィードバックページ：バグ報告、機能リクエスト、使用例を共有。Waline ベース、匿名投稿可。"
+  },
+  "NotFound": {
+    "title": "ページが見つかりません",
+    "description": "アクセスしたページは存在しないか移動されました。",
+    "goHome": "ホームへ戻る"
   }
 }

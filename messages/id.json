@@ -117,7 +117,7 @@
     "resultToSource": "Hasil ➔ Sumber",
     "resultToSourceTooltip": "Timpa kotak input dengan teks hasil",
     "readOnlyMode": "Mode Hanya-Baca",
-    "readOnlyModeTooltip": "Teks terlalu panjang, otomatis beralih ke mode hanya-baca untuk menjaga performa halaman",
+    "readOnlyModeTooltip": "Teks terlalu panjang: editor sementara hanya-baca dan hanya menampilkan pratinjau sebagian. Konten lengkap Anda tidak terpengaruh — pemrosesan dan ekspor tetap menggunakan seluruh teks.",
     "clearInputTooltip": "Bersihkan konten input dan file yang diunggah",
     "fileExported": "File diekspor: {fileName}",
     "exportSuccess": "Ekspor berhasil: {fileName}",
@@ -143,7 +143,8 @@
     "langPresetIndian": "Anak Benua India",
     "selectedCount": "{count} dipilih",
     "recentLanguages": "Terbaru",
-    "langGroupAmericasOceania": "Amerika & Oseania"
+    "langGroupAmericasOceania": "Amerika & Oseania",
+    "relatedTools": "Alat Terkait"
   },
   "MDTranslator": {
     "clientDescription": "Unggah file Markdown atau tempel teks. Mempertahankan format, kode, dan rumus dengan cerdas. Terjemahan satu klik ke berbagai bahasa.",
@@ -228,20 +229,40 @@
     "mdTranslator": {
       "title": "Penerjemah Markdown",
       "description": "Terjemahan Markdown batch, pertahankan format dan kode",
-      "metaTitle": "Penerjemah Markdown Online - Terjemahan AI Pertahankan Format",
-      "metaDescription": "Perlu terjemahkan dokumen? Terjemahkan Markdown tanpa merusak format atau kode. Mendukung frontmatter dan LaTeX. Sempurna untuk blog teknis!",
+      "metaTitle": "Penerjemah Markdown | Kode, LaTeX & Front Matter Terjaga",
+      "metaDescription": "Penerjemah Markdown menjaga blok kode, LaTeX, tautan, Front Matter. 25+ mesin AI: DeepSeek, Claude, GPT. Hugo, Jekyll, Docusaurus.",
       "faq": [
         {
-          "q": "Bagaimana menjaga blok kode saat menerjemahkan Markdown?",
-          "a": "Alat secara otomatis mendeteksi dan melewati blok kode, rumus LaTeX, tautan, dan elemen pemformatan lainnya, hanya menerjemahkan teks biasa untuk menjaga dokumen teknis Anda tetap dapat dipublikasikan setelah diterjemahkan."
+          "q": "Alat terjemahan Markdown gratis mana yang paling baik?",
+          "a": "MDTranslator adalah penerjemah Markdown gratis, open-source, sisi browser: sumber tidak pernah meninggalkan mesin Anda, kunci API tetap di localStorage. Mendukung Google free translate plus DeepSeek, Claude, GPT, Gemini, DeepL — total 25+ mesin, mencakup 120+ bahasa target. Otomatis melewati blok kode, rumus LaTeX, URL, dan Front Matter, Anda dapat menerbitkan langsung ke Hugo, Jekyll, Hexo, VitePress, atau Docusaurus tanpa perbaikan format manual."
+        },
+        {
+          "q": "Bagaimana cara mempertahankan blok kode dan rumus saat menerjemahkan Markdown?",
+          "a": "Alat ini menggunakan strategi perlindungan placeholder: blok kode (```kode berpagar```), kode inline (`code`), rumus LaTeX ($...$, $$...$$), URL, jalur gambar, dan tag HTML/JSX diganti dengan `<<<MULTILINE_CODE_x>>>`, `<<<HTML_x>>>` dll. sebelum dikirim ke penerjemah, lalu dipulihkan apa adanya. Front Matter dilewati secara default; nyalakan «Terjemahkan Frontmatter» untuk menyertakannya. Sakelar terpisah mengontrol blok kode, LaTeX, dan teks tautan. Docs teknis keluar dengan format sempurna, tanpa perbaikan manual."
+        },
+        {
+          "q": "Dokumentasi teknis: mesin terjemahan atau terjemahan AI/LLM? Mana yang paling cocok?",
+          "a": "AI/LLM sangat direkomendasikan untuk konten teknis; mesin terjemahan hanya cocok untuk pratinjau cepat. Model AI/LLM mengenali nama library, fungsi, dan variabel dalam konteks tanpa salah menerjemahkan — Claude Sonnet memimpin pada akurasi terminologi dokumen API, DeepSeek menawarkan nilai sangat baik (standar de-facto untuk blog teknis Mandarin), Gemini 3 Pro cocok untuk dokumentasi sebesar buku (konteks 1M token). Mesin terjemahan (Google gratis, DeepL) hanya cocok untuk pratinjau cepat — dokumen Markdown panjang akan terpotong, istilah teknis salah diterjemahkan ke…"
+        },
+        {
+          "q": "Bagaimana menerjemahkan README GitHub atau seluruh situs dokumentasi VitePress / Docusaurus?",
+          "a": "Unggah batch direktori docs/ Anda. Field Front Matter seperti title dan description dapat diterjemahkan dengan mengaktifkan 'Terjemahkan Front Matter'; field slug dan permalink dipertahankan. Blok kode, contoh CLI, dan endpoint API otomatis dilewati — hanya komentar dan prosa yang diterjemahkan. Letakkan file terjemahan kembali ke direktori asli dan framework Anda akan mengambilnya melalui konfigurasi i18n.locales. VitePress menggunakan subfolder zh/, en/; Docusaurus menggunakan struktur i18n/{locale}/."
+        },
+        {
+          "q": "Apakah mendukung dialek Markdown seperti GFM, MDX, atau Astro?",
+          "a": "Dukungan penuh untuk CommonMark standar dan GFM (GitHub Flavored Markdown) termasuk tabel, daftar tugas, strikethrough, dan fenced code block. Untuk MDX (Markdown dengan komponen JSX) dan Astro Components, tag komponen diperlakukan sebagai blok buram; atribut teks biasa seperti <Alert>this gets translated</Alert> diterjemahkan, sementara atribut ekspresi (title={var}) dipertahankan apa adanya untuk menghindari kerusakan kode. Untuk MDX kompleks ketika ingin melewati parsing Markdown sepenuhnya, aktifkan sakelar «Abaikan Format» — semuanya akan diterjemahkan sebagai teks polos."
         },
         {
           "q": "Alat apa yang menerjemahkan artikel teknis secara massal?",
           "a": "MDTranslator mendukung unggah massal file Markdown dengan terjemahan satu klik, mempertahankan Front Matter."
         },
         {
-          "q": "Alat terjemahan Markdown gratis terbaik?",
-          "a": "MDTranslator sepenuhnya gratis dan open source, mempertahankan sintaks Markdown secara cerdas."
+          "q": "Bagaimana jika perlu menerjemahkan subtitle atau file konfigurasi JSON, bukan Markdown?",
+          "a": "Untuk file subtitle (SRT/ASS/VTT/LRC), gunakan [Penerjemah Subtitle](../subtitle-translator) — mempertahankan timecode dan tag gaya ASS. Untuk file i18n JSON (struktur key-value i18next, next-intl, vue-i18n), gunakan [Penerjemah JSON](../json-translate) — terjemahan selektif berdasarkan jalur Key, dengan perlindungan placeholder untuk {name}, {count}, dll. Ketiga alat terjemahan berbagi konfigurasi mesin dan API Key yang sama, jadi beralih di antaranya tidak perlu setup ulang."
+        },
+        {
+          "q": "Apakah Markdown terjemahan diunggah ke server Anda? Apakah open source?",
+          "a": "Sepenuhnya sisi-klien: pembacaan Markdown, parsing, dan permintaan terjemahan semua terjadi di browser Anda — konten asli tidak pernah menyentuh server kami. Permintaan mesin LLM dikirim langsung dari browser Anda ke endpoint API yang Anda konfigurasi (OpenAI, DeepSeek, dll.), dan API Key disimpan hanya di penyimpanan browser lokal. Cache terjemahan menggunakan IndexedDB browser. Kode sumber terbuka di GitHub (rockbenben/md-translator) untuk self-hosting atau audit."
         }
       ],
       "howto": [
@@ -278,11 +299,11 @@
   },
   "Metadata": {
     "title": "ToolsByAI - Peralatan Data & Terjemahan AI untuk Developer",
-    "description": "Kumpulan alat AI gratis untuk developer: terjemahan subtitle, i18n, Markdown, dan edit JSON. Proses batch cepat, aman secara lokal, dan open source.",
+    "description": "ToolsByAI: 17 alat open source gratis untuk penerjemahan subtitle, Markdown, JSON i18n, dan pemrosesan teks/JSON batch. 25+ AI engine.",
     "homeTitle": "Suite ToolsByAI",
     "homeDescription": "20+ alat untuk terjemahan, teks, JSON, dan konversi data. Tingkatkan efisiensi pengembang dan kreator.",
     "ogTitle": "ToolsByAI - Alat Dev AI Gratis dan Open Source",
-    "ogDescription": "20+ utilitas untuk pengembang: terjemahan, pemrosesan data, dan JSON. Hormati privasi Anda dengan pemrosesan lokal di browser."
+    "ogDescription": "ToolsByAI: 17 alat open source gratis untuk penerjemahan subtitle, Markdown, JSON i18n, dan pemrosesan teks/JSON batch. 25+ AI engine."
   },
   "languages": {
     "auto": "Deteksi Otomatis",
@@ -416,13 +437,19 @@
   },
   "feedback": {
     "feedback1": "Umpan Balik & Saran",
-    "feedback2": "Jika Anda menemukan masalah atau memiliki saran, beri tahu saya! Umpan balik Anda memengaruhi pengembangan masa depan dan membantu kami membuat alat yang lebih baik.",
+    "feedback2": "Jika Anda menemukan masalah atau memiliki saran, beri tahu saya!Umpan balik Anda memengaruhi pengembangan masa depan dan membantu kami membuat alat yang l…",
     "feedback3": "Jelaskan kasus penggunaan, masalah, atau ide Anda. Saya membaca setiap pesan dan akan merespons/mengoptimalkan sesegera mungkin.",
     "reaction0": "Suka",
     "reaction1": "Dukung",
     "reaction2": "Keren",
     "reaction3": "Apa?",
     "reaction4": "Bingung",
-    "placeholder": "Tinggalkan pesan (tidak perlu login, email opsional untuk balasan)"
+    "placeholder": "Tinggalkan pesan (tidak perlu login, email opsional untuk balasan)",
+    "metaDescription": "Halaman feedback Tools By AI: laporkan bug, sarankan fitur, atau bagikan ide penggunaan. Berbasis Waline, posting anonim diizinkan, gratis."
+  },
+  "NotFound": {
+    "title": "Halaman Tidak Ditemukan",
+    "description": "Halaman yang Anda kunjungi tidak ada atau telah dipindahkan.",
+    "goHome": "Kembali ke Beranda"
   }
 }
