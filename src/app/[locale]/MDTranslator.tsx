@@ -90,6 +90,9 @@ const MDTranslator = () => {
     failedLines,
     failedLangs,
     setFailedLangs,
+    failedReason,
+    clearFailures,
+    markRunHadFailures,
     isTranslating,
     setIsTranslating,
     progressPercent,
@@ -133,14 +136,14 @@ const MDTranslator = () => {
   const [translatedTextLang, setTranslatedTextLang] = useState<string | null>(null);
   const { customFileName, setCustomFileName, generateFileName } = useExportFilename("md-translator");
 
-  // 源文本变化时复位 extracted/translated 预览。render-time pattern 而非
-  // useEffect+setState (react-hooks/set-state-in-effect 禁止后者)。
+  // 源文本变化时只复位"源派生"的本地预览(extractedText)。译文结果及其元数据
+  // (translatedText / translatedTextLang)则保留——和 JSON 翻译一致:改源后旧结果不清,
+  // 直到重新翻译。这样既符合"保留旧结果",又不必在 render 阶段去 set 共享 context 的
+  // translatedText(那会更新 TranslationProvider → setState-in-render 警告)。
   const [prevSourceText, setPrevSourceText] = useState(sourceText);
   if (prevSourceText !== sourceText) {
     setPrevSourceText(sourceText);
     setExtractedText("");
-    setTranslatedText("");
-    setTranslatedTextLang(null);
   }
 
   /**
@@ -268,12 +271,15 @@ const MDTranslator = () => {
       } catch (error: unknown) {
         if (isCascadedAbort(error)) continue;
         hasFailedLang = true;
+        markRunHadFailures(); // so runTranslation reports this hard failure → no contradictory success toast
         // De-duped: multi-file batch can fire catch for the same lang per file.
         setFailedLangs((prev) => (prev.includes(currentTargetLang) ? prev : [...prev, currentTargetLang]));
         const friendly = isNetworkError(error) ? t("networkUnavailable") : isAbortError(error) ? t("translationTimeout") : null;
         const langLabel = sourceOptions.find((o) => o.value === currentTargetLang)?.label || currentTargetLang;
         const messageText = friendly ? `${friendly} (${langLabel})` : [getErrorMessage(error), langLabel, t("translationError")].join(" ");
-        message.error(messageText, 60);
+        // Shared key: failed languages roll into one toast instead of stacking N high
+        // — the TranslateFailurePanel keeps the full per-lang list.
+        message.error({ content: messageText, key: "translate-lang-fail", duration: 10 });
       }
     }
 
@@ -291,8 +297,10 @@ const MDTranslator = () => {
     setIsTranslating(true);
     setProgressPercent(0);
     failedFilesRef.current = 0;
-    // Batch path doesn't go through runTranslation — reset lang-failure manually.
-    setFailedLangs([]);
+    // Batch path doesn't go through the hook's runTranslation — reset ALL failure
+    // state (not just langs) so counts don't accumulate across runs and the failure
+    // warning re-fires on a fresh batch.
+    clearFailures();
 
     try {
       const isValid = await validate();
@@ -301,11 +309,20 @@ const MDTranslator = () => {
       for (let i = 0; i < multipleFiles.length; i++) {
         const currentFile = multipleFiles[i];
         await new Promise<void>((resolve) => {
-          readFile(currentFile, async (text) => {
-            await performTranslation(text, currentFile.name, i, multipleFiles.length);
-            await delay(1500);
-            resolve();
-          });
+          readFile(
+            currentFile,
+            async (text) => {
+              await performTranslation(text, currentFile.name, i, multipleFiles.length);
+              await delay(1500);
+              resolve();
+            },
+            // Decode/read failure: mark this file failed (so succeeded=total-failed is
+            // accurate) and unblock the loop.
+            () => {
+              failedFilesRef.current++;
+              resolve();
+            }
+          );
         });
       }
 
@@ -324,19 +341,27 @@ const MDTranslator = () => {
     }
   };
 
+  // Single-file translation just shows the result (no per-file export toast), so confirm
+  // completion here — only when the run fully succeeded (runTranslation returns false if
+  // any line/lang failed, so we don't contradict the failure panel/error toast).
+  const handleSingleTranslate = async () => {
+    const ok = await runTranslation(performTranslation, sourceText);
+    if (ok) message.success(t("textProcessed"));
+  };
+
   const handleExportFile = () => {
     const uploadFileName = multipleFiles[0]?.name || "markdown.md";
     // ResultCard 只在 translatedText 非空时渲染,而 translatedText 写入必伴随 lang 同帧 setState,
     // 所以 handleExportFile 触发时 translatedTextLang 必非 null —— ?? 仅作类型收窄兜底
     const langLabel = translatedTextLang ?? targetLanguage;
     const fileName = generateFileName(uploadFileName, langLabel);
-    downloadFile(translatedText, fileName);
-    return fileName;
+    void downloadFile(translatedText, fileName);
+    message.success(t("fileExported", { fileName }));
   };
 
   const handleExtractText = () => {
     if (!sourceText.trim()) {
-      message.error(t("noSourceText"));
+      message.warning(t("noSourceText"));
       return;
     }
     const lines = splitTextIntoLines(sourceText);
@@ -417,7 +442,7 @@ const MDTranslator = () => {
                 size="large"
                 icon={<GlobalOutlined spin={isTranslating} />}
                 className="flex-1"
-                onClick={() => (uploadMode === "single" ? runTranslation(performTranslation, sourceText) : handleMultipleTranslate())}
+                onClick={() => (uploadMode === "single" ? handleSingleTranslate() : handleMultipleTranslate())}
                 disabled={isTranslating}
                 loading={isTranslating}>
                 {multiLanguageMode ? `${t("translate")} | ${t("totalLanguages")}${targetLanguages.length || 0}` : t("translate")}
@@ -636,8 +661,10 @@ const MDTranslator = () => {
         count={failedCount}
         lines={failedLines}
         failedLangs={failedLangs}
+        reason={failedReason}
+        onClose={clearFailures}
         disabled={isTranslating}
-        onRetry={() => (uploadMode === "single" ? runTranslation(performTranslation, sourceText) : handleMultipleTranslate())}
+        onRetry={() => (uploadMode === "single" ? handleSingleTranslate() : handleMultipleTranslate())}
       />
 
       {/* Results Section */}
@@ -652,10 +679,7 @@ const MDTranslator = () => {
                   charCount={resultStats.charCount}
                   lineCount={resultStats.lineCount}
                   onCopy={() => copyToClipboard(translatedText)}
-                  onExport={() => {
-                    const fileName = handleExportFile();
-                    message.success(`${t("exportedFile")}: ${fileName}`);
-                  }}
+                  onExport={handleExportFile}
                   textDirection={getLangDir(targetLanguage)}
                 />
               </Col>
