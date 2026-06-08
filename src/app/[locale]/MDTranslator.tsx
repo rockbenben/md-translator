@@ -93,6 +93,7 @@ const MDTranslator = () => {
     failedReason,
     clearFailures,
     markRunHadFailures,
+    hadRunFailures,
     isTranslating,
     setIsTranslating,
     progressPercent,
@@ -123,7 +124,8 @@ const MDTranslator = () => {
   });
   const [rawMode, setRawMode] = useLocalStorage("md-translator-rawMode", false);
   const [contextAware, setContextAware] = useLocalStorage("md-translator-contextAware", false);
-  const [collapseKeys, setCollapseKeys] = useLocalStorage<string[]>("md-translator-collapseKeys", ["MDTranslator"]);
+  // key 必须与 Collapse items 的 "markdown"/"advanced" 一致(同字幕工具的修复)
+  const [collapseKeys, setCollapseKeys] = useLocalStorage<string[]>("md-translator-collapseKeys", ["markdown"]);
   const [multiLangModalOpen, setMultiLangModalOpen] = useState(false);
   // 提取出的纯文本预览 — tool-local,不放在共享 TranslationContext 里。
   const [extractedText, setExtractedText] = useState("");
@@ -152,11 +154,31 @@ const MDTranslator = () => {
    * 2. 对每一行根据预设的占位符规则进行分割，只调用翻译 API 翻译非占位符片段；
    * 3. 组装翻译后的行，并最终将占位符还原为原始内容。
    */
+  // removeChars 工具:跳过占位符 token,只清理可见译文段(见调用处注释)
+  const applyRemoveChars = (text: string): string => {
+    if (!removeChars.trim()) return text;
+    const charsToRemove = splitBySpaces(removeChars);
+    return text
+      .split(PLACEHOLDER_SPLIT_REGEX)
+      .map((seg) => {
+        if (PLACEHOLDER_TEST_REGEX.test(seg)) return seg;
+        let cleaned = seg;
+        charsToRemove.forEach((char) => {
+          cleaned = cleaned.replaceAll(char, "");
+        });
+        return cleaned;
+      })
+      .join("");
+  };
+
   const performTranslation = async (sourceText: string, fileNameSet?: string, fileIndex?: number, totalFiles?: number) => {
     const targetLangs = multiLanguageMode ? targetLanguages : [targetLanguage];
     if (multiLanguageMode && targetLangs.length === 0) {
       message.error(t("noTargetLanguage"));
       failedFilesRef.current++;
+      // 不标记失败的话 runTranslation 返回 true → 绿色"已处理"toast 跟错误
+      // toast 同屏自相矛盾。
+      markRunHadFailures();
       return;
     }
     const lines = splitTextIntoLines(sourceText);
@@ -219,7 +241,10 @@ const MDTranslator = () => {
               })
               .join(""),
           );
-          translatedTextWithPlaceholders = finalTranslatedLines.join("\n");
+          // removeChars 必须在占位符还原【之前】应用,且跳过占位符 token 本身
+          // —— 还原后应用会损坏受保护的代码块/链接/LaTeX;字符命中 <<<…>>>
+          // 会毁掉占位符导致泄漏。
+          translatedTextWithPlaceholders = applyRemoveChars(finalTranslatedLines.join("\n"));
 
           // 单次正则扫描 + Map 查表还原所有占位符 (O(text.length))。
           // 因为占位符自带 <<<...>>> 分隔符,literal 比较不会发生 prefix 重叠,
@@ -240,15 +265,7 @@ const MDTranslator = () => {
           // Raw text mode: translate all lines
           // If context mode is enabled, use context-aware translation with markdown type
           const translatedLines = await translateBatch(lines, translationMethod, currentTargetLang, fileIndex, totalFiles, contextAware ? "markdown" : undefined);
-          translatedTextWithPlaceholders = translatedLines.join("\n");
-        }
-
-        // Remove specified characters from the final translated text (after all formatting is done)
-        if (removeChars.trim()) {
-          const charsToRemove = splitBySpaces(removeChars);
-          charsToRemove.forEach((char) => {
-            translatedTextWithPlaceholders = translatedTextWithPlaceholders.replaceAll(char, "");
-          });
+          translatedTextWithPlaceholders = applyRemoveChars(translatedLines.join("\n"));
         }
 
         // Create language-specific file name for download
@@ -326,11 +343,12 @@ const MDTranslator = () => {
         });
       }
 
-      // 部分/全失败时不报"已导出"(per-file error toast 已经告知细节),只在有成功时显示汇总
+      // 部分/全失败时不报"已导出"(per-file error toast 已经告知细节),只在有成功时显示汇总。
+      // hadRunFailures() 覆盖行级软失败(provider 故障时文件是原文副本)。
       const total = multipleFiles.length;
       const failed = failedFilesRef.current;
       const succeeded = total - failed;
-      if (failed === 0) {
+      if (failed === 0 && !hadRunFailures()) {
         message.success(t("translationExported"), 10);
       } else if (succeeded > 0) {
         message.warning(`${t("translationExported")} (${succeeded}/${total})`, 10);
