@@ -1,4 +1,34 @@
 {
+  "TranslationGlossary": {
+    "title": "Glossaire",
+    "defaultName": "Mon glossaire",
+    "colFrom": "Source",
+    "colTo": "Traduction",
+    "langHint": "Les termes sont enregistrés par langue cible",
+    "presetCreated": "Glossaire créé",
+    "presetRenamed": "Glossaire renommé",
+    "presetDeleted": "Glossaire supprimé",
+    "subtitle": "Fixez des traductions pour les noms propres / termes spécialisés, par langue cible",
+    "enable": "Activer le glossaire",
+    "presetSelect": "Sélectionner un glossaire",
+    "presetEmptyHint": "Aucun glossaire — cliquez sur + pour en créer un",
+    "presetNew": "Nouveau glossaire",
+    "presetRename": "Renommer",
+    "presetDelete": "Supprimer",
+    "presetDeleteConfirm": "Supprimer ce glossaire ?",
+    "presetNamePlaceholder": "Nom du glossaire (ex. une série)",
+    "edit": "Modifier les termes",
+    "drawerTitle": "Modifier le glossaire",
+    "fromPlaceholder": "Terme source (ex. Spike)",
+    "toPlaceholder": "Traduction (ex. Spike)",
+    "addTerm": "Ajouter un terme",
+    "termCount": "{count, plural, one {# terme} other {# termes}}",
+    "noTermsForLang": "Aucun terme pour cette langue cible",
+    "importTsv": "Importer TSV",
+    "exportTsv": "Exporter TSV",
+    "importDone": "{count} terme(s) importé(s)",
+    "nameRequired": "Nom du glossaire requis"
+  },
   "common": {
     "fileProcessFailed": "Échec du traitement du fichier — vérifiez son encodage ou essayez-en un autre",
     "fileReadFailed": "Échec de la lecture du fichier",
@@ -126,6 +156,7 @@
     "apiStatusTesting": "Test en cours",
     "apiStatusConnected": "✓ Connecté",
     "apiStatusFailed": "Échec de connexion",
+    "apiStatusTimeout": "Délai de connexion dépassé",
     "testConnection": "Tester la connexion",
     "moreProviderSettings": "Plus de paramètres Provider",
     "gtxFreeAPIUnavailable": "Le service GTX Free est temporairement inaccessible — il pourrait s'agir d'une restriction réseau. Réessayez plus tard ou changez de service de traduction.",
@@ -254,7 +285,7 @@
         },
         {
           "q": "Documentation technique : faut-il utiliser la traduction automatique ou la traduction IA?",
-          "a": "L'IA/LLM est fortement recommandée pour le contenu technique ; la traduction automatique ne convient qu'aux aperçus rapides. Les modèles IA/LLM reconnaissent noms de bibliothèques, de fonctions et variables en contexte sans les mal traduire — Claude Sonnet mène sur la précision terminologique des docs API, DeepSeek offre un excellent rapport qualité-prix (standard de fait pour les blogs techniques chinois), Gemini 3 Pro convient à la documentation de la taille d'un livre (contexte 1M tokens). La traduction automatique (Google free, DeepL) ne convient qu'aux aperçus rapides…"
+          "a": "L'IA/LLM est fortement recommandée pour le contenu technique ; la traduction automatique ne convient qu'aux aperçus rapides. Les modèles IA/LLM reconnaissent noms de bibliothèques, de fonctions et variables en contexte sans les mal traduire — Claude Sonnet mène sur la précision terminologique des docs API, DeepSeek offre un excellent rapport qualité-prix (standard de fait pour les blogs techniques chinois), Gemini 3 Pro convient à la documentation de la taille d'un livre (contexte 1M tokens). La traduction automatique (Google free, DeepL) ne convient qu'aux aperçus rapides : les longs documents Markdown sont tronqués et les termes techniques sont facilement traduits en mots du quotidien. La configuration des moteurs peut être partagée avec [Traducteur de Sous-titres](../subtitle-translator) et [Traducteur JSON](../json-translate)."
         },
         {
           "q": "Comment traduire un README GitHub ou un site de docs VitePress / Docusaurus complet ?",
@@ -262,7 +293,7 @@
         },
         {
           "q": "Prend-il en charge les dialectes Markdown GFM, MDX ou Astro ?",
-          "a": "Prise en charge complète de CommonMark standard et GFM (GitHub Flavored Markdown) y compris tableaux, listes de tâches, barré et blocs de code clôturés. Pour MDX (Markdown avec composants JSX) et Astro Components, les balises de composants sont traitées comme des blocs opaques ; les attributs en texte brut comme <Alert>ceci est traduit</Alert> sont traduits, tandis que les attributs d'expression (title={var}) sont préservés à l'identique pour ne pas casser le code. Pour du MDX complexe où vous voulez ignorer entièrement l'analyse Markdown, activez l'interrupteur « Ignorer…"
+          "a": "Prise en charge complète de CommonMark standard et de GFM (GitHub Flavored Markdown), y compris tableaux, listes de tâches, texte barré et blocs de code clôturés. MDX (Markdown avec composants JSX) et Astro Components : les balises de composants (comme `<Alert>`, `</Alert>` ou `<Alert title={var}>` avec attributs) sont protégées comme placeholders de bloc et exclues de la traduction, tandis que le texte brut entre les balises est traduit normalement (ex. `<Alert>ce passage sera traduit</Alert>`). Pour du MDX complexe où vous voulez ignorer entièrement le format, activez l'interrupteur « Ignorer le format » dans le « Mode format » pour traduire en texte brut."
         },
         {
           "q": "Quel outil permet de traduire en lot des articles de blog techniques ?",

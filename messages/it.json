@@ -1,4 +1,34 @@
 {
+  "TranslationGlossary": {
+    "title": "Glossario",
+    "defaultName": "Il mio glossario",
+    "colFrom": "Origine",
+    "colTo": "Traduzione",
+    "langHint": "I termini sono salvati per lingua di destinazione",
+    "presetCreated": "Glossario creato",
+    "presetRenamed": "Glossario rinominato",
+    "presetDeleted": "Glossario eliminato",
+    "subtitle": "Imposta traduzioni fisse per nomi / termini tecnici, applicate per lingua di destinazione",
+    "enable": "Attiva glossario",
+    "presetSelect": "Seleziona un glossario",
+    "presetEmptyHint": "Nessun glossario — clicca + per crearne uno",
+    "presetNew": "Nuovo glossario",
+    "presetRename": "Rinomina",
+    "presetDelete": "Elimina",
+    "presetDeleteConfirm": "Eliminare questo glossario?",
+    "presetNamePlaceholder": "Nome del glossario (es. una serie TV)",
+    "edit": "Modifica termini",
+    "drawerTitle": "Modifica glossario",
+    "fromPlaceholder": "Termine sorgente (es. Spike)",
+    "toPlaceholder": "Traduzione (es. Spike)",
+    "addTerm": "Aggiungi termine",
+    "termCount": "{count, plural, one {# termine} other {# termini}}",
+    "noTermsForLang": "Nessun termine per questa lingua di destinazione",
+    "importTsv": "Importa TSV",
+    "exportTsv": "Esporta TSV",
+    "importDone": "{count} importati",
+    "nameRequired": "Nome del glossario obbligatorio"
+  },
   "common": {
     "fileProcessFailed": "Elaborazione del file non riuscita — controlla la codifica o prova un altro file",
     "fileReadFailed": "Lettura del file non riuscita",
@@ -113,6 +143,7 @@
     "apiStatusTesting": "Test in corso",
     "apiStatusConnected": "✓ Connesso",
     "apiStatusFailed": "Connessione fallita",
+    "apiStatusTimeout": "Connessione scaduta",
     "testConnection": "Testa connessione",
     "moreProviderSettings": "Altre impostazioni Provider",
     "format": "Formatta",
@@ -254,7 +285,7 @@
         },
         {
           "q": "Documentazione tecnica: traduzione automatica o traduzione IA/LLM? Quale è l'opzione migliore?",
-          "a": "IA/LLM è fortemente raccomandata per contenuti tecnici; la traduzione automatica è adatta solo per anteprime rapide. I modelli IA/LLM riconoscono nomi di librerie, funzioni e variabili nel contesto senza tradurli erroneamente — Claude Sonnet guida per precisione terminologica della documentazione API, DeepSeek offre un valore eccellente (standard di fatto per blog tecnici cinesi), Gemini 3 Pro si adatta a documentazione delle dimensioni di un libro (contesto 1M token). La traduzione automatica (Google free, DeepL) è adatta solo per anteprime rapide — i docs Markdown lunghi…"
+          "a": "IA/LLM è fortemente raccomandata per contenuti tecnici; la traduzione automatica è adatta solo per anteprime rapide. I modelli IA/LLM riconoscono nomi di librerie, funzioni e variabili nel contesto senza tradurli erroneamente — Claude Sonnet guida per precisione terminologica della documentazione API, DeepSeek offre un valore eccellente (standard di fatto per blog tecnici cinesi), Gemini 3 Pro si adatta a documentazione delle dimensioni di un libro (contesto 1M token). La traduzione automatica (Google free, DeepL) è adatta solo per anteprime rapide: i documenti Markdown lunghi vengono troncati e i termini tecnici finiscono spesso tradotti come parole di uso comune. La configurazione del motore può essere condivisa con [Traduttore Sottotitoli](../subtitle-translator) e [Traduttore JSON](../json-translate)."
         },
         {
           "q": "Come traduco un README GitHub o un intero sito di documentazione VitePress / Docusaurus?",
@@ -262,7 +293,7 @@
         },
         {
           "q": "Supporta i dialetti Markdown GFM, MDX o Astro?",
-          "a": "Supporto completo per CommonMark standard e GFM (GitHub Flavored Markdown) inclusi tabelle, liste di task, barrato e blocchi di codice recintati. Per MDX (Markdown con componenti JSX) e Astro Components, i tag dei componenti sono trattati come blocchi opachi; gli attributi in testo semplice come <Alert>questo viene tradotto</Alert> vengono tradotti, mentre gli attributi di espressione (title={var}) sono preservati letteralmente per non rompere il codice. Per MDX complesso dove si vuole saltare completamente il parsing Markdown, attiva l'interruttore «Ignora formattazione»…"
+          "a": "Supporto completo per CommonMark standard e GFM (GitHub Flavored Markdown), inclusi tabelle, elenchi di attività, barrato e blocchi di codice recintati. Per MDX (Markdown con componenti JSX) e Astro Components: i tag dei componenti (come `<Alert>`, `</Alert>` o `<Alert title={var}>` con attributi) vengono protetti come placeholder a blocco intero ed esclusi dalla traduzione, mentre il testo semplice tra i tag viene tradotto normalmente (ad es. `<Alert>questo testo viene tradotto</Alert>`). Per MDX complessi in cui vuoi saltare completamente la formattazione, attiva l'interruttore «Ignora formattazione» in «Modalità formato» per tradurre come testo semplice."
         },
         {
           "q": "Quale strumento traduce articoli tecnici in batch?",

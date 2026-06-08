@@ -1,4 +1,34 @@
 {
+  "TranslationGlossary": {
+    "title": "Glosarium",
+    "defaultName": "Glosarium saya",
+    "colFrom": "Sumber",
+    "colTo": "Terjemahan",
+    "langHint": "Istilah disimpan terpisah per bahasa target",
+    "presetCreated": "Glosarium dibuat",
+    "presetRenamed": "Nama glosarium diubah",
+    "presetDeleted": "Glosarium dihapus",
+    "subtitle": "Tetapkan terjemahan tetap untuk nama / istilah, diterapkan per bahasa target",
+    "enable": "Aktifkan glosarium",
+    "presetSelect": "Pilih glosarium",
+    "presetEmptyHint": "Belum ada glosarium — klik + untuk membuat",
+    "presetNew": "Glosarium baru",
+    "presetRename": "Ganti nama",
+    "presetDelete": "Hapus",
+    "presetDeleteConfirm": "Hapus glosarium ini?",
+    "presetNamePlaceholder": "Nama glosarium (mis. nama serial)",
+    "edit": "Edit istilah",
+    "drawerTitle": "Edit glosarium",
+    "fromPlaceholder": "Istilah sumber (mis. Spike)",
+    "toPlaceholder": "Terjemahan (mis. Spike)",
+    "addTerm": "Tambah istilah",
+    "termCount": "{count, plural, other {{count} istilah}}",
+    "noTermsForLang": "Belum ada istilah untuk bahasa target ini",
+    "importTsv": "Impor TSV",
+    "exportTsv": "Ekspor TSV",
+    "importDone": "{count} istilah diimpor",
+    "nameRequired": "Nama glosarium wajib diisi"
+  },
   "common": {
     "fileProcessFailed": "Gagal memproses file — periksa encoding-nya atau coba file lain",
     "fileReadFailed": "Gagal membaca file",
@@ -113,6 +143,7 @@
     "apiStatusTesting": "Menguji",
     "apiStatusConnected": "✓ Terhubung",
     "apiStatusFailed": "Koneksi gagal",
+    "apiStatusTimeout": "Waktu koneksi habis",
     "testConnection": "Uji koneksi",
     "moreProviderSettings": "Pengaturan Provider lain",
     "format": "Format",
@@ -254,7 +285,7 @@
         },
         {
           "q": "Dokumentasi teknis: mesin terjemahan atau terjemahan AI/LLM? Mana yang paling cocok?",
-          "a": "AI/LLM sangat direkomendasikan untuk konten teknis; mesin terjemahan hanya cocok untuk pratinjau cepat. Model AI/LLM mengenali nama library, fungsi, dan variabel dalam konteks tanpa salah menerjemahkan — Claude Sonnet memimpin pada akurasi terminologi dokumen API, DeepSeek menawarkan nilai sangat baik (standar de-facto untuk blog teknis Mandarin), Gemini 3 Pro cocok untuk dokumentasi sebesar buku (konteks 1M token). Mesin terjemahan (Google gratis, DeepL) hanya cocok untuk pratinjau cepat — dokumen Markdown panjang akan terpotong, istilah teknis salah diterjemahkan ke…"
+          "a": "AI/LLM sangat direkomendasikan untuk konten teknis; mesin terjemahan hanya cocok untuk pratinjau cepat. Model AI/LLM mengenali nama library, fungsi, dan variabel dalam konteks tanpa salah menerjemahkan — Claude Sonnet memimpin pada akurasi terminologi dokumen API, DeepSeek menawarkan nilai sangat baik (standar de-facto untuk blog teknis Mandarin), Gemini 3 Pro cocok untuk dokumentasi sebesar buku (konteks 1M token). Mesin terjemahan (Google gratis, DeepL) hanya cocok untuk pratinjau cepat — dokumen Markdown panjang akan terpotong dan istilah teknis mudah salah diterjemahkan menjadi kata sehari-hari. Konfigurasi mesin dapat dibagikan dengan [Penerjemah Subtitle](../subtitle-translator) dan [Penerjemah JSON](../json-translate)."
         },
         {
           "q": "Bagaimana menerjemahkan README GitHub atau seluruh situs dokumentasi VitePress / Docusaurus?",
@@ -505,7 +536,7 @@
   },
   "feedback": {
     "feedback1": "Umpan Balik & Saran",
-    "feedback2": "Jika Anda menemukan masalah atau memiliki saran, beri tahu saya!Umpan balik Anda memengaruhi pengembangan masa depan dan membantu kami membuat alat yang l…",
+    "feedback2": "Jika Anda menemukan masalah saat menggunakan alat ini, atau punya saran dan ide apa pun, jangan ragu untuk memberi tahu saya! Umpan balik Anda akan langsung memengaruhi pengembangan dan penyempurnaan fitur di masa depan, serta membantu kami bersama-sama membangun alat yang lebih sesuai dengan kebutuhan semua orang.",
     "feedback3": "Jelaskan kasus penggunaan, masalah, atau ide Anda. Saya membaca setiap pesan dan akan merespons/mengoptimalkan sesegera mungkin.",
     "reaction0": "Suka",
     "reaction1": "Dukung",
