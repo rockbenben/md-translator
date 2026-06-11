@@ -24,7 +24,7 @@ import { useLocalStorage } from "@/app/hooks/useLocalStorage";
 import { useTextStats } from "@/app/hooks/useTextStats";
 import { useExportFilename } from "@/app/hooks/useExportFilename";
 
-import { splitTextIntoLines, downloadFile, splitBySpaces, getErrorMessage, isAbortError, isCascadedAbort, isNetworkError, getFileTypePresetConfig } from "@/app/utils";
+import { splitTextIntoLines, downloadFile, splitBySpaces, describeError, isAbortError, isCascadedAbort, isNetworkError, getFileTypePresetConfig } from "@/app/utils";
 import { filterMarkdownLines, PLACEHOLDER_SPLIT_REGEX, PLACEHOLDER_TEST_REGEX, PLACEHOLDER_REPLACE_REGEX, restorePlaceholders } from "./markdownUtils";
 import { LLM_MODELS } from "@/app/lib/translation";
 import { delay } from "@/app/hooks/translation";
@@ -293,7 +293,7 @@ const MDTranslator = () => {
         setFailedLangs((prev) => (prev.includes(currentTargetLang) ? prev : [...prev, currentTargetLang]));
         const friendly = isNetworkError(error) ? t("networkUnavailable") : isAbortError(error) ? t("translationTimeout") : null;
         const langLabel = sourceOptions.find((o) => o.value === currentTargetLang)?.label || currentTargetLang;
-        const messageText = friendly ? `${friendly} (${langLabel})` : [getErrorMessage(error), langLabel, t("translationError")].join(" ");
+        const messageText = friendly ? `${friendly} (${langLabel})` : [describeError(error, t), langLabel, t("translationError")].join(" ");
         // Shared key: failed languages roll into one toast instead of stacking N high
         // — the TranslateFailurePanel keeps the full per-lang list.
         message.error({ content: messageText, key: "translate-lang-fail", duration: 10 });
