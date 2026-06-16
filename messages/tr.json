@@ -196,6 +196,8 @@
     "errorHint429": "İstek sınırı aşıldı, lütfen daha sonra tekrar deneyin",
     "errorHint456": "Bu dönemin çeviri kotası tükendi",
     "errorHint5xx": "Sunucu hatası, lütfen daha sonra tekrar deneyin",
+    "errorHintRelay": "Ağ hatası (muhtemelen CORS) — API Ayarlarında \"API Aktarıcı\"yı açın",
+    "errorHintRelay403": "API 403 Forbidden döndürdü — API Ayarlarında \"API Aktarıcı\"yı açın",
     "rateLimitCooldown": "İstek sınırına ulaşıldı — kısa bir duraklamadan sonra otomatik olarak yeniden denenecek"
   },
   "MDTranslator": {
@@ -255,6 +257,7 @@
     "delayTime": "Gecikme",
     "useRelay": "API Aktarıcı",
     "useRelayTooltip": "CORS veya 403 hatalarında API aktarıcıyı etkinleştirin",
+    "useRelayOverridden": "Özel bir URL ayarlı — istekler doğrudan oraya gider ve bu anahtar etkisizdir; yeniden etkinleştirmek için URL'yi temizleyin",
     "reasoningEffort": "Akıl yürütme yoğunluğu",
     "reasoningEffortExtra": "Off düşünmeyi devre dışı bırakır (varsayılan); açmak genellikle daha doğrudur ama daha yavaştır ve daha fazla token tüketir. Özel modellerde ayrıca Auto vardır = modelin yerleşik varsayılanını izler (yalnızca Off bir API hatasına yol açarsa kullanın).",
     "presetSelect": "Ön Ayar Seç",
@@ -282,7 +285,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Altyazı Çevirici",
-      "description": "Toplu SRT, ASS, VTT, LRC çevirisi. 120+ dil."
+      "description": "Toplu SRT, ASS, VTT, SBV, LRC çevirisi. 120+ dil."
     },
     "jsonTranslate": {
       "title": "i18n JSON Çevirici",
@@ -320,7 +323,7 @@
         },
         {
           "q": "Markdown yerine altyazı veya JSON yapılandırma dosyası çevirmem gerekirse ne yapmalıyım?",
-          "a": "Altyazı dosyaları (SRT/ASS/VTT/LRC) için [Altyazı Çevirici](../subtitle-translator) kullanın — zaman kodlarını ve ASS stil etiketlerini korur. JSON i18n dosyaları (i18next, next-intl, vue-i18n gibi key-value yapıları) için [JSON Çevirici](../json-translate) kullanın — Key yoluna göre seçici çeviri ve {name}, {count} gibi yer tutucuları koruma desteği vardır. Üç çeviri aracı aynı motor yapılandırmasını ve API Key'leri paylaşır, aralarında geçiş yapmak yeniden yapılandırma gerektirmez."
+          "a": "Altyazı dosyaları (SRT/ASS/VTT/SBV/LRC) için [Altyazı Çevirici](../subtitle-translator) kullanın — zaman kodlarını ve ASS stil etiketlerini korur. JSON i18n dosyaları (i18next, next-intl, vue-i18n gibi key-value yapıları) için [JSON Çevirici](../json-translate) kullanın — Key yoluna göre seçici çeviri ve {name}, {count} gibi yer tutucuları koruma desteği vardır. Üç çeviri aracı aynı motor yapılandırmasını ve API Key'leri paylaşır, aralarında geçiş yapmak yeniden yapılandırma gerektirmez."
         },
         {
           "q": "Çevrilen Markdown sunucuya yükleniyor mu? Açık kaynak mı?",
@@ -404,6 +407,10 @@
     "dataParserImgPrompt": {
       "title": "IMGPrompt Veri Oluşturucu",
       "description": "Toplu IMGPrompt JSON verileri oluştur"
+    },
+    "textDiff": {
+      "title": "Text Diff",
+      "description": "İki metni veya dosyayı yan yana karşılaştırın ve ilk farkı bulun."
     }
   },
   "navigation": {

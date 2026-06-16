@@ -29,6 +29,70 @@ export const PLACEHOLDER_SPLIT_REGEX = new RegExp(`(<<<(?:${placeholderPattern})
 export const PLACEHOLDER_TEST_REGEX = new RegExp(`^<<<(?:${placeholderPattern})>>>$`);
 /** 全局替换占位符 */
 export const PLACEHOLDER_REPLACE_REGEX = new RegExp(`<<<(?:${placeholderPattern})>>>`, "g");
+/**
+ * 跨占位符配对守卫:HTML 注释 / LaTeX 块的内容类逐字符回火,禁止跨越先行
+ * pass 产出的占位符 token(围栏占位符行【不含】反引号也不含空行,裸内容类
+ * 会让两个散落定界符跨占位符配对,中间散文整段被吞)。按【精确占位符形态】
+ * 回火而非裸 "<<<":字面 <<<(shell here-string、heredoc 示例)中止匹配会
+ * 让注释失保护、尾部还被开标签 pass 熔成 "<<<<<HTML_n>>>" 形态的假 token。
+ */
+const NOT_PLACEHOLDER_LOOKAHEAD = `(?!<<<(?:${placeholderPattern})>>>)`;
+
+/**
+ * HTML 注释保护:线性扫描(语义与旧正则
+ * `<!--(?:NOT_PLACEHOLDER[^`])*?-->` 完全一致)。旧正则对【未闭合】的
+ * `<!--` 是二次方:每个开标记的惰性中段都要扫到文档末尾才放弃 —— 16k 行
+ * 无闭合注释的文件(grep 输出、注释模板清单)让主线程冻死 4 秒+,每翻倍
+ * ×4(围栏 pass 同病已改行扫描,这里同方)。
+ * 配对规则:最近的 `-->`;中段含反引号或占位符 token 则该开标记永远配不上
+ * (更远的闭标记必然包含同一坏字符),按字面保留。三个游标(闭标记/反引号/
+ * 占位符)单调前移,整体 O(n)。
+ */
+const protectHtmlComments = (text: string, store: (span: string) => string): string => {
+  if (!text.includes("<!--")) return text;
+  const phRe = new RegExp(`<<<(?:${placeholderPattern})>>>`, "g");
+  let out = "";
+  let emitFrom = 0;
+  let searchFrom = 0;
+  let close = -2; // 缓存的最近 "-->" 下标(-2 = 未计算)
+  let tick = -2; // 缓存的最近 "`" 下标
+  let ph = -2; // 缓存的最近占位符 token 起点
+  for (;;) {
+    const open = text.indexOf("<!--", searchFrom);
+    if (open === -1) break;
+    const mid = open + 4;
+    if (close !== -1 && close < mid) close = text.indexOf("-->", mid);
+    if (close === -1) break;
+    if (tick !== -1 && tick < mid) tick = text.indexOf("`", mid);
+    if (ph !== -1 && ph < mid) {
+      phRe.lastIndex = mid;
+      const m = phRe.exec(text);
+      ph = m ? m.index : -1;
+    }
+    const valid = (tick === -1 || tick >= close) && (ph === -1 || ph >= close);
+    if (valid) {
+      out += text.slice(emitFrom, open) + store(text.slice(open, close + 3));
+      emitFrom = close + 3;
+      searchFrom = close + 3;
+    } else {
+      searchFrom = mid;
+    }
+  }
+  return out + text.slice(emitFrom);
+};
+// 第四道守卫 (?!\n[ \t]*#{1,6}[ \t]):内容不跨 ATX 标题行 —— 真公式不会包含
+// markdown 标题,而无空行的 CJK 散文(粘贴文本常见)里两个孤立 $$ 会连同
+// 中间的标题/正文整段冻成假公式,段落守卫(依赖空行)帮不上。
+const LATEX_BLOCK_RE = new RegExp(`\\$\\$(?:(?!\\n[ \\t]*\\n)(?!\\n[ \\t]*#{1,6}[ \\t])${NOT_PLACEHOLDER_LOOKAHEAD}[^\`])*?\\$\\$`, "g");
+
+// HTML 自闭合/开始标签。未引号属性段同样按占位符回火(注释/LaTeX 同款):
+// 裸 [^>"'] 会吃进先行 pass 产出的 <<<CODE_n / <<<LATEX_INLINE_n 字符,标签的
+// 收尾 > 恰好熔断占位符 token 的第一个 >("T<U requires `compare()`" 的行内
+// 代码占位符被吞进 HTML 占位符,行里残留孤立 ">>",译模型不逐字回传时还原出
+// 字面 <<<CODE_n> 垃圾且代码内容丢失)。引号分支不需要回火 —— 引号内的完整
+// token 是合法嵌套,restorePlaceholders 的定点迭代会逐层展开。
+const HTML_SELF_CLOSING_RE = new RegExp(`<([a-zA-Z][a-zA-Z0-9-]*)(?:\\s+[a-zA-Z_:@#{](?:${NOT_PLACEHOLDER_LOOKAHEAD}[^>"']|"[^"]*"|'[^']*')*?|\\s*)\\/>`, "g");
+const HTML_OPEN_TAG_RE = new RegExp(`<([a-zA-Z][a-zA-Z0-9-]*)(?:\\s+[a-zA-Z_:@#](?:${NOT_PLACEHOLDER_LOOKAHEAD}[^>"']|"[^"]*"|'[^']*')*|\\s*\\/|\\s+)?>`, "g");
 
 /**
  * 解析 Markdown 文本，将特殊元素替换为占位符以保护其不被翻译
@@ -109,15 +173,29 @@ export const filterMarkdownLines = (lines: string[], mdOptions: MarkdownOptions)
   const latexInlinePlaceholders: { [key: string]: string } = {};
   const htmlPlaceholders: { [key: string]: string } = {};
 
-  let frontmatterCounter = 100;
-  let codeCounter = 100;
-  let linkCounter = 100;
-  let headingCounter = 100;
-  let listCounter = 100;
-  let blockquoteCounter = 100;
-  let latexBlockCounter = 100;
-  let latexInlineCounter = 100;
-  let htmlCounter = 100;
+  // 计数器从源文里已有的字面占位符形态文本之后起算:粘贴过"复制占位符
+  // 文本"的输出、讲解本管线的文档里会出现字面 <<<CODE_100>>> —— 若新分配
+  // 的占位符与之同名,还原时 all.get 命中真实映射,把用户的字面 token 静默
+  // 替换成无关内容(数据损坏)。避让后字面 token 不进映射,restorePlaceholders
+  // 的 `?? match` 兜底让它原样留在输出里。
+  // 序号限 1-9 位:更长的数字(如字面 <<<CODE_99999999999999999999>>>)解析
+  // 成浮点会让模板字符串产出 "1e+21" 形态的不合规占位符、且自增失效全员同名;
+  // 而计数器从 100 起每文档至多加几千,永远到不了 10^9 —— 超长序号不避让也
+  // 不可能碰撞,直接忽略。
+  let counterSeed = 100;
+  for (const m of lines.join("\n").matchAll(/<<<[A-Z_]+_(\d{1,9})>>>/g)) {
+    counterSeed = Math.max(counterSeed, Number(m[1]) + 1);
+  }
+
+  let frontmatterCounter = counterSeed;
+  let codeCounter = counterSeed;
+  let linkCounter = counterSeed;
+  let headingCounter = counterSeed;
+  let listCounter = counterSeed;
+  let blockquoteCounter = counterSeed;
+  let latexBlockCounter = counterSeed;
+  let latexInlineCounter = counterSeed;
+  let htmlCounter = counterSeed;
 
   // 合并所有行，处理多行 frontmatter 和代码块
   let fullText = lines.join("\n");
@@ -151,43 +229,100 @@ export const filterMarkdownLines = (lines: string[], mdOptions: MarkdownOptions)
       codeCounter++;
       return placeholder;
     };
-    // 反引号围栏:info string 不得含反引号(CommonMark 明文规定 —— 否则行首
-    // 的 ```cmd``` 行内代码 span 会被当成开栏,吞掉后续全部正文直到下一个
-    // 围栏或 EOF)。波浪线围栏无此限制。中段 (?:[\s\S]*?\n)? 可选:零内容
-    // 围栏(```bash 紧跟 ```)也要在这里配对,否则掉进未闭合 fallback
-    // 吞掉文档剩余部分。
-    fullText = fullText.replace(/^[ \t]*(`{3,})[^`\n]*\n(?:[\s\S]*?\n)?[ \t]*\1`*[ \t]*$/gm, storeFence);
-    fullText = fullText.replace(/^[ \t]*(~{3,})[^\n]*\n(?:[\s\S]*?\n)?[ \t]*\1~*[ \t]*$/gm, storeFence);
-    // 未闭合围栏:CommonMark 规定开栏无闭栏时代码块延伸到文档末尾 —— 不保护
-    // 的话整段代码体被送翻译。上两趟已消耗所有配对围栏,此处剩余的开栏行
-    // 必然未闭合(alternation 单趟取最早开栏,不分种类)。
-    fullText = fullText.replace(/^[ \t]*(?:`{3,}[^`\n]*|~{3,}[^\n]*)\n[\s\S]*$/m, storeFence);
+    // 单趟行扫描按【文档顺序】配对围栏(CommonMark 语义):
+    //   - 开栏 = ≥3 个同种字符;反引号栏的 info string 不得含反引号(规范
+    //     明文 —— 否则行首 ```cmd``` 行内代码 span 会被当开栏),波浪线栏
+    //     无此限制;
+    //   - 闭栏 = 同种字符、长度 ≥ 开栏、整行仅该字符(两侧允许空白);
+    //   - 无闭栏 → 块延伸到文档末尾(规范);零内容围栏(```bash 紧跟 ```)
+    //     正常配对。
+    // 此前是"先全文配对反引号、再全文配对波浪"的两趟正则 + 未闭合 fallback:
+    //   1. 两个波浪栏【内容里】的字面 ``` 行(演示围栏语法的标准写法)会被
+    //      跨块配成一对,把两块之间的正文整段吞进代码占位符 —— 输出与源文
+    //      逐字节相同却报翻译成功;
+    //   2. 每个配对失败的开栏行,懒惰中段都要对剩余全文回溯 —— 病态输入
+    //      (几万行 ```x 开栏)让主线程卡死在二次方扫描里。
+    // 行扫描两者皆除,O(行数)。
+    const srcLines = fullText.split("\n");
+    const outLines: string[] = [];
+    // blockquote 前缀("> "、"> > ",规范允许 0-3 前导空格):引用块内的围栏
+    // 按 CommonMark 仍是代码围栏 —— 不剥前缀直接匹配会让 "> ```js" 的整块
+    // 引用代码(changelog、引用回答里很常见)当散文送翻,代码被机翻写坏。
+    const BQ_PREFIX_RE = /^(?:[ \t]{0,3}>[ \t]?)+/;
+    for (let i = 0; i < srcLines.length; i++) {
+      const bq = srcLines[i].match(BQ_PREFIX_RE);
+      const openerBody = bq ? srcLines[i].slice(bq[0].length) : srcLines[i];
+      const opener = openerBody.match(/^[ \t]*(`{3,})[^`]*$|^[ \t]*(~{3,})/);
+      if (!opener) {
+        outLines.push(srcLines[i]);
+        continue;
+      }
+      const fenceChar = opener[1] ? "`" : "~";
+      const minLen = (opener[1] ?? opener[2]!).length;
+      let end = i + 1;
+      let closerAt: number | null = null;
+      while (end < srcLines.length) {
+        let body = srcLines[end];
+        if (bq) {
+          // 引用块围栏的内容/闭栏行必须仍带 > 前缀(围栏不是段落,没有
+          // lazy continuation);无前缀行 = 引用块结束,围栏块随之截止。
+          const m = body.match(BQ_PREFIX_RE);
+          if (!m) break;
+          body = body.slice(m[0].length);
+        }
+        // 只容忍 space/tab(与开栏一致):trim() 会连 NBSP/全角空格一起吞,
+        // 把 "　```" 这种按规范属于代码内容的行误判成闭栏,栏后内容
+        // 泄漏出保护、残留的真闭栏再开出幻影围栏吞掉后续正文。
+        const t = body.replace(/^[ \t]+|[ \t]+$/g, "");
+        if (t.length >= minLen && [...t].every((c) => c === fenceChar)) {
+          closerAt = end;
+          break;
+        }
+        end++;
+      }
+      // 闭栏行收尾;无闭栏时:引用块围栏到引用块最后一行为止,顶层围栏
+      // 延伸到文档末尾(规范)。
+      const blockEnd = closerAt ?? (bq ? end - 1 : srcLines.length - 1);
+      outLines.push(storeFence(srcLines.slice(i, blockEnd + 1).join("\n")));
+      i = blockEnd;
+    }
+    fullText = outLines.join("\n");
   }
 
-  // latex 公式块。两道 guard,皆因真实公式不会包含这些:
+  // HTML 注释:必须在整文阶段处理 —— <!-- --> 常跨多行([\s\S] 写对了但旧代码
+  // 按行应用,跨行注释永远匹配不上,注释正文被翻译并污染输出)。
+  // 【先于 LaTeX 块】:注释是更外层的文档区域 —— 反过来跑时,注释内的
+  // "$$"(<!-- TODO: fix $$ rendering -->)会与后文散文里的 $$ 配对,注释
+  // 正文被送翻、可见散文被冻结。
+  // [^`] 而非 [\s\S]:本扫描跑在行内代码保护之前,反引号包裹的 `<!--` 代码
+  // span 曾开出幻影注释吞掉后续正文(含反引号的真实注释罕见,按字面保留)。
+  // 占位符回火(NOT_PLACEHOLDER_LOOKAHEAD,定义见顶部):围栏等先行 pass 的
+  // 占位符行【不含】反引号/空行,裸 [^`] 会让 "<!--" + 围栏占位符 + "-->"
+  // 跨占位符配对,中间散文整段被吞 —— 输出与源文逐字节相同却报成功
+  // (LaTeX 块同款守卫,见下)。
+  fullText = protectHtmlComments(fullText, (match) => {
+    const placeholder = `<<<HTML_${htmlCounter}>>>`;
+    htmlPlaceholders[placeholder] = match;
+    htmlCounter++;
+    return placeholder;
+  });
+
+  // latex 公式块。三道 guard,皆因真实公式不会包含这些:
   // 1. 内容不跨【空白行】(?!\n[ \t]*\n) —— 不是只挡字面 \n\n,编辑器留的
   //    行尾空格曾绕过段落边界检查,两个孤立 $$ 重新冻结跨段散文;
   // 2. 内容不含反引号 —— 本扫描跑在行内代码保护之前,文档里两个 `$$`
-  //    代码 span 之间的散文曾被冻成假公式。
+  //    代码 span 之间的散文曾被冻成假公式;
+  // 3. 内容不跨占位符(NOT_PLACEHOLDER_LOOKAHEAD)—— 围栏占位符行无反引号
+  //    也无空行,讲解 math 语法的文档("Wrap display math in $$" + 围栏示例
+  //    + "A closing $$")曾跨围栏配对,两段散文连同围栏被吞进假公式。
   if (!mdOptions.translateLatex) {
-    fullText = fullText.replace(/\$\$((?:(?!\n[ \t]*\n)[^`])*?)\$\$/g, (match) => {
+    fullText = fullText.replace(LATEX_BLOCK_RE, (match) => {
       const placeholder = `<<<LATEX_BLOCK_${latexBlockCounter}>>>`;
       latexBlockPlaceholders[placeholder] = match;
       latexBlockCounter++;
       return placeholder;
     });
   }
-
-  // HTML 注释:必须在整文阶段处理 —— <!-- --> 常跨多行([\s\S] 写对了但旧代码
-  // 按行应用,跨行注释永远匹配不上,注释正文被翻译并污染输出)。
-  // [^`] 而非 [\s\S]:本扫描跑在行内代码保护之前,反引号包裹的 `<!--` 代码
-  // span 曾开出幻影注释吞掉后续正文(含反引号的真实注释罕见,按字面保留)。
-  fullText = fullText.replace(/<!--[^`]*?-->/g, (match) => {
-    const placeholder = `<<<HTML_${htmlCounter}>>>`;
-    htmlPlaceholders[placeholder] = match;
-    htmlCounter++;
-    return placeholder;
-  });
 
   // 按行处理
   const processedLines = splitTextIntoLines(fullText);
@@ -223,8 +358,15 @@ export const filterMarkdownLines = (lines: string[], mdOptions: MarkdownOptions)
     }
 
     // HTML 标签(开始/结束/自闭合;跨行注释已在整文阶段处理)
-    // 匹配自闭合标签 <tag ... /> 或 <tag/>
-    modifiedLine = modifiedLine.replace(/<([a-zA-Z][a-zA-Z0-9-]*)\s*[^>]*\/>/g, (match) => {
+    // 匹配自闭合标签 <tag ... /> 或 <tag/>。属性段与开始标签同款双守卫:
+    //   1. 必须以合法属性名字符开头 —— 裸 \s*[^>]* 会把 "i<n 时…<item/>" 的
+    //      中间散文整段吞进占位符(开始标签 pass 修过的同一 bug,这条跑在它
+    //      之前,不守卫等于白修);
+    //   2. 引号内的 > 不终结属性段(CommonMark 明文允许)—— 否则标签在引号
+    //      中间截断,残尾被当散文送翻,还原后属性被写坏。
+    // \{ 在属性起始集里:JSX/MDX 的展开属性 <Component {...props}/> 在守卫
+    // 加固前是受保护的,不放行会把它当散文送翻。
+    modifiedLine = modifiedLine.replace(HTML_SELF_CLOSING_RE, (match) => {
       const placeholder = `<<<HTML_${htmlCounter}>>>`;
       htmlPlaceholders[placeholder] = match;
       htmlCounter++;
@@ -237,8 +379,16 @@ export const filterMarkdownLines = (lines: string[], mdOptions: MarkdownOptions)
       htmlCounter++;
       return placeholder;
     });
-    // 匹配开始标签 <tag ...> 或 <tag>
-    modifiedLine = modifiedLine.replace(/<([a-zA-Z][a-zA-Z0-9-]*)(?:\s+[^>]*)?>/g, (match) => {
+    // 匹配开始标签 <tag ...> 或 <tag>。属性段必须以合法属性名字符
+    // ([a-zA-Z_:],外加 @/# 容纳 Vue 的 @click / #slot 速记)或自闭合 /
+    // 开头(CommonMark 原始 HTML 规则)—— 裸 [^>]* 会把 "如果 a<b 且 c>d"
+    // 的比较句吞成假标签,"且 c" 整段冻结不译(渲染器把它当字面文本显示,
+    // 是可见散文)。第三分支 \s+ 兜住「标签名后只有空白」的 <div >。
+    // 属性尾用引号感知的交替而非裸 [^>]*:title="a>b" 的引号内 > 曾把标签
+    // 截断在引号中间,残尾 b"> 被当散文送翻 —— 译模型不逐字回传时还原出
+    // 损坏的属性(CommonMark 明文允许引号值内出现 >)。未闭合引号按规范
+    // 不是标签,整段保持可译散文。
+    modifiedLine = modifiedLine.replace(HTML_OPEN_TAG_RE, (match) => {
       const placeholder = `<<<HTML_${htmlCounter}>>>`;
       htmlPlaceholders[placeholder] = match;
       htmlCounter++;

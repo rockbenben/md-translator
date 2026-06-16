@@ -196,6 +196,8 @@
     "errorHint429": "請求過於頻繁，請稍後重試",
     "errorHint456": "本期翻譯配額已用盡",
     "errorHint5xx": "伺服器錯誤，請稍後重試",
+    "errorHintRelay": "網路錯誤（可能是 CORS 限制），請在 API 設定中開啟「中轉 API」",
+    "errorHintRelay403": "介面回傳 403 禁止存取，請在 API 設定中開啟「中轉 API」",
     "rateLimitCooldown": "請求過於頻繁，已自動暫停片刻後重試"
   },
   "MDTranslator": {
@@ -255,6 +257,7 @@
     "delayTime": "延遲時間",
     "useRelay": "中轉 API",
     "useRelayTooltip": "如遇到 CORS 或 403 錯誤，請開啟中轉 API",
+    "useRelayOverridden": "已填寫自訂 URL，請求將直達該位址，此開關暫不生效；清空 URL 後恢復",
     "reasoningEffort": "推理強度",
     "reasoningEffortExtra": "Off 關閉思考（預設）；開啟後通常更準確，但更慢、更耗 token。自訂模型還有 Auto = 跟隨模型自帶預設，僅當 Off 導致介面報錯時改用。",
     "presetSelect": "選擇預設",
@@ -282,7 +285,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "字幕翻譯器",
-      "description": "批次翻譯 SRT、ASS、VTT、LRC 字幕，支援 120+ 語言"
+      "description": "批次翻譯 SRT、ASS、VTT、SBV、LRC 字幕，支援 120+ 語言"
     },
     "jsonTranslate": {
       "title": "JSON 多語言翻譯",
@@ -320,7 +323,7 @@
         },
         {
           "q": "要翻譯的不是 Markdown，是字幕或 JSON 設定檔怎麼辦？",
-          "a": "字幕檔案（SRT/ASS/VTT/LRC）請用 [字幕翻譯器](../subtitle-translator)，保留時間軸和 ASS 樣式標籤；JSON 國際化檔案（i18next、next-intl、vue-i18n 那種 key-value 結構）請用 [JSON 翻譯](../json-translate)，按 Key 路徑選擇性翻譯，可保護佔位符 {name}、{count} 不被破壞。"
+          "a": "字幕檔案（SRT/ASS/VTT/SBV/LRC）請用 [字幕翻譯器](../subtitle-translator)，保留時間軸和 ASS 樣式標籤；JSON 國際化檔案（i18next、next-intl、vue-i18n 那種 key-value 結構）請用 [JSON 翻譯](../json-translate)，按 Key 路徑選擇性翻譯，可保護佔位符 {name}、{count} 不被破壞。"
         },
         {
           "q": "翻譯後的 Markdown 會上傳到伺服器嗎？開源嗎？",
@@ -404,6 +407,10 @@
     "dataParserImgPrompt": {
       "title": "IMGPrompt 資料產生",
       "description": "批次產生 IMGPrompt JSON 資料"
+    },
+    "textDiff": {
+      "title": "文字比對",
+      "description": "並排比較兩段文字或檔案，標示首處差異的確切位置。"
     }
   },
   "navigation": {

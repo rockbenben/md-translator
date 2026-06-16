@@ -20,6 +20,7 @@ import { useTranslations } from "next-intl";
 import { getLangDir } from "rtl-detect";
 import { useCopyToClipboard } from "@/app/hooks/useCopyToClipboard";
 import useFileUpload from "@/app/hooks/useFileUpload";
+import { useResetOnSourceChange } from "@/app/hooks/useResetOnSourceChange";
 import { useLocalStorage } from "@/app/hooks/useLocalStorage";
 import { useTextStats } from "@/app/hooks/useTextStats";
 import { useExportFilename } from "@/app/hooks/useExportFilename";
@@ -94,10 +95,11 @@ const MDTranslator = () => {
     clearFailures,
     markRunHadFailures,
     hadRunFailures,
+    isDisposed,
     isTranslating,
     setIsTranslating,
+    resetProgress,
     progressPercent,
-    setProgressPercent,
     progressInfo,
     handleLanguageChange,
     handleSwapLanguages,
@@ -124,6 +126,12 @@ const MDTranslator = () => {
   });
   const [rawMode, setRawMode] = useLocalStorage("md-translator-rawMode", false);
   const [contextAware, setContextAware] = useLocalStorage("md-translator-contextAware", false);
+  // 上下文感知只对 LLM 生效(MT 不走上下文路径),它要求的 raw 模式按【生效中】
+  // 派生为覆盖层,不写穿用户自己的 rawMode 偏好 —— 事件式 setRawMode(true) 曾把
+  // rawMode 永久写成 true:之后切到 MT 服务,上下文感知块随 LLM 条件隐藏,raw
+  // 开关却仍被 contextAware 锁死在开启,Markdown 保护静默失效且 UI 无法解锁。
+  const contextAwareActive = contextAware && LLM_MODELS.includes(translationMethod);
+  const effectiveRawMode = rawMode || contextAwareActive;
   // key 必须与 Collapse items 的 "markdown"/"advanced" 一致(同字幕工具的修复)
   const [collapseKeys, setCollapseKeys] = useLocalStorage<string[]>("md-translator-collapseKeys", ["markdown"]);
   const [multiLangModalOpen, setMultiLangModalOpen] = useState(false);
@@ -142,11 +150,15 @@ const MDTranslator = () => {
   // (translatedText / translatedTextLang)则保留——和 JSON 翻译一致:改源后旧结果不清,
   // 直到重新翻译。这样既符合"保留旧结果",又不必在 render 阶段去 set 共享 context 的
   // translatedText(那会更新 TranslationProvider → setState-in-render 警告)。
-  const [prevSourceText, setPrevSourceText] = useState(sourceText);
-  if (prevSourceText !== sourceText) {
-    setPrevSourceText(sourceText);
-    setExtractedText("");
-  }
+  useResetOnSourceChange(sourceText, () => setExtractedText(""));
+
+  // 作废上一轮翻译产物:Clear All 与换/删上传文件时调用,使译文结果、语种标记、
+  // 失败面板回到"未翻译"初始态。extractedText 由上面的 prevSourceText 复位。
+  const clearResults = () => {
+    setTranslatedText("");
+    setTranslatedTextLang(null);
+    clearFailures();
+  };
 
   /**
    * 翻译函数：
@@ -202,7 +214,7 @@ const MDTranslator = () => {
     for (const currentTargetLang of targetLangs) {
       let translatedTextWithPlaceholders = "";
       try {
-        if (!rawMode) {
+        if (!effectiveRawMode) {
           // 对每一行进行处理，分割占位符与普通文本，仅翻译普通文本部分。不处理加粗文本格式，否则对语义伤害较大。
           // 第一步：收集所有待翻译片段及其位置信息
           const textsToTranslate: string[] = [];
@@ -312,7 +324,9 @@ const MDTranslator = () => {
     // validate 不再自管 isTranslating, 这里 try/finally 兜底
     // 让 progress modal 在 test ping → 文件循环之间保持连续可见。
     setIsTranslating(true);
-    setProgressPercent(0);
+    // resetProgress 而非裸 setProgressPercent(0):progressInfo 的 {current,
+    // total} 不清,进度弹窗会在新一轮首批返回前一直显示上一轮的最终计数。
+    resetProgress();
     failedFilesRef.current = 0;
     // Batch path doesn't go through the hook's runTranslation — reset ALL failure
     // state (not just langs) so counts don't accumulate across runs and the failure
@@ -341,6 +355,9 @@ const MDTranslator = () => {
             }
           );
         });
+        // 中途导航离开:后续文件只会逐个快速级联失败,汇总 toast 也会弹在
+        // 用户切去的页面上 —— 直接收工。
+        if (isDisposed()) return;
       }
 
       // 部分/全失败时不报"已导出"(per-file error toast 已经告知细节),只在有成功时显示汇总。
@@ -412,8 +429,7 @@ const MDTranslator = () => {
                   disabled={isTranslating}
                   onClick={() => {
                     resetUpload();
-                    setTranslatedText("");
-                    setTranslatedTextLang(null);
+                    clearResults();
                     message.success(t("resetUploadSuccess"));
                   }}
                   icon={<ClearOutlined />}
@@ -424,12 +440,18 @@ const MDTranslator = () => {
             }
             style={cardStyle}>
             <Dragger
-              customRequest={({ file }) => handleFileUpload(file as File)}
+              customRequest={({ file }) => {
+                clearResults();
+                handleFileUpload(file as File);
+              }}
               accept={uploadFileTypes.accept}
               multiple={!singleFileMode}
               showUploadList
               beforeUpload={singleFileMode ? resetUpload : undefined}
-              onRemove={handleUploadRemove}
+              onRemove={(file) => {
+                clearResults();
+                return handleUploadRemove(file);
+              }}
               onChange={handleUploadChange}
               fileList={fileList}>
               <p className="ant-upload-drag-icon">
@@ -532,16 +554,7 @@ const MDTranslator = () => {
 
             {LLM_MODELS.includes(translationMethod) && (
               <>
-                <ContextTranslationBlock
-                  enabled={contextAware}
-                  onEnabledChange={(checked) => {
-                    setContextAware(checked);
-                    if (checked) {
-                      setRawMode(true);
-                    }
-                  }}
-                  disabled={isTranslating}
-                />
+                <ContextTranslationBlock enabled={contextAware} onEnabledChange={setContextAware} disabled={isTranslating} />
                 <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, marginTop: -8, marginBottom: 12, paddingLeft: 4 }}>
                   <InfoCircleOutlined style={{ marginRight: 4 }} />
                   {tMarkdown("contextAwareRawNote")}
@@ -637,7 +650,7 @@ const MDTranslator = () => {
                           <Tooltip title={tMarkdown("rawTranslationModeTooltip")}>
                             <span>{tMarkdown("rawTranslationMode")}</span>
                           </Tooltip>
-                          <Switch size="small" checked={rawMode} onChange={setRawMode} disabled={contextAware} aria-label={tMarkdown("rawTranslationMode")} />
+                          <Switch size="small" checked={effectiveRawMode} onChange={setRawMode} disabled={contextAwareActive} aria-label={tMarkdown("rawTranslationMode")} />
                         </Flex>
                       </section>
                     </Flex>

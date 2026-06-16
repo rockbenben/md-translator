@@ -196,6 +196,8 @@
     "errorHint429": "リクエストが多すぎます。しばらくしてから再試行してください",
     "errorHint456": "今期の翻訳クォータを使い切りました",
     "errorHint5xx": "サーバーエラーです。しばらくしてから再試行してください",
+    "errorHintRelay": "ネットワークエラー（CORS 制限の可能性があります）。API 設定で「API 中継」を有効にしてください",
+    "errorHintRelay403": "API が 403 Forbidden を返しました。API 設定で「API 中継」を有効にしてください",
     "rateLimitCooldown": "レート制限に達したため少し待機し、自動的に再試行します"
   },
   "MDTranslator": {
@@ -255,6 +257,7 @@
     "delayTime": "遅延時間",
     "useRelay": "API 中継",
     "useRelayTooltip": "CORS や 403 エラーが発生した場合は API 中継を有効にしてください",
+    "useRelayOverridden": "カスタム URL が設定されているため、リクエストはその URL に直接送信され、このスイッチは無効です。URL を消去すると再び有効になります",
     "reasoningEffort": "推論強度",
     "reasoningEffortExtra": "Off で思考モードを無効化（既定）。有効にすると通常は精度が向上しますが、応答が遅くなりトークン消費が増えます。カスタムモデルには Auto もあり、モデル本来の既定に従います（Off で API エラーになる場合のみ使用）。",
     "presetSelect": "プリセットを選択",
@@ -282,7 +285,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "字幕翻訳機",
-      "description": "SRT、ASS、VTT、LRC字幕を一括翻訳、120以上の言語に対応"
+      "description": "SRT、ASS、VTT、SBV、LRC字幕を一括翻訳、120以上の言語に対応"
     },
     "jsonTranslate": {
       "title": "i18n JSON翻訳",
@@ -320,7 +323,7 @@
         },
         {
           "q": "翻訳したいのが Markdown ではなく字幕や JSON 設定ファイルの場合は？",
-          "a": "字幕ファイル（SRT/ASS/VTT/LRC）には [字幕翻訳器](../subtitle-translator) を使用してください。タイムラインと ASS スタイルタグを保持します。JSON 国際化ファイル（i18next、next-intl、vue-i18n のような key-value 構造）には [JSON 翻訳](../json-translate) を使用してください。Key パスごとに選択的翻訳でき、{name}、{count} などのプレースホルダーを保護できます。3 つの翻訳ツールは同じエンジン設定と API Key を共有するため、ツール間の切り替え時に再設定は不要です。"
+          "a": "字幕ファイル（SRT/ASS/VTT/SBV/LRC）には [字幕翻訳器](../subtitle-translator) を使用してください。タイムラインと ASS スタイルタグを保持します。JSON 国際化ファイル（i18next、next-intl、vue-i18n のような key-value 構造）には [JSON 翻訳](../json-translate) を使用してください。Key パスごとに選択的翻訳でき、{name}、{count} などのプレースホルダーを保護できます。3 つの翻訳ツールは同じエンジン設定と API Key を共有するため、ツール間の切り替え時に再設定は不要です。"
         },
         {
           "q": "翻訳された Markdown はサーバーにアップロードされますか？オープンソースですか？",
@@ -404,6 +407,10 @@
     "dataParserImgPrompt": {
       "title": "IMGPromptデータ生成",
       "description": "IMGPrompt JSONデータを一括生成"
+    },
+    "textDiff": {
+      "title": "テキスト差分",
+      "description": "2つのテキストまたはファイルを並べて比較し、最初の差異を特定します。"
     }
   },
   "navigation": {

@@ -196,6 +196,8 @@
     "errorHint429": "Batas permintaan terlampaui, silakan coba lagi nanti",
     "errorHint456": "Kuota terjemahan periode ini telah habis",
     "errorHint5xx": "Kesalahan server, silakan coba lagi nanti",
+    "errorHintRelay": "Kesalahan jaringan (kemungkinan CORS) — aktifkan \"Relay API\" di Pengaturan API",
+    "errorHintRelay403": "API mengembalikan 403 Forbidden — aktifkan \"Relay API\" di Pengaturan API",
     "rateLimitCooldown": "Batas permintaan tercapai — jeda sejenak, akan dicoba ulang otomatis"
   },
   "MDTranslator": {
@@ -255,6 +257,7 @@
     "delayTime": "Penundaan",
     "useRelay": "Relay API",
     "useRelayTooltip": "Aktifkan relay API jika terjadi kesalahan CORS atau 403",
+    "useRelayOverridden": "URL kustom telah diisi — permintaan langsung menuju URL tersebut dan sakelar ini tidak berlaku; kosongkan URL untuk mengaktifkannya kembali",
     "reasoningEffort": "Intensitas penalaran",
     "reasoningEffortExtra": "Off menonaktifkan pemikiran (default); mengaktifkannya biasanya lebih akurat tetapi lebih lambat dan menggunakan lebih banyak token. Model kustom juga punya Auto = mengikuti default bawaan model (gunakan hanya jika Off menyebabkan error API).",
     "presetSelect": "Pilih Preset",
@@ -282,7 +285,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Penerjemah Subtitle",
-      "description": "Terjemahan batch SRT, ASS, VTT, LRC. 120+ bahasa."
+      "description": "Terjemahan batch SRT, ASS, VTT, SBV, LRC. 120+ bahasa."
     },
     "jsonTranslate": {
       "title": "Penerjemah JSON i18n",
@@ -320,7 +323,7 @@
         },
         {
           "q": "Bagaimana jika perlu menerjemahkan subtitle atau file konfigurasi JSON, bukan Markdown?",
-          "a": "Untuk file subtitle (SRT/ASS/VTT/LRC), gunakan [Penerjemah Subtitle](../subtitle-translator) — mempertahankan timecode dan tag gaya ASS. Untuk file i18n JSON (struktur key-value i18next, next-intl, vue-i18n), gunakan [Penerjemah JSON](../json-translate) — terjemahan selektif berdasarkan jalur Key, dengan perlindungan placeholder untuk {name}, {count}, dll. Ketiga alat terjemahan berbagi konfigurasi mesin dan API Key yang sama, jadi beralih di antaranya tidak perlu setup ulang."
+          "a": "Untuk file subtitle (SRT/ASS/VTT/SBV/LRC), gunakan [Penerjemah Subtitle](../subtitle-translator) — mempertahankan timecode dan tag gaya ASS. Untuk file i18n JSON (struktur key-value i18next, next-intl, vue-i18n), gunakan [Penerjemah JSON](../json-translate) — terjemahan selektif berdasarkan jalur Key, dengan perlindungan placeholder untuk {name}, {count}, dll. Ketiga alat terjemahan berbagi konfigurasi mesin dan API Key yang sama, jadi beralih di antaranya tidak perlu setup ulang."
         },
         {
           "q": "Apakah Markdown terjemahan diunggah ke server Anda? Apakah open source?",
@@ -404,6 +407,10 @@
     "dataParserImgPrompt": {
       "title": "Generator Data IMGPrompt",
       "description": "Hasilkan data JSON IMGPrompt secara batch"
+    },
+    "textDiff": {
+      "title": "Text Diff",
+      "description": "Bandingkan dua teks atau file berdampingan dan temukan perbedaan pertama."
     }
   },
   "navigation": {

@@ -196,6 +196,8 @@
     "errorHint429": "Anfragelimit überschritten, bitte später erneut versuchen",
     "errorHint456": "Übersetzungskontingent für diesen Zeitraum aufgebraucht",
     "errorHint5xx": "Serverfehler, bitte später erneut versuchen",
+    "errorHintRelay": "Netzwerkfehler (möglicherweise CORS) — aktivieren Sie „API-Relay“ in den API-Einstellungen",
+    "errorHintRelay403": "Die API hat 403 Forbidden zurückgegeben — aktivieren Sie „API-Relay“ in den API-Einstellungen",
     "rateLimitCooldown": "Anfragelimit erreicht — kurze Pause, automatischer neuer Versuch"
   },
   "MDTranslator": {
@@ -255,6 +257,7 @@
     "delayTime": "Verzögerungszeit",
     "useRelay": "API-Relay",
     "useRelayTooltip": "Aktivieren Sie API-Relay bei CORS- oder 403-Fehlern",
+    "useRelayOverridden": "Eine benutzerdefinierte URL ist gesetzt — Anfragen gehen direkt dorthin, dieser Schalter hat keine Wirkung; URL leeren, um ihn wieder zu aktivieren",
     "reasoningEffort": "Reasoning-Aufwand",
     "reasoningEffortExtra": "Off deaktiviert das Denken (Standard); aktiviert ist es meist genauer, aber langsamer und verbraucht mehr Tokens. Benutzerdefinierte Modelle bieten zudem Auto = der modelleigenen Voreinstellung folgen (nur verwenden, wenn Off einen API-Fehler verursacht).",
     "presetSelect": "Voreinstellung wählen",
@@ -282,7 +285,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Untertitel-Übersetzer",
-      "description": "Batch-Übersetzung für SRT, ASS, VTT, LRC. 120+ Sprachen."
+      "description": "Batch-Übersetzung für SRT, ASS, VTT, SBV, LRC. 120+ Sprachen."
     },
     "jsonTranslate": {
       "title": "i18n JSON-Übersetzer",
@@ -320,7 +323,7 @@
         },
         {
           "q": "Was ist, wenn ich statt Markdown Untertitel oder JSON-Konfigurationsdateien übersetzen muss?",
-          "a": "Für Untertiteldateien (SRT/ASS/VTT/LRC) nutzen Sie den [Untertitel-Übersetzer](../subtitle-translator) — er erhält Timecodes und ASS-Stil-Tags. Für JSON-i18n-Dateien (i18next, next-intl, vue-i18n Key-Value-Strukturen) verwenden Sie den [JSON-Übersetzer](../json-translate) — selektive Übersetzung nach Key-Pfad mit Platzhalterschutz für {name}, {count} etc. Alle drei Übersetzungstools teilen dieselben Engine-Konfigurationen und API-Keys, sodass der Wechsel zwischen ihnen keine erneute Einrichtung erfordert."
+          "a": "Für Untertiteldateien (SRT/ASS/VTT/SBV/LRC) nutzen Sie den [Untertitel-Übersetzer](../subtitle-translator) — er erhält Timecodes und ASS-Stil-Tags. Für JSON-i18n-Dateien (i18next, next-intl, vue-i18n Key-Value-Strukturen) verwenden Sie den [JSON-Übersetzer](../json-translate) — selektive Übersetzung nach Key-Pfad mit Platzhalterschutz für {name}, {count} etc. Alle drei Übersetzungstools teilen dieselben Engine-Konfigurationen und API-Keys, sodass der Wechsel zwischen ihnen keine erneute Einrichtung erfordert."
         },
         {
           "q": "Wird das übersetzte Markdown auf Ihre Server hochgeladen? Ist es Open Source?",
@@ -404,6 +407,10 @@
     "dataParserImgPrompt": {
       "title": "IMGPrompt Datengenerator",
       "description": "IMGPrompt JSON-Daten im Batch generieren"
+    },
+    "textDiff": {
+      "title": "Text Diff",
+      "description": "Vergleichen Sie zwei Texte oder Dateien nebeneinander und finden Sie den ersten Unterschied."
     }
   },
   "navigation": {

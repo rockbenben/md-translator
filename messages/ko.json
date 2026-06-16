@@ -196,6 +196,8 @@
     "errorHint429": "요청 한도를 초과했습니다. 나중에 다시 시도하세요",
     "errorHint456": "이번 기간의 번역 할당량을 모두 사용했습니다",
     "errorHint5xx": "서버 오류입니다. 나중에 다시 시도하세요",
+    "errorHintRelay": "네트워크 오류(CORS 제한일 수 있음). API 설정에서 \"API 중계\"를 켜세요",
+    "errorHintRelay403": "API가 403 Forbidden을 반환했습니다. API 설정에서 \"API 중계\"를 켜세요",
     "rateLimitCooldown": "요청 한도 도달 — 잠시 멈춘 뒤 자동으로 재시도합니다"
   },
   "MDTranslator": {
@@ -255,6 +257,7 @@
     "delayTime": "지연 시간",
     "useRelay": "API 중계",
     "useRelayTooltip": "CORS 또는 403 오류가 발생하면 API 중계를 활성화하세요",
+    "useRelayOverridden": "사용자 지정 URL이 설정되어 요청이 해당 주소로 직접 전송되며 이 스위치는 적용되지 않습니다. URL을 지우면 다시 활성화됩니다",
     "reasoningEffort": "추론 강도",
     "reasoningEffortExtra": "Off는 사고 모드를 비활성화(기본값); 켜면 보통 더 정확하지만 느려지고 토큰을 더 소비합니다. 사용자 지정 모델에는 Auto도 있어 모델 자체 기본값을 따릅니다(Off에서 API 오류가 발생할 때만 사용).",
     "presetSelect": "프리셋 선택",
@@ -282,7 +285,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "자막 번역기",
-      "description": "SRT, ASS, VTT, LRC 자막 일괄 번역, 120개 이상 언어 지원"
+      "description": "SRT, ASS, VTT, SBV, LRC 자막 일괄 번역, 120개 이상 언어 지원"
     },
     "jsonTranslate": {
       "title": "i18n JSON 번역",
@@ -320,7 +323,7 @@
         },
         {
           "q": "번역할 것이 Markdown이 아니라 자막이나 JSON 설정 파일인 경우는?",
-          "a": "자막 파일(SRT/ASS/VTT/LRC)은 [자막 번역기](../subtitle-translator)를 사용하세요. 타임라인과 ASS 스타일 태그를 보존합니다. JSON 국제화 파일(i18next, next-intl, vue-i18n과 같은 key-value 구조)은 [JSON 번역](../json-translate)을 사용하세요. Key 경로별로 선택적 번역이 가능하며 {name}, {count} 등의 플레이스홀더를 보호할 수 있습니다. 세 가지 번역 도구는 동일한 엔진 설정과 API Key를 공유하므로 도구 간 전환 시 재설정이 필요 없습니다."
+          "a": "자막 파일(SRT/ASS/VTT/SBV/LRC)은 [자막 번역기](../subtitle-translator)를 사용하세요. 타임라인과 ASS 스타일 태그를 보존합니다. JSON 국제화 파일(i18next, next-intl, vue-i18n과 같은 key-value 구조)은 [JSON 번역](../json-translate)을 사용하세요. Key 경로별로 선택적 번역이 가능하며 {name}, {count} 등의 플레이스홀더를 보호할 수 있습니다. 세 가지 번역 도구는 동일한 엔진 설정과 API Key를 공유하므로 도구 간 전환 시 재설정이 필요 없습니다."
         },
         {
           "q": "번역된 Markdown이 서버에 업로드되나요? 오픈소스인가요?",
@@ -404,6 +407,10 @@
     "dataParserImgPrompt": {
       "title": "IMGPrompt 생성기",
       "description": "IMGPrompt JSON 데이터 일괄 생성"
+    },
+    "textDiff": {
+      "title": "텍스트 비교",
+      "description": "두 텍스트 또는 파일을 나란히 비교하여 첫 번째 차이점을 정확히 찾아냅니다."
     }
   },
   "navigation": {

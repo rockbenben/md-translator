@@ -196,6 +196,8 @@
     "errorHint429": "Vượt quá giới hạn yêu cầu, vui lòng thử lại sau",
     "errorHint456": "Đã hết hạn mức dịch của kỳ này",
     "errorHint5xx": "Lỗi máy chủ, vui lòng thử lại sau",
+    "errorHintRelay": "Lỗi mạng (có thể do CORS) — hãy bật \"Chuyển tiếp API\" trong Cài đặt API",
+    "errorHintRelay403": "API trả về 403 Forbidden — hãy bật \"Chuyển tiếp API\" trong Cài đặt API",
     "rateLimitCooldown": "Đạt giới hạn yêu cầu — tạm dừng một lát rồi tự động thử lại"
   },
   "MDTranslator": {
@@ -255,6 +257,7 @@
     "delayTime": "Độ trễ",
     "useRelay": "Chuyển tiếp API",
     "useRelayTooltip": "Bật chuyển tiếp API khi gặp lỗi CORS hoặc 403",
+    "useRelayOverridden": "Đã đặt URL tùy chỉnh — yêu cầu sẽ đi thẳng tới đó và công tắc này không có hiệu lực; xóa URL để bật lại",
     "reasoningEffort": "Mức độ suy luận",
     "reasoningEffortExtra": "Off tắt chế độ suy nghĩ (mặc định); bật lên thường chính xác hơn nhưng chậm hơn và tiêu tốn nhiều token hơn. Các mô hình tùy chỉnh còn có Auto = theo mặc định tích hợp của mô hình (chỉ dùng khi Off gây lỗi API).",
     "presetSelect": "Chọn cài đặt sẵn",
@@ -282,7 +285,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Dịch giả Phụ đề",
-      "description": "Dịch hàng loạt SRT, ASS, VTT, LRC. 120+ ngôn ngữ."
+      "description": "Dịch hàng loạt SRT, ASS, VTT, SBV, LRC. 120+ ngôn ngữ."
     },
     "jsonTranslate": {
       "title": "Dịch giả JSON i18n",
@@ -320,7 +323,7 @@
         },
         {
           "q": "Nếu cần dịch phụ đề hoặc tệp cấu hình JSON thay vì Markdown thì sao?",
-          "a": "Với tệp phụ đề (SRT/ASS/VTT/LRC), dùng [Dịch giả Phụ đề](../subtitle-translator) — giữ timecode và thẻ kiểu ASS. Với tệp i18n JSON (cấu trúc key-value như i18next, next-intl, vue-i18n), dùng [Dịch JSON](../json-translate) — dịch chọn lọc theo đường dẫn Key, bảo vệ placeholder {name}, {count}, v.v. Cả ba công cụ dịch dùng chung cùng cấu hình engine và API Key, nên chuyển qua lại giữa chúng không cần cài đặt lại."
+          "a": "Với tệp phụ đề (SRT/ASS/VTT/SBV/LRC), dùng [Dịch giả Phụ đề](../subtitle-translator) — giữ timecode và thẻ kiểu ASS. Với tệp i18n JSON (cấu trúc key-value như i18next, next-intl, vue-i18n), dùng [Dịch JSON](../json-translate) — dịch chọn lọc theo đường dẫn Key, bảo vệ placeholder {name}, {count}, v.v. Cả ba công cụ dịch dùng chung cùng cấu hình engine và API Key, nên chuyển qua lại giữa chúng không cần cài đặt lại."
         },
         {
           "q": "Markdown đã dịch có được tải lên máy chủ không? Có mã nguồn mở không?",
@@ -404,6 +407,10 @@
     "dataParserImgPrompt": {
       "title": "Trình tạo dữ liệu IMGPrompt",
       "description": "Tạo dữ liệu JSON IMGPrompt hàng loạt"
+    },
+    "textDiff": {
+      "title": "Text Diff",
+      "description": "So sánh hai văn bản hoặc tệp song song và xác định điểm khác biệt đầu tiên."
     }
   },
   "navigation": {

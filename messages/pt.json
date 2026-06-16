@@ -196,6 +196,8 @@
     "errorHint429": "Limite de requisições excedido, tente novamente mais tarde",
     "errorHint456": "Cota de tradução esgotada neste período",
     "errorHint5xx": "Erro do servidor, tente novamente mais tarde",
+    "errorHintRelay": "Erro de rede (possivelmente CORS) — ative o \"Relay da API\" nas configurações de API",
+    "errorHintRelay403": "A API retornou 403 Forbidden — ative o \"Relay da API\" nas configurações de API",
     "rateLimitCooldown": "Limite de requisições atingido — pausando brevemente, repetiremos automaticamente"
   },
   "MDTranslator": {
@@ -255,6 +257,7 @@
     "delayTime": "Atraso",
     "useRelay": "Relay da API",
     "useRelayTooltip": "Ative o relay da API em caso de erros CORS ou 403",
+    "useRelayOverridden": "Um URL personalizado está definido — as solicitações vão diretamente para ele e este botão não tem efeito; limpe o URL para reativá-lo",
     "reasoningEffort": "Esforço de raciocínio",
     "reasoningEffortExtra": "Off desativa o pensamento (padrão); ativá-lo geralmente é mais preciso, mas mais lento e consome mais tokens. Modelos personalizados também oferecem Auto = seguir o padrão integrado do modelo (use apenas se Off causar erro de API).",
     "presetSelect": "Selecionar predefinição",
@@ -282,7 +285,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Tradutor Legendas",
-      "description": "Tradução em lote SRT, ASS, VTT, LRC. 120+ idiomas."
+      "description": "Tradução em lote SRT, ASS, VTT, SBV, LRC. 120+ idiomas."
     },
     "jsonTranslate": {
       "title": "Tradutor JSON i18n",
@@ -320,7 +323,7 @@
         },
         {
           "q": "E se eu precisar traduzir legendas ou arquivos de configuração JSON em vez de Markdown?",
-          "a": "Para arquivos de legenda (SRT/ASS/VTT/LRC), use o [Tradutor de Legendas](../subtitle-translator) — preserva timecodes e tags de estilo ASS. Para arquivos JSON de i18n (estruturas key-value como i18next, next-intl, vue-i18n), use o [Tradutor JSON](../json-translate) — tradução seletiva por caminho de chave, com proteção de placeholders {name}, {count} etc. As três ferramentas compartilham as mesmas configurações de motor e API Keys, então alternar entre elas dispensa nova configuração."
+          "a": "Para arquivos de legenda (SRT/ASS/VTT/SBV/LRC), use o [Tradutor de Legendas](../subtitle-translator) — preserva timecodes e tags de estilo ASS. Para arquivos JSON de i18n (estruturas key-value como i18next, next-intl, vue-i18n), use o [Tradutor JSON](../json-translate) — tradução seletiva por caminho de chave, com proteção de placeholders {name}, {count} etc. As três ferramentas compartilham as mesmas configurações de motor e API Keys, então alternar entre elas dispensa nova configuração."
         },
         {
           "q": "O Markdown traduzido é enviado ao servidor? É open source?",
@@ -404,6 +407,10 @@
     "dataParserImgPrompt": {
       "title": "Gerador Dados IMGPrompt",
       "description": "Gerar dados JSON IMGPrompt em lote"
+    },
+    "textDiff": {
+      "title": "Text Diff",
+      "description": "Compare dois textos ou arquivos lado a lado e localize a primeira diferença."
     }
   },
   "navigation": {

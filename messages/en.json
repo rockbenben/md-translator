@@ -196,6 +196,8 @@
     "errorHint429": "Rate limit exceeded, please retry later",
     "errorHint456": "Translation quota exhausted for this billing period",
     "errorHint5xx": "Server error, please retry later",
+    "errorHintRelay": "Network error (possibly CORS) — enable \"API Relay\" in API Settings",
+    "errorHintRelay403": "The API returned 403 Forbidden — enable \"API Relay\" in API Settings",
     "rateLimitCooldown": "Rate limited — pausing briefly, will retry automatically"
   },
   "MDTranslator": {
@@ -255,6 +257,7 @@
     "delayTime": "Delay Time",
     "useRelay": "API Relay",
     "useRelayTooltip": "Enable API relay if you encounter CORS or 403 errors",
+    "useRelayOverridden": "A custom URL is set — requests go directly to it and this switch has no effect; clear the URL to re-enable",
     "reasoningEffort": "Reasoning Effort",
     "reasoningEffortExtra": "Off disables thinking (default); enabling is usually more accurate but slower and uses more tokens. Custom models also offer Auto = follow the model's built-in default (use only if Off triggers an API error).",
     "presetSelect": "Select Preset",
@@ -282,7 +285,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Subtitle Translator",
-      "description": "Batch translate SRT, ASS, VTT, LRC subtitles. 120+ languages."
+      "description": "Batch translate SRT, ASS, VTT, SBV, LRC subtitles. 120+ languages."
     },
     "jsonTranslate": {
       "title": "JSON Multi-Language Translator",
@@ -320,7 +323,7 @@
         },
         {
           "q": "What if I need to translate subtitles or JSON config files instead of Markdown?",
-          "a": "For subtitle files (SRT/ASS/VTT/LRC), use [Subtitle Translator](../subtitle-translator) — it preserves timecodes and ASS style tags. For JSON i18n files (i18next, next-intl, vue-i18n key-value structure), use [JSON Translator](../json-translate) — selective translation by Key path, with placeholder protection for {name}, {count}, etc. All three translation tools share the same engine configurations and API keys, so switching between them needs no re-setup."
+          "a": "For subtitle files (SRT/ASS/VTT/SBV/LRC), use [Subtitle Translator](../subtitle-translator) — it preserves timecodes and ASS style tags. For JSON i18n files (i18next, next-intl, vue-i18n key-value structure), use [JSON Translator](../json-translate) — selective translation by Key path, with placeholder protection for {name}, {count}, etc. All three translation tools share the same engine configurations and API keys, so switching between them needs no re-setup."
         },
         {
           "q": "Is the translated Markdown uploaded to your server? Is it open source?",
@@ -404,6 +407,10 @@
     "dataParserImgPrompt": {
       "title": "IMGPrompt Data Gen",
       "description": "Batch generate IMGPrompt JSON data"
+    },
+    "textDiff": {
+      "title": "Text Diff",
+      "description": "Compare two texts or files side by side and pinpoint the first difference."
     }
   },
   "navigation": {
