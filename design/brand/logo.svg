@@ -1,0 +1,27 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Markdown Translator — prose translates (blue); syntax is preserved. The fenced
+       code block and link URL stay locked (gray, bordered); only readable text changes. -->
+  <rect width="512" height="512" fill="#15171C"/>
+
+  <!-- # heading: hash mark (muted) + translated title (blue) -->
+  <rect x="80" y="150" width="12" height="44" rx="4" transform="rotate(9 86 172)" fill="#565D67"/>
+  <rect x="104" y="150" width="12" height="44" rx="4" transform="rotate(9 110 172)" fill="#565D67"/>
+  <rect x="78" y="160" width="44" height="11" rx="4" fill="#565D67"/>
+  <rect x="76" y="178" width="44" height="11" rx="4" fill="#565D67"/>
+  <rect x="140" y="156" width="216" height="28" rx="7" fill="#4C8DFF"/>
+
+  <!-- prose line (translated) -->
+  <rect x="80" y="214" width="352" height="22" rx="6" fill="#4C8DFF"/>
+
+  <!-- fenced code block — locked / preserved -->
+  <rect x="80" y="262" width="352" height="86" rx="12" fill="#1A1D23" stroke="#2A2F38" stroke-width="3"/>
+  <rect x="104" y="284" width="150" height="13" rx="5" fill="#4A515B"/>
+  <rect x="104" y="312" width="206" height="13" rx="5" fill="#4A515B"/>
+  <!-- tiny lock -->
+  <rect x="384" y="294" width="26" height="20" rx="4" fill="#565D67"/>
+  <path d="M390 294 v-6 a7 7 0 0 1 14 0 v6" stroke="#565D67" stroke-width="4" fill="none"/>
+
+  <!-- link: [translated label](preserved url) -->
+  <rect x="80" y="372" width="150" height="22" rx="6" fill="#4C8DFF"/>
+  <rect x="244" y="372" width="118" height="22" rx="6" fill="#4A515B"/>
+</svg>

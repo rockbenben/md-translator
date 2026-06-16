@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+  :root {
+    --bg:#15171C; --panel:#1A1D23; --ink:#ECEAE3; --muted:#868D97;
+    --line:#2A2F38; --gutter:#565D67;
+    --blue:#4C8DFF; --blue-t:#8FB8FF; --hold:#5C6470;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1200px; height:630px; }
+  body { background:var(--bg); font-family:'Schibsted Grotesk',system-ui,sans-serif; color:var(--ink);
+    display:flex; align-items:stretch; overflow:hidden; position:relative; }
+  body::before { content:""; position:absolute; inset:0;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px);
+    background-size:100% 78.75px; opacity:.35; pointer-events:none; }
+  .left { flex:1; padding:64px 56px 64px 80px; display:flex; flex-direction:column;
+    justify-content:center; gap:26px; position:relative; z-index:1; }
+  .eyebrow { font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:500;
+    letter-spacing:.32em; text-transform:uppercase; color:var(--muted);
+    display:flex; align-items:center; gap:14px; }
+  .eyebrow .h { color:var(--blue); font-weight:700; font-size:24px; letter-spacing:0; }
+  .title { font-weight:800; font-size:96px; line-height:.9; letter-spacing:-.04em; }
+  .title .t { color:var(--blue); }
+  .lede { font-size:35px; font-weight:500; line-height:1.2; color:var(--ink); max-width:19ch; }
+  .lede em { color:var(--blue); font-style:normal; font-weight:700; }
+  .desc { font-family:'JetBrains Mono',monospace; font-size:17px; line-height:1.55;
+    color:var(--muted); max-width:44ch; }
+  .url { font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:500;
+    color:var(--ink); display:flex; align-items:center; gap:12px; }
+  .url::before { content:""; width:26px; height:2px; background:var(--blue); }
+
+  .panel { width:472px; flex:none; align-self:center; margin-right:72px;
+    background:var(--panel); border:1px solid var(--line); position:relative; z-index:1;
+    box-shadow:0 40px 80px -30px rgba(0,0,0,.7); }
+  .panel .bar { display:flex; align-items:center; gap:12px; padding:16px 20px;
+    border-bottom:1px solid var(--line); font-family:'JetBrains Mono',monospace;
+    font-size:15px; color:var(--muted); }
+  .panel .bar .dot { width:9px; height:9px; background:var(--gutter); }
+  .panel .bar b { color:var(--ink); font-weight:500; }
+  .panel .bar .arrow { color:var(--blue); }
+  .md { padding:22px 26px; font-family:'JetBrains Mono',monospace; font-size:18px; line-height:1.7; }
+  .md .hash { color:var(--gutter); }
+  .md .head { color:var(--blue-t); font-weight:700; font-size:22px; }
+  .md .prose { color:var(--blue-t); }
+  .md .hold { color:#5C6470; }
+  .md .fence { color:var(--gutter); }
+  .md .link { color:var(--blue-t); }
+  .md .url2 { color:#5C6470; }
+  .md .block { margin:10px 0; padding:12px 16px; background:#14171c;
+    border:1px solid #23272e; border-radius:8px; font-size:16px; line-height:1.5; }
+</style>
+</head>
+<body>
+  <div class="left">
+    <div class="eyebrow"><span class="h">#</span> Tools&nbsp;By&nbsp;AI · Markdown&nbsp;Localization</div>
+    <div class="title">Markdown<br><span class="t">Translator</span></div>
+    <div class="lede">Translate the prose. <em>Preserve</em> the syntax.</div>
+    <div class="desc">
+      Code, LaTeX, links &amp; front-matter tokenized and restored<br>
+      byte-perfect · 120+ languages · batch whole doc folders.
+    </div>
+    <div class="url">tools.newzone.top</div>
+  </div>
+  <div class="panel">
+    <div class="bar"><span class="dot"></span><b>guide.md</b><span class="arrow">→</span><b>guide.de.md</b></div>
+    <div class="md">
+      <div><span class="hash"># </span><span class="head">Erste Schritte</span></div>
+      <div class="prose">Installiere das Paket:</div>
+      <div class="block"><span class="fence">```bash</span><br><span class="hold">npm install pkg</span><br><span class="fence">```</span></div>
+      <div><span class="link">[Doku]</span><span class="url2">(https://example.com)</span></div>
+    </div>
+  </div>
+</body>
+</html>

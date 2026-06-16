@@ -1,0 +1,14 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Markdown Translator mark — the heading hash (#) is the most legible Markdown
+       token; below it a translated prose line in the accent. Format in, format out. -->
+  <rect width="512" height="512" fill="#15171C"/>
+
+  <!-- # hash mark -->
+  <rect x="183" y="150" width="20" height="150" rx="6" transform="rotate(9 193 225)" fill="#4C8DFF"/>
+  <rect x="247" y="150" width="20" height="150" rx="6" transform="rotate(9 257 225)" fill="#4C8DFF"/>
+  <rect x="160" y="190" width="150" height="20" rx="6" fill="#4C8DFF"/>
+  <rect x="156" y="244" width="150" height="20" rx="6" fill="#4C8DFF"/>
+
+  <!-- translated prose line -->
+  <rect x="120" y="338" width="272" height="30" rx="9" fill="#4C8DFF"/>
+</svg>
