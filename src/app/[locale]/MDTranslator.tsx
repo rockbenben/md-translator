@@ -95,6 +95,9 @@ const MDTranslator = () => {
     clearFailures,
     markRunHadFailures,
     hadRunFailures,
+    runRetry,
+    isScopedRetry,
+    getActiveTargetLangs,
     isDisposed,
     isTranslating,
     setIsTranslating,
@@ -141,8 +144,9 @@ const MDTranslator = () => {
   // 单文件模式(runTranslation 路径)下也会被写,但不会被读,无副作用。
   const failedFilesRef = useRef(0);
   // 记录 translatedText 对应的目标语种,handleExportFile 用它生成文件名;
-  // 多语言模式下 translatedText 是 targetLangs[0] 而非主 targetLanguage,
-  // 不记录的话导出文件名会标错语种(主 targetLanguage 跟 translatedText 内容不匹配)
+  // 多语言模式下 translatedText 是 previewLang(常规跑 = targetLangs[0];scoped
+  // 重试时保持上一次预览的语种)而非主 targetLanguage,不记录的话导出文件名会
+  // 标错语种(主 targetLanguage 跟 translatedText 内容不匹配)
   const [translatedTextLang, setTranslatedTextLang] = useState<string | null>(null);
   const { customFileName, setCustomFileName, generateFileName } = useExportFilename("md-translator");
 
@@ -184,7 +188,9 @@ const MDTranslator = () => {
   };
 
   const performTranslation = async (sourceText: string, fileNameSet?: string, fileIndex?: number, totalFiles?: number) => {
-    const targetLangs = multiLanguageMode ? targetLanguages : [targetLanguage];
+    // On a failure-panel retry (runRetry) this is narrowed to the langs still
+    // needing work — successful languages aren't re-walked/re-downloaded.
+    const targetLangs = getActiveTargetLangs();
     if (multiLanguageMode && targetLangs.length === 0) {
       message.error(t("noTargetLanguage"));
       failedFilesRef.current++;
@@ -193,10 +199,18 @@ const MDTranslator = () => {
       markRunHadFailures();
       return;
     }
+    const fileName = fileNameSet || multipleFiles[0]?.name || "markdown.md";
+    // 预览语言:常规跑 = 本轮第一个语言(旧行为);多语言 scoped 重试 = 保持
+    // 当前预览的语言 —— 仅当它也在重试范围内时刷新,否则不动预览。不加这条,
+    // 重试会把用户正在看的 targetLangs[0](现在是第一个【失败】语言)静默
+    // 换掉。单语言模式恒取 targetLangs[0]:换过目标语言的重试也要把新结果
+    // 显示出来(预览是单语言模式唯一的输出)。
+    const previewLang = multiLanguageMode && isScopedRetry() && translatedTextLang ? (targetLangs.includes(translatedTextLang) ? translatedTextLang : null) : targetLangs[0];
     const lines = splitTextIntoLines(sourceText);
 
     const {
       contentLines,
+      sourceLineNumbers,
       frontmatterPlaceholders,
       codePlaceholders,
       linkPlaceholders,
@@ -218,9 +232,13 @@ const MDTranslator = () => {
           // 对每一行进行处理，分割占位符与普通文本，仅翻译普通文本部分。不处理加粗文本格式，否则对语义伤害较大。
           // 第一步：收集所有待翻译片段及其位置信息
           const textsToTranslate: string[] = [];
+          // 与 textsToTranslate 平行:每个片段所在的源文件物理行号(同一行拆出
+          // 的多个片段共享行号)。失败面板靠它指向真实源行 —— 片段序数跟行号
+          // 无关(链接/代码拆分后一行多段,且折叠占位符一行顶多行)。
+          const textLineNumbers: number[] = [];
           const lineSegments: { segments: string[]; mapping: ({ type: "placeholder" | "empty"; value: string } | { type: "text"; index: number; leading: string; trailing: string })[] }[] = [];
 
-          for (const line of contentLines) {
+          contentLines.forEach((line, lineIdx) => {
             const segments = line.split(PLACEHOLDER_SPLIT_REGEX);
             const mapping: (typeof lineSegments)[number]["mapping"] = [];
             for (const segment of segments) {
@@ -234,15 +252,16 @@ const MDTranslator = () => {
                   mapping.push({ type: "empty", value: segment });
                 } else {
                   mapping.push({ type: "text", index: textsToTranslate.length, leading: leadingSpace, trailing: trailingSpace });
+                  textLineNumbers.push(sourceLineNumbers[lineIdx]);
                   textsToTranslate.push(trimmedSegment);
                 }
               }
             }
             lineSegments.push({ segments, mapping });
-          }
+          });
 
           // 第二步：一次性翻译所有片段（translateBatch 内部已有 pLimit 并发控制）
-          const translatedTexts = await translateBatch(textsToTranslate, translationMethod, currentTargetLang, fileIndex, totalFiles);
+          const translatedTexts = await translateBatch(textsToTranslate, translationMethod, currentTargetLang, fileIndex, totalFiles, undefined, { lineNumbers: textLineNumbers, fileName });
 
           // 第三步：回填翻译结果
           const finalTranslatedLines = lineSegments.map(({ mapping }) =>
@@ -276,20 +295,20 @@ const MDTranslator = () => {
         } else {
           // Raw text mode: translate all lines
           // If context mode is enabled, use context-aware translation with markdown type
-          const translatedLines = await translateBatch(lines, translationMethod, currentTargetLang, fileIndex, totalFiles, contextAware ? "markdown" : undefined);
+          // (lines 就是完整物理行数组,行号走 i+1 默认值,只需带上文件名)
+          const translatedLines = await translateBatch(lines, translationMethod, currentTargetLang, fileIndex, totalFiles, contextAware ? "markdown" : undefined, { fileName });
           translatedTextWithPlaceholders = applyRemoveChars(translatedLines.join("\n"));
         }
 
         // Create language-specific file name for download
         const langLabel = currentTargetLang;
-        const fileName = fileNameSet || multipleFiles[0]?.name || "markdown.md";
-        const downloadFileName = generateFileName(fileName, langLabel);
+        const downloadFileName = generateFileName(fileName, langLabel, undefined, multiLanguageMode);
 
         if (multiLanguageMode || multipleFiles.length > 1) {
           await downloadFile(translatedTextWithPlaceholders, downloadFileName);
         }
 
-        if (!multiLanguageMode || (multiLanguageMode && currentTargetLang === targetLangs[0])) {
+        if (currentTargetLang === previewLang) {
           setTranslatedText(translatedTextWithPlaceholders);
           setTranslatedTextLang(currentTargetLang);
         }
@@ -389,7 +408,7 @@ const MDTranslator = () => {
     // ResultCard 只在 translatedText 非空时渲染,而 translatedText 写入必伴随 lang 同帧 setState,
     // 所以 handleExportFile 触发时 translatedTextLang 必非 null —— ?? 仅作类型收窄兜底
     const langLabel = translatedTextLang ?? targetLanguage;
-    const fileName = generateFileName(uploadFileName, langLabel);
+    const fileName = generateFileName(uploadFileName, langLabel, undefined, multiLanguageMode);
     void downloadFile(translatedText, fileName);
     message.success(t("fileExported", { fileName }));
   };
@@ -695,7 +714,7 @@ const MDTranslator = () => {
         reason={failedReason}
         onClose={clearFailures}
         disabled={isTranslating}
-        onRetry={() => (uploadMode === "single" ? handleSingleTranslate() : handleMultipleTranslate())}
+        onRetry={() => runRetry(() => (uploadMode === "single" ? handleSingleTranslate() : handleMultipleTranslate()))}
       />
 
       {/* Results Section */}
@@ -745,8 +764,9 @@ const MDTranslator = () => {
       )}
 
       <TranslationProgressModal
-        open={isTranslating}
+        isTranslating={isTranslating}
         percent={progressPercent}
+        onDismiss={resetProgress}
         multiLanguageMode={multiLanguageMode}
         targetLanguageCount={targetLanguages.length}
         currentCount={progressInfo.current}

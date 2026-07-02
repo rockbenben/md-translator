@@ -236,13 +236,9 @@ export const filterMarkdownLines = (lines: string[], mdOptions: MarkdownOptions)
     //   - 闭栏 = 同种字符、长度 ≥ 开栏、整行仅该字符(两侧允许空白);
     //   - 无闭栏 → 块延伸到文档末尾(规范);零内容围栏(```bash 紧跟 ```)
     //     正常配对。
-    // 此前是"先全文配对反引号、再全文配对波浪"的两趟正则 + 未闭合 fallback:
-    //   1. 两个波浪栏【内容里】的字面 ``` 行(演示围栏语法的标准写法)会被
-    //      跨块配成一对,把两块之间的正文整段吞进代码占位符 —— 输出与源文
-    //      逐字节相同却报翻译成功;
-    //   2. 每个配对失败的开栏行,懒惰中段都要对剩余全文回溯 —— 病态输入
-    //      (几万行 ```x 开栏)让主线程卡死在二次方扫描里。
-    // 行扫描两者皆除,O(行数)。
+    // ⚠ 别改回两趟全文正则:波浪栏内的字面 ``` 行会跨块配对、吞掉两块间的正文
+    // (输出与源文逐字节相同却报成功);且懒惰回溯对病态输入(几万行 ```x 开栏)
+    // 是 O(n²) 卡死主线程。行扫描两者皆除,O(行数)。
     const srcLines = fullText.split("\n");
     const outLines: string[] = [];
     // blockquote 前缀("> "、"> > ",规范允许 0-3 前导空格):引用块内的围栏
@@ -465,9 +461,33 @@ export const filterMarkdownLines = (lines: string[], mdOptions: MarkdownOptions)
     contentIndices.push(index);
   });
 
+  // 每个 contentLine 对应的 1-based【源文件物理行号】。contentIndices 是对
+  // 占位符折叠后文档的行索引 —— frontmatter/多行代码块/跨行 HTML 注释/LaTeX
+  // 块各折叠成一行,其后所有行的索引都小于真实源行号,直接 +1 会把失败面板
+  // 指向错误位置。按折叠占位符内嵌的换行数累计还原:只有整文阶段的四类映射
+  // 可能存多行原文(行内占位符原文无换行,贡献 0);源文里字面的占位符形态
+  // 文本不在映射中(counterSeed 避让),查不到按 0 处理。
+  const sourceLineNumbers: number[] = [];
+  {
+    const countNewlines = (token: string): number => {
+      const original = frontmatterPlaceholders[token] ?? codePlaceholders[token] ?? htmlPlaceholders[token] ?? latexBlockPlaceholders[token];
+      if (!original) return 0;
+      let n = 0;
+      for (let at = original.indexOf("\n"); at !== -1; at = original.indexOf("\n", at + 1)) n++;
+      return n;
+    };
+    let srcLine = 1;
+    for (const line of contentLines) {
+      sourceLineNumbers.push(srcLine);
+      srcLine += 1;
+      for (const m of line.matchAll(/<<<[A-Z_]+_\d{1,9}>>>/g)) srcLine += countNewlines(m[0]);
+    }
+  }
+
   return {
     contentLines,
     contentIndices,
+    sourceLineNumbers,
     frontmatterPlaceholders,
     codePlaceholders,
     linkPlaceholders,
