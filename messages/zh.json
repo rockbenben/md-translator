@@ -95,6 +95,7 @@
     "exportedFile": "已导出",
     "extractedText": "提取的文本",
     "translating": "翻译中",
+    "translateDone": "翻译完成",
     "multiTranslating": "正在翻译，目标语言共",
     "model": "模型",
     "sameLanguageTarget": "源语言与目标语言相同，已自动调整目标语言为",
@@ -138,7 +139,7 @@
     "requestTimeoutSec": "超时时间",
     "requestTimeoutSecTooltip": "单次请求的最大等待时间（秒）。LLM 思考耗时较长，建议 180 秒以上",
     "customExportFilename": "导出文件名格式",
-    "customExportFilenameTooltip": "'{'name'}' = 原始文件名, '{'lang'}' = 语言, '{'ext'}' = 扩展名, '{'date'}' = 日期, '{'time'}' = 时间",
+    "customExportFilenameTooltip": "'{'name'}' = 原始文件名, '{'lang'}' = 语言, '{'ext'}' = 扩展名, '{'date'}' = 日期, '{'time'}' = 时间；多语言模式会自动加 '{'lang'}' 防止文件名冲突",
     "partialFailureTitle": "翻译失败 {count} 行",
     "partialFailureDesc": "失败的行已用原文占位（不影响文件结构）。这种失败大多是网络抖动或翻译服务临时不稳定——免费服务和自建服务器特别容易碰到，不是你的设置问题。点「再试一次」即可继续，已成功的行走缓存不会重翻；如果还是失败，稍后再点或换个翻译服务试试。也可点「查看失败行」自己处理。",
     "retryFailedLines": "再试一次",
@@ -170,6 +171,7 @@
     "translategemmaUnavailable": "TranslateGemma 服务暂时连不上，请确认本地服务器（LM Studio / llama.cpp / Ollama）已启动且 URL 正确。",
     "networkUnavailable": "翻译服务暂时连不上，可能是网络或服务的临时问题。稍后再试，或换一个翻译服务。",
     "translationTimeout": "翻译请求超时，可能是网络较慢或翻译服务响应慢。稍后再试，或换一个翻译服务。",
+    "translationTimeoutLocal": "本地模型翻译超时。本地大模型可能陷入复读循环——请在高级设置中调低 max_tokens（输出上限），并确认所选源语言与文本实际语言一致。",
     "langGroupCommon": "常用",
     "langGroupEurope": "欧洲",
     "langGroupMiddleEast": "中东",
@@ -271,6 +273,8 @@
     "presetUpdated": "已保存到当前预设",
     "presetDeleteConfirm": "确定要删除此预设吗？",
     "presetEmptyHint": "暂无预设，编辑后点保存",
+    "presetDefault": "默认提示词",
+    "presetDefaultReadonly": "默认提示词为内置项，不可修改或删除；如需自定义请「另存为新预设」",
     "qwenMtDomains": "领域提示词 (仅支持英文)",
     "sendSystemPrompt": "发送 system 提示词",
     "sendSystemPromptExtra": "仅当 chat template 拒绝 system 角色时关闭，典型报错 \"Conversations must start with a user prompt\"（如 Gemma 系列）",
@@ -328,20 +332,6 @@
         {
           "q": "翻译后的 Markdown 会上传到服务器吗？开源吗？",
           "a": "完全前端处理：Markdown 文档读取、解析、翻译请求都在浏览器内完成，原文不经过我们的服务器存储。LLM 引擎的请求直接从你的浏览器发往你配置的 API 端点（OpenAI、DeepSeek 等），API Key 仅保存在本地 localStorage。翻译缓存使用浏览器 IndexedDB。源代码在 GitHub 开源（rockbenben/md-translator），可自部署或审查实现。"
-        }
-      ],
-      "howto": [
-        {
-          "name": "上传 Markdown 文件",
-          "text": "上传一个或多个 .md 文件，或将 Markdown 内容粘贴到输入区。"
-        },
-        {
-          "name": "配置选项",
-          "text": "根据需要选择是否翻译 Front Matter、代码块和 LaTeX 公式。"
-        },
-        {
-          "name": "翻译并导出",
-          "text": "选择目标语言并点击翻译。下载翻译后的 .md 文件，格式完整保留。"
         }
       ],
       "features": [
@@ -420,7 +410,11 @@
     "textParser": "文本处理",
     "jsonParser": "JSON 处理",
     "dataParser": "数据转换",
-    "otherTools": "其他工具"
+    "otherTools": "其他工具",
+    "externalTools": {
+      "legendtalk": "AI 思想家圆桌",
+      "imgprompt": "AI 绘图提示词"
+    }
   },
   "Metadata": {
     "title": "ToolsByAI | 免费开源的 AI 翻译与数据处理工具集",

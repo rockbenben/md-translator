@@ -89,6 +89,7 @@
     "exportedFile": "내보내기 완료",
     "extractedText": "추출된 텍스트",
     "translating": "번역 중",
+    "translateDone": "번역 완료",
     "multiTranslating": "번역 중, 총 언어 수:",
     "model": "모델",
     "sameLanguageTarget": "원본 언어와 목표 언어가 같습니다. 자동으로 목표 언어를 조정했습니다:",
@@ -132,7 +133,7 @@
     "requestTimeoutSec": "시간 초과",
     "requestTimeoutSecTooltip": "요청당 최대 대기 시간(초). LLM 사고 시간이 길어지므로 180초 이상 권장합니다.",
     "customExportFilename": "내보내기 파일명 패턴",
-    "customExportFilenameTooltip": "'{'name'}' = 원본 파일명, '{'lang'}' = 언어, '{'ext'}' = 확장자, '{'date'}' = 날짜, '{'time'}' = 시간",
+    "customExportFilenameTooltip": "'{'name'}' = 원본 파일명, '{'lang'}' = 언어, '{'ext'}' = 확장자, '{'date'}' = 날짜, '{'time'}' = 시간; 다국어 모드에서는 '{'lang'}'이(가) 자동 추가되어 파일명 충돌을 방지합니다",
     "partialFailureTitle": "{count}개 줄 번역 실패",
     "partialFailureDesc": "실패한 줄은 원본 텍스트로 자리표시되어 있어 파일 구조에 영향이 없습니다. 이런 실패는 대부분 네트워크 변동이나 번역 서비스의 일시적인 불안정 때문이며, 무료 서비스와 셀프호스팅 서버에서 특히 자주 발생하고, 설정 문제가 아닙니다. 다시 시도를 클릭하면 계속됩니다 (성공한 줄은 캐시에서 가져오므로 다시 번역되지 않습니다). 계속 실패하면 잠시 후 다시 시도하거나 다른 번역 서비스를 사용해 보세요. 또는 실패한 줄 보기를 클릭하여 수동으로 처리할 수도 있습니다.",
     "retryFailedLines": "다시 시도",
@@ -170,6 +171,7 @@
     "translategemmaUnavailable": "TranslateGemma 서비스에 일시적으로 연결할 수 없습니다. 로컬 서버(LM Studio / llama.cpp / Ollama)가 실행 중이고 URL이 올바른지 확인하세요.",
     "networkUnavailable": "번역 서비스에 일시적으로 연결할 수 없습니다. 네트워크 문제이거나 서비스 측의 일시적인 문제일 수 있습니다. 잠시 후 다시 시도하거나 다른 번역 서비스로 전환하세요.",
     "translationTimeout": "번역 요청이 시간 초과되었습니다. 네트워크가 느리거나 서비스 응답이 느릴 수 있습니다. 잠시 후 다시 시도하거나 다른 번역 서비스로 전환하세요.",
+    "translationTimeoutLocal": "로컬 모델 번역이 시간 초과되었습니다. 로컬 LLM은 반복 루프에 빠질 수 있습니다. 고급 설정에서 max_tokens(출력 상한)를 낮추고, 선택한 원본 언어가 실제 텍스트와 일치하는지 확인하세요.",
     "langGroupCommon": "자주 사용",
     "langGroupEurope": "유럽",
     "langGroupMiddleEast": "중동",
@@ -271,6 +273,8 @@
     "presetUpdated": "현재 프리셋에 저장됨",
     "presetDeleteConfirm": "이 프리셋을 삭제하시겠습니까?",
     "presetEmptyHint": "프리셋이 없습니다 — 편집 후 저장을 클릭하세요",
+    "presetDefault": "기본 프롬프트",
+    "presetDefaultReadonly": "기본 프롬프트는 내장 항목이라 수정하거나 삭제할 수 없습니다. 사용자 지정하려면 \"새 프리셋으로 저장\"하세요.",
     "qwenMtDomains": "도메인 프롬프트(영어로만 제공)",
     "sendSystemPrompt": "system 프롬프트 전송",
     "sendSystemPromptExtra": "chat template이 system 역할을 거부할 때만 끄세요 — 전형적인 오류 \"Conversations must start with a user prompt\" (예: Gemma 계열).",
@@ -328,20 +332,6 @@
         {
           "q": "번역된 Markdown이 서버에 업로드되나요? 오픈소스인가요?",
           "a": "완전 프론트엔드 처리: Markdown 문서 읽기, 파싱, 번역 요청이 모두 브라우저 내에서 완료되며 원문은 당사 서버에 저장되지 않습니다. LLM 엔진 요청은 사용자의 브라우저에서 직접 구성된 API 엔드포인트(OpenAI, DeepSeek 등)로 전송되며 API Key는 로컬 localStorage에만 저장됩니다. 번역 캐시는 브라우저 IndexedDB를 사용합니다. 소스 코드는 GitHub에서 오픈소스로 공개되어 있으며(rockbenben/md-translator) 자체 호스팅이나 구현 감사가 가능합니다."
-        }
-      ],
-      "howto": [
-        {
-          "name": "Markdown 업로드",
-          "text": "하나 이상의 .md 파일을 업로드하거나 입력 영역에 Markdown 콘텐츠를 붙여넣습니다."
-        },
-        {
-          "name": "옵션 구성",
-          "text": "필요에 따라 Front Matter, 코드 블록 및 LaTeX 수식 번역 여부를 선택합니다."
-        },
-        {
-          "name": "번역 및 내보내기",
-          "text": "대상 언어를 선택하고 번역을 클릭. 서식이 보존된 번역된 .md 파일을 다운로드."
         }
       ],
       "features": [
@@ -420,7 +410,11 @@
     "textParser": "텍스트 처리",
     "jsonParser": "JSON 처리",
     "dataParser": "데이터 변환",
-    "otherTools": "기타 도구"
+    "otherTools": "기타 도구",
+    "externalTools": {
+      "legendtalk": "AI 사상가 라운드테이블",
+      "imgprompt": "AI 이미지 프롬프트"
+    }
   },
   "Metadata": {
     "title": "ToolsByAI | 무료 오픈소스 AI 번역 및 데이터 처리 도구",

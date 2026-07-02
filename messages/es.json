@@ -91,6 +91,7 @@
     "batchDownloaded": "Procesamiento completo, el archivo se descargó automáticamente",
     "extractedText": "Texto Extraído",
     "translating": "Traduciendo...",
+    "translateDone": "Traducción completada",
     "multiTranslating": "Traduciendo, total idiomas:",
     "model": "Modelo",
     "sameLanguageTarget": "Idiomas origen y destino iguales; destino ajustado automáticamente a",
@@ -145,7 +146,7 @@
     "requestTimeoutSec": "Tiempo de espera",
     "requestTimeoutSecTooltip": "Espera máxima por solicitud (segundos). El pensamiento de LLM tarda más; se recomiendan 180 s o más.",
     "customExportFilename": "Patrón de nombre de archivo",
-    "customExportFilenameTooltip": "'{'name'}' = nombre original, '{'lang'}' = idioma, '{'ext'}' = extensión, '{'date'}' = fecha, '{'time'}' = hora",
+    "customExportFilenameTooltip": "'{'name'}' = nombre original, '{'lang'}' = idioma, '{'ext'}' = extensión, '{'date'}' = fecha, '{'time'}' = hora; en modo multiidioma se agrega '{'lang'}' automáticamente para evitar conflictos de nombres",
     "partialFailureTitle": "{count} línea(s) fallaron",
     "partialFailureDesc": "Las líneas fallidas conservaron el texto original como marcador de posición, manteniendo el archivo utilizable. Estos fallos suelen ser interrupciones de red o problemas temporales del servicio de traducción — los servicios gratuitos y los servidores autoalojados son especialmente propensos a esto, y no es un problema de tu configuración. Haz clic en Reintentar para continuar (las líneas exitosas vienen de la caché, sin retraducción); si sigue fallando, inténtalo más tarde o prueba otro servicio de traducción. O haz clic en Ver líneas fallidas para gestionarlas manualmente.",
     "retryFailedLines": "Reintentar",
@@ -170,6 +171,7 @@
     "translategemmaUnavailable": "El servicio TranslateGemma está temporalmente inaccesible, asegúrate de que tu servidor local (LM Studio / llama.cpp / Ollama) esté en ejecución y la URL sea correcta.",
     "networkUnavailable": "El servicio de traducción está temporalmente inaccesible — podría ser un problema de red o el servicio está teniendo un percance. Inténtalo de nuevo más tarde o cambia a otro servicio de traducción.",
     "translationTimeout": "La solicitud de traducción agotó el tiempo de espera — podría ser una red lenta o el servicio está tardando demasiado en responder. Inténtalo de nuevo más tarde o cambia a otro servicio de traducción.",
+    "translationTimeoutLocal": "Se agotó el tiempo de la traducción con el modelo local. Un LLM local puede quedarse atascado en un bucle de repetición: reduce max_tokens (el límite de salida) en la configuración avanzada y asegúrate de que el idioma de origen seleccionado coincida con el texto real.",
     "langGroupCommon": "Comunes",
     "langGroupEurope": "Europa",
     "langGroupMiddleEast": "Oriente Medio",
@@ -271,6 +273,8 @@
     "presetUpdated": "Guardado en preset actual",
     "presetDeleteConfirm": "¿Eliminar este preset?",
     "presetEmptyHint": "Aún no hay preajustes — edite y haga clic en Guardar",
+    "presetDefault": "Prompt predeterminado",
+    "presetDefaultReadonly": "El prompt predeterminado es integrado: no se puede modificar ni eliminar. Usa \"Guardar como nuevo ajuste\" para personalizar.",
     "qwenMtDomains": "Avisos de dominio (solo en inglés)",
     "sendSystemPrompt": "Enviar prompt system",
     "sendSystemPromptExtra": "Apague solo cuando el chat template rechaza el rol system — error típico \"Conversations must start with a user prompt\" (p. ej. familia Gemma).",
@@ -328,20 +332,6 @@
         {
           "q": "¿El Markdown traducido se sube a su servidor? ¿Es de código abierto?",
           "a": "Totalmente del lado cliente: la lectura, parseo y solicitudes de traducción Markdown ocurren en su navegador — el contenido original nunca toca nuestros servidores. Las solicitudes del motor LLM van directamente desde su navegador a su endpoint API configurado (OpenAI, DeepSeek, etc.), y las API keys se almacenan solo en el localStorage local. La caché de traducción usa IndexedDB del navegador. El código fuente es de código abierto en GitHub (rockbenben/md-translator), para auto-hospedaje o auditar la implementación."
-        }
-      ],
-      "howto": [
-        {
-          "name": "Subir Markdown",
-          "text": "Suba uno o más archivos .md, o pegue contenido Markdown en el área de entrada."
-        },
-        {
-          "name": "Configurar opciones",
-          "text": "Elija si traducir Front Matter, bloques de código y fórmulas LaTeX según sus necesidades."
-        },
-        {
-          "name": "Traducir y exportar",
-          "text": "Seleccione idioma de destino y haga clic en Traducir. Descargue con formato preservado."
         }
       ],
       "features": [
@@ -420,7 +410,11 @@
     "textParser": "Herramientas Texto",
     "jsonParser": "Herramientas JSON",
     "dataParser": "Herramientas Datos",
-    "otherTools": "Otras Herramientas"
+    "otherTools": "Otras Herramientas",
+    "externalTools": {
+      "legendtalk": "Mesa redonda de pensadores IA",
+      "imgprompt": "Prompts de imágenes IA"
+    }
   },
   "Metadata": {
     "title": "ToolsByAI | Herramientas de Traducción y Dev con IA",

@@ -89,6 +89,7 @@
     "exportedFile": "Esportato",
     "extractedText": "Testo Estratto",
     "translating": "Traduzione in corso...",
+    "translateDone": "Traduzione completata",
     "multiTranslating": "Traduzione in corso, totale lingue:",
     "model": "Modello",
     "sameLanguageTarget": "Lingue sorgente e destinazione uguali; destinazione adattata automaticamente a",
@@ -132,7 +133,7 @@
     "requestTimeoutSec": "Timeout",
     "requestTimeoutSecTooltip": "Attesa massima per richiesta (secondi). Il pensiero LLM richiede più tempo; si consigliano 180 s o più.",
     "customExportFilename": "Modello nome file",
-    "customExportFilenameTooltip": "'{'name'}' = nome originale, '{'lang'}' = lingua, '{'ext'}' = estensione, '{'date'}' = data, '{'time'}' = ora",
+    "customExportFilenameTooltip": "'{'name'}' = nome originale, '{'lang'}' = lingua, '{'ext'}' = estensione, '{'date'}' = data, '{'time'}' = ora; in modalità multilingua '{'lang'}' viene aggiunto automaticamente per evitare conflitti di nome",
     "partialFailureTitle": "{count} riga/righe non riuscite",
     "partialFailureDesc": "Le righe non riuscite hanno mantenuto il testo originale come segnaposto, il file rimane utilizzabile. Questi fallimenti sono solitamente fluttuazioni di rete o instabilità temporanea del servizio di traduzione — i servizi gratuiti e i server auto-ospitati sono particolarmente soggetti a questo, e non è un problema della tua configurazione. Fai clic su Riprova per continuare (le righe riuscite vengono dalla cache, senza ritraduzione); se continua a fallire, riprova più tardi o prova un altro servizio di traduzione. O fai clic su Visualizza righe non riuscite per gestirle manualmente.",
     "retryFailedLines": "Riprova",
@@ -170,6 +171,7 @@
     "translategemmaUnavailable": "Il servizio TranslateGemma è temporaneamente irraggiungibile, assicurati che il tuo server locale (LM Studio / llama.cpp / Ollama) sia in esecuzione e l'URL sia corretto.",
     "networkUnavailable": "Il servizio di traduzione è temporaneamente irraggiungibile — potrebbe essere un problema di rete o il servizio ha un piccolo intoppo. Riprova più tardi o passa a un altro servizio di traduzione.",
     "translationTimeout": "La richiesta di traduzione è scaduta — potrebbe essere una rete lenta o il servizio impiega troppo tempo a rispondere. Riprova più tardi o passa a un altro servizio di traduzione.",
+    "translationTimeoutLocal": "Traduzione con modello locale scaduta. Un LLM locale può bloccarsi in un ciclo di ripetizione: riduci max_tokens (il limite di output) nelle Impostazioni avanzate e assicurati che la lingua di origine selezionata corrisponda al testo effettivo.",
     "langGroupCommon": "Comuni",
     "langGroupEurope": "Europa",
     "langGroupMiddleEast": "Medio Oriente",
@@ -271,6 +273,8 @@
     "presetUpdated": "Salvato nel preset corrente",
     "presetDeleteConfirm": "Eliminare questo preset?",
     "presetEmptyHint": "Nessun preset ancora — modifica e clicca Salva",
+    "presetDefault": "Prompt predefinito",
+    "presetDefaultReadonly": "Il prompt predefinito è integrato: non può essere modificato né eliminato. Usa \"Salva come nuova preimpostazione\" per personalizzare.",
     "qwenMtDomains": "Prompt di dominio (solo in inglese)",
     "sendSystemPrompt": "Invia prompt system",
     "sendSystemPromptExtra": "Disattivare solo quando il chat template rifiuta il ruolo system — errore tipico \"Conversations must start with a user prompt\" (es. famiglia Gemma).",
@@ -328,20 +332,6 @@
         {
           "q": "Il Markdown tradotto viene caricato sul vostro server? È open source?",
           "a": "Completamente lato client: la lettura, parsing e richieste di traduzione Markdown avvengono nel tuo browser — il contenuto originale non tocca mai i nostri server. Le richieste del motore LLM vanno direttamente dal tuo browser al tuo endpoint API configurato (OpenAI, DeepSeek, ecc.), e le API key sono memorizzate solo nel localStorage locale. La cache di traduzione usa IndexedDB del browser. Il codice sorgente è open source su GitHub (rockbenben/md-translator), per self-hosting o audit dell'implementazione."
-        }
-      ],
-      "howto": [
-        {
-          "name": "Carica Markdown",
-          "text": "Carica uno o più file .md o incolla contenuto Markdown."
-        },
-        {
-          "name": "Configura opzioni",
-          "text": "Scegli di tradurre Front Matter, blocchi di codice e formule LaTeX."
-        },
-        {
-          "name": "Traduci ed esporta",
-          "text": "Seleziona lingua. Scarica file .md con formattazione preservata."
         }
       ],
       "features": [
@@ -420,7 +410,11 @@
     "textParser": "Strumenti Testo",
     "jsonParser": "Strumenti JSON",
     "dataParser": "Strumenti Dati",
-    "otherTools": "Altri Strumenti"
+    "otherTools": "Altri Strumenti",
+    "externalTools": {
+      "legendtalk": "Tavola rotonda dei pensatori IA",
+      "imgprompt": "Prompt per immagini IA"
+    }
   },
   "Metadata": {
     "title": "ToolsByAI - Utility Sviluppatori & Traduzione IA Online",

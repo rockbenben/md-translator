@@ -91,6 +91,7 @@
     "batchDownloaded": "Processing complete, file downloaded automatically",
     "extractedText": "Extracted Text",
     "translating": "Translating",
+    "translateDone": "Translation complete",
     "multiTranslating": "Translating, total target languages:",
     "model": "Model",
     "sameLanguageTarget": "Source and target languages are the same; automatically adjusted target to",
@@ -145,7 +146,7 @@
     "requestTimeoutSec": "Timeout",
     "requestTimeoutSecTooltip": "Maximum wait per request (seconds). LLM thinking takes longer; 180s or more recommended.",
     "customExportFilename": "Export Filename Pattern",
-    "customExportFilenameTooltip": "'{'name'}' = original filename, '{'lang'}' = language, '{'ext'}' = extension, '{'date'}' = date, '{'time'}' = time",
+    "customExportFilenameTooltip": "'{'name'}' = original filename, '{'lang'}' = language, '{'ext'}' = extension, '{'date'}' = date, '{'time'}' = time; in multi-language mode '{'lang'}' is added automatically to avoid name clashes",
     "partialFailureTitle": "{count} line(s) failed",
     "partialFailureDesc": "Failed lines kept the original text as a placeholder, so the file stays usable. These failures are usually network blips or temporary upstream hiccups — free services and self-hosted servers are especially prone to this, and it's not a problem with your setup. Click Retry to continue (successful lines come from cache, no re-translation); if it still fails, try again later or switch to a different translation service. Or click View failed lines to handle them manually.",
     "retryFailedLines": "Retry",
@@ -170,6 +171,7 @@
     "translategemmaUnavailable": "TranslateGemma service is temporarily unreachable, please make sure your local server (LM Studio / llama.cpp / Ollama) is running and the URL is correct.",
     "networkUnavailable": "Translation service is temporarily unreachable — could be a network issue or the service is having a hiccup. Please try again later, or switch to a different translation service.",
     "translationTimeout": "Translation request timed out — could be a slow network or the service is taking too long to respond. Please try again later, or switch to a different translation service.",
+    "translationTimeoutLocal": "Local model translation timed out. A local LLM can get stuck in a repeat loop — lower max_tokens (the output cap) in Advanced Settings, and make sure the selected source language matches the actual text.",
     "langGroupCommon": "Common",
     "langGroupEurope": "Europe",
     "langGroupMiddleEast": "Middle East",
@@ -271,6 +273,8 @@
     "presetUpdated": "Saved to current preset",
     "presetDeleteConfirm": "Delete this preset?",
     "presetEmptyHint": "No presets yet — edit and click Save",
+    "presetDefault": "Default prompt",
+    "presetDefaultReadonly": "The default prompt is built-in — it can't be modified or deleted. Use \"Save as new preset\" to customize.",
     "qwenMtDomains": "Domain Prompts (English only)",
     "sendSystemPrompt": "Send system prompt",
     "sendSystemPromptExtra": "Turn off only when the chat template rejects the system role — typical error \"Conversations must start with a user prompt\" (e.g. Gemma family).",
@@ -328,20 +332,6 @@
         {
           "q": "Is the translated Markdown uploaded to your server? Is it open source?",
           "a": "Fully client-side: Markdown reading, parsing, and translation requests all happen in your browser — original content never touches our servers. LLM engine requests go directly from your browser to your configured API endpoint (OpenAI, DeepSeek, etc.), and API keys are stored only in local browser storage. Translation cache uses browser IndexedDB. Source code is open on GitHub (rockbenben/md-translator) for self-hosting or auditing."
-        }
-      ],
-      "howto": [
-        {
-          "name": "Upload Markdown",
-          "text": "Upload one or more .md files, or paste Markdown content into the input area."
-        },
-        {
-          "name": "Configure options",
-          "text": "Choose whether to translate Front Matter, code blocks, and LaTeX formulas based on your needs."
-        },
-        {
-          "name": "Translate and export",
-          "text": "Select target language and click Translate. Download translated .md files with formatting preserved."
         }
       ],
       "features": [
@@ -420,7 +410,11 @@
     "textParser": "Text Tools",
     "jsonParser": "JSON Tools",
     "dataParser": "Data Tools",
-    "otherTools": "Other Tools"
+    "otherTools": "Other Tools",
+    "externalTools": {
+      "legendtalk": "AI Thinkers Roundtable",
+      "imgprompt": "AI Image Prompts"
+    }
   },
   "Metadata": {
     "title": "ToolsByAI | Free Open Source AI Translation & Data Tools",
