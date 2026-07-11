@@ -2,10 +2,8 @@
 
 import React, { useState, useRef } from "react";
 import { Flex, Card, Button, Typography, Input, Upload, Form, Space, App, Tooltip, Spin, Row, Col, Divider, Switch, Collapse, theme } from "antd";
-import {
-  CopyOutlined,
+import { SettingOutlined, CopyOutlined,
   InboxOutlined,
-  SettingOutlined,
   FileTextOutlined,
   ClearOutlined,
   FormatPainterOutlined,
@@ -14,8 +12,7 @@ import {
   InfoCircleOutlined,
   SaveOutlined,
   FileMarkdownOutlined,
-  ControlOutlined,
-} from "@ant-design/icons";
+  ControlOutlined, } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import { getLangDir } from "rtl-detect";
 import { useCopyToClipboard } from "@/app/hooks/useCopyToClipboard";
@@ -519,11 +516,7 @@ const MDTranslator = () => {
         {/* Right Column: Settings and Configuration */}
         <Col xs={24} lg={10} xl={9}>
           <Card
-            title={
-              <Space>
-                <SettingOutlined /> {t("configuration")}
-              </Space>
-            }
+            title={<Space><SettingOutlined /> {t("configuration")}</Space>}
             style={cardStyle}
             extra={
               <Space>
