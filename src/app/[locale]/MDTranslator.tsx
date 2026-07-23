@@ -427,7 +427,7 @@ const MDTranslator = () => {
   };
 
   return (
-    <Spin spinning={isFileProcessing} description="Please wait..." size="large">
+    <Spin spinning={isFileProcessing} description={t("pleaseWait")} size="large">
       <Row gutter={[24, 24]}>
         {/* Left Column: Upload and Main Actions */}
         <Col xs={24} lg={14} xl={15}>

@@ -35,6 +35,7 @@
     "nameRequired": "請填寫術語表名稱"
   },
   "common": {
+    "supportEscapeChars": "支援轉義字元：\\n (換行)、\\r (回車)、\\t (製表符)、\\s (空格)、\\\\ (反斜槓)",
     "skipToContent": "跳至主要內容",
     "fileProcessFailed": "檔案處理失敗，請檢查檔案編碼或換一個檔案",
     "fileReadFailed": "讀取檔案失敗",
@@ -83,6 +84,7 @@
     "extractText": "提取純文字",
     "translationResult": "翻譯結果",
     "copy": "複製",
+    "expand": "展開",
     "remove": "刪除",
     "format": "格式化",
     "formatTooltip": "格式化：移除空行及首尾空格",
@@ -247,6 +249,7 @@
     "userPromptExtra": "自訂翻譯提示詞，留空使用預設。變量說明",
     "for": "為",
     "textToTranslate": "待翻譯文字",
+    "fullText": "全文",
     "chunkSize": "分塊大小",
     "chunkSizeExtra": "多行文字（字幕、Markdown 等）將按此大小分塊翻譯",
     "batchSize": "並發行數",
@@ -258,6 +261,7 @@
     "contextWindow": "上下文行數",
     "contextWindowExtra": "每批包含的行數。值越大請求越少、加速越明顯，但可能超 token 上限",
     "delayTime": "延遲時間",
+    "delayTimeExtra": "兩次請求之間的等待時間。頻繁被限流時調大它降速",
     "useRelay": "中轉 API",
     "useRelayTooltip": "如遇到 CORS 或 403 錯誤，請開啟中轉 API",
     "useRelayOverridden": "已填寫自訂 URL，請求將直達該位址，此開關暫不生效；清空 URL 後恢復",
@@ -266,7 +270,7 @@
     "presetSelect": "選擇預設",
     "presetSave": "另存為新預設",
     "presetDelete": "刪除當前預設",
-    "presetNamePlaceholder": "輸入預設名稱",
+    "presetNamePlaceholder": "預設名稱（如：影視字幕 / 技術文件）",
     "presetSaved": "已另存為新預設",
     "presetDeleted": "已刪除當前預設",
     "presetNameRequired": "請輸入預設名稱",
@@ -299,7 +303,7 @@
     "mdTranslator": {
       "title": "Markdown 翻譯",
       "description": "批次翻譯 Markdown 文檔，保留格式和代碼",
-      "metaTitle": "Markdown 翻譯工具 - 保留程式碼、公式、Front Matter 的 AI 批次翻譯",
+      "metaTitle": "Markdown 翻譯工具 - 保留程式碼、公式、Front Matter AI 翻譯",
       "metaDescription": "Markdown 檔案翻譯，保留程式碼區塊、LaTeX、連結與 Front Matter，適配 Hugo、Jekyll、Docusaurus 檔案站。",
       "faq": [
         {
@@ -345,7 +349,7 @@
     },
     "textSplitter": {
       "title": "文字分割",
-      "description": "智慧分割長文字，適用於 AI 輸入和社交媒體"
+      "description": "按符號、字數或整句拆分長文字，適配 AI 投餵與分段發布"
     },
     "chineseConversion": {
       "title": "簡繁轉換",
@@ -362,6 +366,10 @@
     "dataBatch": {
       "title": "資料批處理",
       "description": "Excel 表格批次去重、欄位提取、文字合併，多規則按序執行"
+    },
+    "textJoiner": {
+      "title": "文字拼接",
+      "description": "多欄文字逐行按範本合併，批次生成 CSV、SQL、JSON"
     },
     "jsonValueExtractor": {
       "title": "JSON 欄位值提取",
@@ -566,6 +574,11 @@
     "reaction4": "看不懂",
     "placeholder": "請留言，無需登錄（填寫郵箱可獲回復提醒）",
     "metaDescription": "意見回饋頁：回報使用問題、提交功能建議、參與工具改進。基於 Waline 評論系統，匿名也可發言。"
+  },
+  "AppError": {
+    "title": "頁面載入出錯",
+    "description": "頁面載入失敗,可能是網站剛更新到新版本,請重新載入。",
+    "reload": "重新載入"
   },
   "NotFound": {
     "title": "頁面未找到",

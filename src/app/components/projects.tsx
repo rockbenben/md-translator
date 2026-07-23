@@ -25,6 +25,7 @@ import {
   ToolOutlined,
   MessageOutlined,
   DiffOutlined,
+  MergeCellsOutlined,
 } from "@ant-design/icons";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
@@ -48,6 +49,7 @@ const TOOL_ICONS: Record<ToolKey, React.ReactNode> = {
   chineseConversion: <SwapOutlined />,
   novelProcessor: <FontSizeOutlined />,
   textToolbox: <CodeOutlined />,
+  textJoiner: <MergeCellsOutlined />,
   textDiff: <DiffOutlined />,
   dataBatch: <ProfileOutlined />,
   jsonValueExtractor: <FileSearchOutlined />,

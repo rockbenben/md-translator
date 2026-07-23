@@ -35,6 +35,7 @@
     "nameRequired": "Nama glosarium wajib diisi"
   },
   "common": {
+    "supportEscapeChars": "Mendukung karakter escape: \\n (baris baru), \\r (kembali), \\t (tab), \\s (spasi), \\\\ (garis miring terbalik)",
     "skipToContent": "Lewati ke konten utama",
     "fileProcessFailed": "Gagal memproses file — periksa encoding-nya atau coba file lain",
     "fileReadFailed": "Gagal membaca file",
@@ -83,6 +84,7 @@
     "extractText": "Ekstrak Teks",
     "translationResult": "Hasil",
     "copy": "Salin",
+    "expand": "selengkapnya",
     "remove": "Hapus",
     "exportFile": "Ekspor",
     "exportAllFile": "Ekspor Semua",
@@ -247,6 +249,7 @@
     "userPromptExtra": "Prompt terjemahan kustom, biarkan kosong untuk default. Variabel:",
     "for": "untuk",
     "textToTranslate": "teks untuk diterjemahkan",
+    "fullText": "teks lengkap",
     "chunkSize": "Ukuran Potongan",
     "chunkSizeExtra": "Teks multi-baris (Subtitle, Markdown) akan dibagi dengan ukuran ini",
     "batchSize": "Baris simultan",
@@ -258,6 +261,7 @@
     "contextWindow": "Baris konteks",
     "contextWindowExtra": "Baris per batch. Lebih tinggi = lebih sedikit permintaan dan lebih cepat, tetapi dapat melebihi batas token model",
     "delayTime": "Penundaan",
+    "delayTimeExtra": "Waktu tunggu antara dua permintaan berurutan. Perbesar jika sering terkena batas laju",
     "useRelay": "Relay API",
     "useRelayTooltip": "Aktifkan relay API jika terjadi kesalahan CORS atau 403",
     "useRelayOverridden": "URL kustom telah diisi — permintaan langsung menuju URL tersebut dan sakelar ini tidak berlaku; kosongkan URL untuk mengaktifkannya kembali",
@@ -266,7 +270,7 @@
     "presetSelect": "Pilih Preset",
     "presetSave": "Simpan sebagai Preset Baru",
     "presetDelete": "Hapus Preset Saat Ini",
-    "presetNamePlaceholder": "Masukkan nama preset",
+    "presetNamePlaceholder": "Nama preset (mis. Subtitel / Dokumen teknis)",
     "presetSaved": "Disimpan sebagai preset baru",
     "presetDeleted": "Preset saat ini dihapus",
     "presetNameRequired": "Silakan masukkan nama preset",
@@ -359,9 +363,13 @@
       "title": "Pemrosesan Teks Pribadi",
       "description": "Pemrosesan data Excel batch — deduplikasi, ekstraksi kolom, gabung teks, aturan berurutan"
     },
+    "textJoiner": {
+      "title": "Penggabung Teks",
+      "description": "Gabungkan beberapa kolom teks baris demi baris dengan template untuk menghasilkan CSV, SQL, dan JSON secara massal"
+    },
     "textSplitter": {
       "title": "Pemisah Teks",
-      "description": "Pemisahan teks panjang cerdas untuk AI dan media sosial"
+      "description": "Bagi teks panjang per pemisah, panjang, atau kalimat — lalu gabungkan lagi"
     },
     "jsonValueExtractor": {
       "title": "Pengekstrak Nilai JSON",
@@ -419,11 +427,11 @@
   },
   "Metadata": {
     "title": "ToolsByAI - Peralatan Data & Terjemahan AI untuk Developer",
-    "description": "ToolsByAI: 17 alat open source gratis untuk penerjemahan subtitle, Markdown, JSON i18n, dan pemrosesan teks/JSON batch. 25+ AI engine.",
+    "description": "ToolsByAI: 17 alat open source untuk menerjemahkan subtitle, Markdown, dan JSON i18n. Tanpa instalasi, berbasis browser.",
     "homeTitle": "Suite ToolsByAI",
     "homeDescription": "20+ alat untuk terjemahan, teks, JSON, dan konversi data. Tingkatkan efisiensi pengembang dan kreator.",
     "ogTitle": "ToolsByAI - Alat Dev AI Gratis dan Open Source",
-    "ogDescription": "ToolsByAI: 17 alat open source gratis untuk penerjemahan subtitle, Markdown, JSON i18n, dan pemrosesan teks/JSON batch. 25+ AI engine."
+    "ogDescription": "ToolsByAI: 17 alat open source untuk menerjemahkan subtitle, Markdown, dan JSON i18n. Tanpa instalasi, berbasis browser."
   },
   "languages": {
     "auto": "Deteksi Otomatis",
@@ -565,7 +573,12 @@
     "reaction3": "Apa?",
     "reaction4": "Bingung",
     "placeholder": "Tinggalkan pesan (tidak perlu login, email opsional untuk balasan)",
-    "metaDescription": "Halaman feedback Tools By AI: laporkan bug, sarankan fitur, atau bagikan ide penggunaan. Berbasis Waline, posting anonim diizinkan, gratis."
+    "metaDescription": "Halaman feedback Tools By AI: laporkan bug, sarankan fitur, atau bagikan ide. Berbasis Waline, posting anonim, gratis."
+  },
+  "AppError": {
+    "title": "Halaman gagal dimuat",
+    "description": "Halaman tidak dapat dimuat — ini bisa terjadi tepat setelah situs diperbarui. Silakan muat ulang.",
+    "reload": "Muat ulang"
   },
   "NotFound": {
     "title": "Halaman Tidak Ditemukan",

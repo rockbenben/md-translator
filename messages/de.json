@@ -35,6 +35,7 @@
     "nameRequired": "Glossarname erforderlich"
   },
   "common": {
+    "supportEscapeChars": "Unterstützt Escape-Zeichen: \\n (Zeilenumbruch), \\r (Wagenrücklauf), \\t (Tab), \\s (Leerzeichen), \\\\ (Backslash)",
     "skipToContent": "Zum Hauptinhalt springen",
     "fileProcessFailed": "Datei konnte nicht verarbeitet werden – prüfen Sie die Kodierung oder versuchen Sie eine andere",
     "fileReadFailed": "Datei konnte nicht gelesen werden",
@@ -83,6 +84,7 @@
     "extractText": "Text extrahieren",
     "translationResult": "Übersetzungsergebnis",
     "copy": "Kopieren",
+    "expand": "mehr",
     "remove": "Entfernen",
     "exportFile": "Exportieren",
     "exportAllFile": "Alle exportieren",
@@ -247,6 +249,7 @@
     "userPromptExtra": "Benutzerdefinierter Übersetzungsprompt, leer lassen für Standard. Variablenbeschreibung",
     "for": "für",
     "textToTranslate": "zu übersetzender Text",
+    "fullText": "Volltext",
     "chunkSize": "Chunk-Größe",
     "chunkSizeExtra": "Mehrzeiliger Text (Untertitel, Markdown usw.) wird in dieser Größe geteilt übersetzt",
     "batchSize": "Parallele Zeilen",
@@ -258,6 +261,7 @@
     "contextWindow": "Kontextzeilen",
     "contextWindowExtra": "Zeilen pro Stapel. Höher = weniger Anfragen und mehr Geschwindigkeit, aber kann das Token-Limit des Modells überschreiten",
     "delayTime": "Verzögerungszeit",
+    "delayTimeExtra": "Wartezeit zwischen aufeinanderfolgenden Anfragen. Erhöhen, wenn du häufig ins Rate-Limit läufst",
     "useRelay": "API-Relay",
     "useRelayTooltip": "Aktivieren Sie API-Relay bei CORS- oder 403-Fehlern",
     "useRelayOverridden": "Eine benutzerdefinierte URL ist gesetzt — Anfragen gehen direkt dorthin, dieser Schalter hat keine Wirkung; URL leeren, um ihn wieder zu aktivieren",
@@ -266,7 +270,7 @@
     "presetSelect": "Voreinstellung wählen",
     "presetSave": "Als neue Voreinstellung speichern",
     "presetDelete": "Aktuelle Voreinstellung löschen",
-    "presetNamePlaceholder": "Name der Voreinstellung eingeben",
+    "presetNamePlaceholder": "Preset-Name (z. B. Untertitel / Technische Doku)",
     "presetSaved": "Als neue Voreinstellung gespeichert",
     "presetDeleted": "Aktuelle Voreinstellung gelöscht",
     "presetNameRequired": "Bitte einen Namen eingeben",
@@ -300,7 +304,7 @@
       "title": "Markdown-Übersetzer",
       "description": "Markdown-Batch-Übersetzung, Format und Code behalten",
       "metaTitle": "Markdown-Übersetzer | Code, LaTeX & Front Matter erhalten",
-      "metaDescription": "Markdown-Übersetzer, erhält Code-Blöcke, LaTeX, Links, Front Matter. 25+ KI-Engines: DeepSeek, Claude, GPT. Für Hugo, Jekyll, Docusaurus.",
+      "metaDescription": "Markdown-Übersetzer: Code-Blöcke, LaTeX, Links, Front Matter. 25+ KI-Engines: DeepSeek, Claude, GPT. Hugo, Jekyll, Docusaurus.",
       "faq": [
         {
           "q": "Welches kostenlose Markdown-Übersetzungstool funktioniert am besten?",
@@ -345,7 +349,7 @@
     },
     "textSplitter": {
       "title": "Text-Splitter",
-      "description": "Smarte Langtext-Teilung für KI und Social Media"
+      "description": "Lange Texte nach Trenner, Länge oder Satz teilen — und wieder zusammenführen"
     },
     "chineseConversion": {
       "title": "Chinesisch-Konvertierung",
@@ -362,6 +366,10 @@
     "dataBatch": {
       "title": "Textprozessor",
       "description": "Excel-Stapelverarbeitung — Deduplizierung, Spaltenextraktion, Textverbindung, mehrere Regeln in Reihenfolge"
+    },
+    "textJoiner": {
+      "title": "Text-Zusammenführer",
+      "description": "Mehrere Textspalten zeilenweise per Vorlage zusammenführen, um im Batch CSV, SQL und JSON zu erzeugen"
     },
     "jsonValueExtractor": {
       "title": "JSON Wert-Extraktor",
@@ -419,11 +427,11 @@
   },
   "Metadata": {
     "title": "ToolsByAI | Kostenlose KI-Dev- & Übersetzungstools",
-    "description": "ToolsByAI: 17 Open-Source-Tools für Untertitel-, Markdown- und JSON-i18n-Übersetzung sowie Text- und JSON-Batch-Verarbeitung. 25+ KI-Engines.",
+    "description": "ToolsByAI: 17 Open-Source-Tools für Untertitel-, Markdown- und JSON-i18n-Übersetzung. Ohne Installation, im Browser.",
     "homeTitle": "ToolsByAI Werkzeugkasten",
     "homeDescription": "20+ Tools für Übersetzung, Text, JSON und Datenkonvertierung. Effizienzsteigerung für Entwickler und Creator.",
     "ogTitle": "ToolsByAI | Kostenlose KI-Dev- & Übersetzungstools",
-    "ogDescription": "ToolsByAI: 17 Open-Source-Tools für Untertitel-, Markdown- und JSON-i18n-Übersetzung sowie Text- und JSON-Batch-Verarbeitung. 25+ KI-Engines."
+    "ogDescription": "ToolsByAI: 17 Open-Source-Tools für Untertitel-, Markdown- und JSON-i18n-Übersetzung. Ohne Installation, im Browser."
   },
   "languages": {
     "auto": "Automatisch",
@@ -566,6 +574,11 @@
     "reaction4": "Verwirrt",
     "placeholder": "Nachricht hinterlassen (kein Login nötig, E-Mail optional für Antwort)",
     "metaDescription": "Feedback-Seite für Tools By AI: Fehler melden, Funktionen vorschlagen, Anwendungsfälle teilen. Basiert auf Waline, anonym möglich."
+  },
+  "AppError": {
+    "title": "Seite konnte nicht geladen werden",
+    "description": "Die Seite konnte nicht geladen werden – das kann direkt nach einem Website-Update passieren. Bitte neu laden.",
+    "reload": "Neu laden"
   },
   "NotFound": {
     "title": "Seite nicht gefunden",

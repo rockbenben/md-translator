@@ -35,6 +35,7 @@
     "nameRequired": "Nom du glossaire requis"
   },
   "common": {
+    "supportEscapeChars": "Supporte caractères d'échappement : \\n (nouvelle ligne), \\r (retour), \\t (tab), \\s (espace), \\\\ (antislash)",
     "skipToContent": "Aller au contenu principal",
     "fileProcessFailed": "Échec du traitement du fichier — vérifiez son encodage ou essayez-en un autre",
     "fileReadFailed": "Échec de la lecture du fichier",
@@ -83,6 +84,7 @@
     "extractText": "Extraire le texte",
     "translationResult": "Résultat",
     "copy": "Copier",
+    "expand": "plus",
     "remove": "Supprimer",
     "exportFile": "Exporter",
     "exportAllFile": "Tout exporter",
@@ -247,6 +249,7 @@
     "userPromptExtra": "Prompt de traduction personnalisé, laisser vide pour défaut. Variables :",
     "for": "pour",
     "textToTranslate": "texte à traduire",
+    "fullText": "texte complet",
     "chunkSize": "Taille de bloc",
     "chunkSizeExtra": "Le texte multiligne (Sous-titres, Markdown) sera divisé par cette taille",
     "batchSize": "Lignes simultanées",
@@ -258,6 +261,7 @@
     "contextWindow": "Lignes de contexte",
     "contextWindowExtra": "Lignes par lot. Plus élevé = moins de requêtes et plus de vitesse, mais peut dépasser la limite de tokens du modèle",
     "delayTime": "Délai",
+    "delayTimeExtra": "Temps d'attente entre deux requêtes successives. Augmentez-le si vous êtes souvent limité",
     "useRelay": "Relais API",
     "useRelayTooltip": "Activez le relais API en cas d'erreurs CORS ou 403",
     "useRelayOverridden": "Une URL personnalisée est définie — les requêtes y sont envoyées directement et cet interrupteur est sans effet ; videz l'URL pour le réactiver",
@@ -266,7 +270,7 @@
     "presetSelect": "Sélectionner un préréglage",
     "presetSave": "Enregistrer comme nouveau préréglage",
     "presetDelete": "Supprimer le préréglage actuel",
-    "presetNamePlaceholder": "Entrez le nom du préréglage",
+    "presetNamePlaceholder": "Nom du préréglage (ex. Sous-titres / Doc technique)",
     "presetSaved": "Enregistré comme nouveau préréglage",
     "presetDeleted": "Préréglage actuel supprimé",
     "presetNameRequired": "Veuillez entrer un nom",
@@ -300,7 +304,7 @@
       "title": "Traducteur Markdown",
       "description": "Traduction Markdown par lot, format et code préservés",
       "metaTitle": "Traducteur Markdown | Préserve code, LaTeX & Front Matter",
-      "metaDescription": "Traducteur Markdown préservant code, LaTeX, liens, Front Matter. 25+ moteurs IA: DeepSeek, Claude, GPT. Pour Hugo, Jekyll, Docusaurus.",
+      "metaDescription": "Traducteur Markdown préservant code, LaTeX, liens, Front Matter. 25+ IA: DeepSeek, Claude, GPT. Hugo, Jekyll, Docusaurus.",
       "faq": [
         {
           "q": "Quel outil gratuit de traduction Markdown fonctionne le mieux ?",
@@ -345,7 +349,7 @@
     },
     "textSplitter": {
       "title": "Découpeur de Texte",
-      "description": "Découpe intelligente de texte long pour IA et réseaux sociaux"
+      "description": "Découper un long texte par séparateur, longueur ou phrase — et le refusionner"
     },
     "chineseConversion": {
       "title": "Conversion chinois",
@@ -362,6 +366,10 @@
     "dataBatch": {
       "title": "Processeur de texte",
       "description": "Traitement par lots de données Excel — déduplication, extraction de colonnes, fusion, règles enchaînées"
+    },
+    "textJoiner": {
+      "title": "Fusionneur de Texte",
+      "description": "Fusionnez plusieurs colonnes de texte ligne par ligne avec des modèles pour générer en lot du CSV, SQL et JSON"
     },
     "jsonValueExtractor": {
       "title": "Extracteur Valeur JSON",
@@ -566,6 +574,11 @@
     "reaction4": "Confus",
     "placeholder": "Laissez un message (pas de connexion requise, email optionnel pour réponse)",
     "metaDescription": "Page de retours pour Tools By AI : signalez bugs, suggérez fonctionnalités, partagez cas d'usage. Basée sur Waline, publication anonyme."
+  },
+  "AppError": {
+    "title": "Échec du chargement de la page",
+    "description": "La page n'a pas pu être chargée — cela peut arriver juste après une mise à jour du site. Veuillez recharger.",
+    "reload": "Recharger"
   },
   "NotFound": {
     "title": "Page introuvable",

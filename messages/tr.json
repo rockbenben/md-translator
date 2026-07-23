@@ -35,6 +35,7 @@
     "nameRequired": "Sözlük adı gerekli"
   },
   "common": {
+    "supportEscapeChars": "Kaçış karakterlerini destekler: \\n (yeni satır), \\r (dönüş), \\t (sekme), \\s (boşluk), \\\\ (ters eğik çizgi)",
     "skipToContent": "Ana içeriğe geç",
     "fileProcessFailed": "Dosya işlenemedi — kodlamasını kontrol edin veya başka bir dosya deneyin",
     "fileReadFailed": "Dosya okunamadı",
@@ -83,6 +84,7 @@
     "extractText": "Metni Çıkar",
     "translationResult": "Sonuç",
     "copy": "Kopyala",
+    "expand": "daha fazla",
     "remove": "Kaldır",
     "exportFile": "Dışa Aktar",
     "exportAllFile": "Tümünü Dışa Aktar",
@@ -247,6 +249,7 @@
     "userPromptExtra": "Özel çeviri istemi, varsayılan için boş bırakın. Değişkenler:",
     "for": "için",
     "textToTranslate": "çevrilecek metin",
+    "fullText": "tam metin",
     "chunkSize": "Parça Boyutu",
     "chunkSizeExtra": "Çok satırlı metin (Altyazı, Markdown) bu boyuta bölünecektir",
     "batchSize": "Eş zamanlı satırlar",
@@ -258,6 +261,7 @@
     "contextWindow": "Bağlam satırları",
     "contextWindowExtra": "Yığın başına satır. Yüksek = daha az istek ve daha hızlı, ancak modelin token sınırını aşabilir",
     "delayTime": "Gecikme",
+    "delayTimeExtra": "Ardışık iki istek arasındaki bekleme süresi. Sık sık hız sınırına takılıyorsanız artırın",
     "useRelay": "API Aktarıcı",
     "useRelayTooltip": "CORS veya 403 hatalarında API aktarıcıyı etkinleştirin",
     "useRelayOverridden": "Özel bir URL ayarlı — istekler doğrudan oraya gider ve bu anahtar etkisizdir; yeniden etkinleştirmek için URL'yi temizleyin",
@@ -266,7 +270,7 @@
     "presetSelect": "Ön Ayar Seç",
     "presetSave": "Yeni Ön Ayar Olarak Kaydet",
     "presetDelete": "Mevcut Ön Ayarı Sil",
-    "presetNamePlaceholder": "Ön ayar adını girin",
+    "presetNamePlaceholder": "Ön ayar adı (örn. Altyazı / Teknik doküman)",
     "presetSaved": "Yeni ön ayar olarak kaydedildi",
     "presetDeleted": "Mevcut ön ayar silindi",
     "presetNameRequired": "Lütfen bir ad girin",
@@ -300,7 +304,7 @@
       "title": "Markdown Çevirici",
       "description": "Toplu Markdown çevirisi, format ve kodu korur",
       "metaTitle": "Markdown Çevirici | Kodu, LaTeX ve Front Matter'ı Korur",
-      "metaDescription": "Markdown çevirmeni: kod blokları, LaTeX, bağlantılar, Front Matter korunur. 25+ AI motoru: DeepSeek, Claude, GPT. Hugo, Jekyll, Docusaurus için.",
+      "metaDescription": "Markdown çevirmeni: kod blokları, LaTeX, Front Matter korunur. 25+ AI motoru: DeepSeek, Claude, GPT. Hugo, Jekyll, Docusaurus.",
       "faq": [
         {
           "q": "Hangi ücretsiz Markdown çeviri aracı en iyi çalışır?",
@@ -345,7 +349,7 @@
     },
     "textSplitter": {
       "title": "Metin Bölücü",
-      "description": "AI ve sosyal medya için akıllı uzun metin bölme"
+      "description": "Uzun metni ayırıcıya, uzunluğa veya cümleye göre böl — sonra yeniden birleştir"
     },
     "chineseConversion": {
       "title": "Bas/Gel Çince Dönüştürücü",
@@ -362,6 +366,10 @@
     "dataBatch": {
       "title": "Kişisel Metin İşleyici",
       "description": "Excel toplu veri işleme — tekilleştirme, sütun çıkarma, metin birleştirme, zincirli kurallar"
+    },
+    "textJoiner": {
+      "title": "Metin Birleştirici",
+      "description": "Birden çok metin sütununu şablonlarla satır satır birleştirerek toplu CSV, SQL ve JSON oluşturun"
     },
     "jsonValueExtractor": {
       "title": "JSON Değer Çıkarıcı",
@@ -565,7 +573,12 @@
     "reaction3": "Ne?",
     "reaction4": "Kafam Karıştı",
     "placeholder": "Mesaj bırakın (giriş gerekmez, yanıt için e-posta isteğe bağlı)",
-    "metaDescription": "Tools By AI geri bildirim sayfası: hata bildir, özellik öner veya kullanım örneklerini paylaş. Waline tabanlı, anonim gönderim mümkün, ücretsiz."
+    "metaDescription": "Tools By AI geri bildirim sayfası: hata bildir, özellik öner, kullanım örneği paylaş. Waline tabanlı, anonim, ücretsiz."
+  },
+  "AppError": {
+    "title": "Sayfa yüklenemedi",
+    "description": "Sayfa yüklenemedi — bu, site güncellemesinden hemen sonra olabilir. Lütfen yeniden yükleyin.",
+    "reload": "Yeniden yükle"
   },
   "NotFound": {
     "title": "Sayfa Bulunamadı",
