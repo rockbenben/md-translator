@@ -2,10 +2,11 @@
 ⚡️ Markdown Translator
 </h1>
 <p align="center">
-    <a href="./README.md">English</a> | 中文
-</p>
-<p align="center">
     <em>翻译 Markdown 不破坏格式 — 标题、代码、公式全保留</em>
+</p>
+
+<p align="center">
+    <a href="./README.md">English</a> · <b>简体中文</b>
 </p>
 
 <p align="center">
@@ -105,14 +106,6 @@ LLM 模式可在每一批请求里携带前后文，提升段落级连贯性和�
 **字幕或 JSON 配置文件怎么办？**
 请用配套工具——字幕翻译器（SRT/ASS/VTT/LRC）和 JSON 翻译（i18next / next-intl / vue-i18n），三者共享同一套引擎配置和 API Key，无需重复设置。
 
-## 技术栈
-
-- **框架**：[Next.js 16](https://nextjs.org/)（App Router）+ React 19 with React Compiler
-- **UI**：[Ant Design 6](https://ant.design/) + [Tailwind CSS 4](https://tailwindcss.com/)
-- **i18n**：[next-intl](https://next-intl-docs.vercel.app/)
-- **缓存**：[idb](https://github.com/jakearchibald/idb)（IndexedDB）
-- **测试**：[Vitest](https://vitest.dev/) —— `restorePlaceholders` 等占位符工具均有单元测试
-
 ## 快速开始
 
 ### 环境要求
@@ -152,7 +145,3 @@ yarn build
 2. 本地执行 `yarn` 与 `yarn dev`
 3. 适当补充测试 / 文档
 4. 提交 PR 并清晰描述变更
-
-## 许可协议
-
-MIT © 2025 [rockbenben](https://github.com/rockbenben)。详见 [LICENSE](./LICENSE)。

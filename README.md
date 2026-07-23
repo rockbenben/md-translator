@@ -2,10 +2,11 @@
 ⚡️ Markdown Translator
 </h1>
 <p align="center">
-    English | <a href="./README-zh.md">中文</a>
-</p>
-<p align="center">
     <em>Translate Markdown & preserve every format — headings, code, formulas, all intact</em>
+</p>
+
+<p align="center">
+    <b>English</b> · <a href="./README.zh.md">简体中文</a>
 </p>
 
 <p align="center">
@@ -105,14 +106,6 @@ No. Reading, parsing, and translation all run client-side. LLM requests go direc
 **What about subtitles or JSON config files?**
 Use the companion tools — Subtitle Translator (SRT/ASS/VTT/LRC) and JSON Translator (i18next / next-intl / vue-i18n) — which share the same engine configs and API keys, so no re-setup is needed.
 
-## Tech Stack
-
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router) + React 19 with the React Compiler
-- **UI**: [Ant Design 6](https://ant.design/) + [Tailwind CSS 4](https://tailwindcss.com/)
-- **i18n**: [next-intl](https://next-intl-docs.vercel.app/)
-- **Caching**: [idb](https://github.com/jakearchibald/idb) (IndexedDB)
-- **Testing**: [Vitest](https://vitest.dev/) — `restorePlaceholders` and other placeholder utilities ship with unit tests
-
 ## Getting Started
 
 ### Requirements
@@ -152,7 +145,3 @@ Contributions are welcome! Feel free to open issues and pull requests.
 2. Run `yarn` and `yarn dev` locally
 3. Add tests / docs when applicable
 4. Submit a PR with a clear description
-
-## License
-
-MIT © 2025 [rockbenben](https://github.com/rockbenben). See [LICENSE](./LICENSE).
