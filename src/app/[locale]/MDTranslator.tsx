@@ -22,17 +22,18 @@ import { useLocalStorage } from "@/app/hooks/useLocalStorage";
 import { useTextStats } from "@/app/hooks/useTextStats";
 import { useExportFilename } from "@/app/hooks/useExportFilename";
 
-import { splitTextIntoLines, downloadFile, splitBySpaces, describeError, isAbortError, isCascadedAbort, isNetworkError, getFileTypePresetConfig } from "@/app/utils";
-import { filterMarkdownLines, PLACEHOLDER_SPLIT_REGEX, PLACEHOLDER_TEST_REGEX, PLACEHOLDER_REPLACE_REGEX, restorePlaceholders } from "./markdownUtils";
+import { splitTextIntoLines, downloadFile, describeError, isAbortError, isCascadedAbort, isNetworkError, getFileTypePresetConfig } from "@/app/utils";
+import { MARKDOWN_DEFAULTS, filterMarkdownLines, PLACEHOLDER_REPLACE_REGEX, restorePlaceholders, splitMarkdownSegments, mergeMarkdownSegments, applyRemoveCharsToMarkdown, applyRemoveCharsToSegments } from "@/app/lib/translation/formats/markdown";
 import { LLM_MODELS } from "@/app/lib/translation";
-import { delay } from "@/app/hooks/translation";
+import { mapSkippingSoftFilled } from "@/app/lib/translation/softFill";
+import { delay } from "@/app/lib/translation/retry";
 import { useLanguageOptions } from "@/app/components/languages";
 import LanguageSelector from "@/app/components/LanguageSelector";
 import ApiStatusBlock from "@/app/components/ApiStatusBlock";
 import ContextTranslationBlock from "@/app/components/ContextTranslationBlock";
 import { useTranslationContext } from "@/app/components/TranslationContext";
 import ResultCard from "@/app/components/ResultCard";
-import TranslationProgressModal from "@/app/components/TranslationProgressModal";
+import TranslationProgressStrip from "@/app/components/TranslationProgressStrip";
 import AdvancedTranslationSettings from "@/app/components/AdvancedTranslationSettings";
 import TranslateFailurePanel from "@/app/components/TranslateFailurePanel";
 
@@ -91,6 +92,7 @@ const MDTranslator = () => {
     failedReason,
     clearFailures,
     markRunHadFailures,
+    runHadFailures,
     hadRunFailures,
     runRetry,
     isScopedRetry,
@@ -100,10 +102,13 @@ const MDTranslator = () => {
     setIsTranslating,
     resetProgress,
     progressPercent,
+    setProgressPercent,
     progressInfo,
     handleLanguageChange,
     handleSwapLanguages,
     validate,
+    requestCancel,
+    isCancelRequested,
     retryCount,
     setRetryCount,
     requestTimeoutSec,
@@ -118,14 +123,12 @@ const MDTranslator = () => {
 
   const [taggedText, setTaggedText] = useState("");
 
-  const [mdOptions, setMdOptions] = useLocalStorage("md-translator-options", {
-    translateFrontmatter: false,
-    translateMultilineCode: false,
-    translateLatex: false,
-    translateLinkText: true,
-  });
+  // 默认值与 CLI 共用 MARKDOWN_DEFAULTS(formats/markdown)——改默认只动那一处。
+  // options 展开成新对象:useLocalStorage 的初值会被 setMdOptions 路径引用,
+  // 不能让共享常量对象有被间接改写的机会。
+  const [mdOptions, setMdOptions] = useLocalStorage("md-translator-options", { ...MARKDOWN_DEFAULTS.options });
   const [rawMode, setRawMode] = useLocalStorage("md-translator-rawMode", false);
-  const [contextAware, setContextAware] = useLocalStorage("md-translator-contextAware", false);
+  const [contextAware, setContextAware] = useLocalStorage("md-translator-contextAware", MARKDOWN_DEFAULTS.contextAware);
   // 上下文感知只对 LLM 生效(MT 不走上下文路径),它要求的 raw 模式按【生效中】
   // 派生为覆盖层,不写穿用户自己的 rawMode 偏好 —— 事件式 setRawMode(true) 曾把
   // rawMode 永久写成 true:之后切到 MT 服务,上下文感知块随 LLM 条件隐藏,raw
@@ -140,6 +143,14 @@ const MDTranslator = () => {
   // 批量翻译时统计失败文件数;handleMultipleTranslate 开始时重置,结束时读取以决定汇总消息。
   // 单文件模式(runTranslation 路径)下也会被写,但不会被读,无副作用。
   const failedFilesRef = useRef(0);
+  // 【记一次文件级失败,只走这一个入口】。此前是两套并行记账:failedFilesRef
+  // 只喂末尾的汇总 toast,markRunHadFailures 才是进度条能看见的信号 —— 结果
+  // 批量里第一个文件格式不支持时只 bump 了 ref,进度条照样打绿色「翻译完成
+  // 100%」,正压在「已导出 (4/5)」上面。合成一个函数,漏不掉。
+  const noteFileFailure = () => {
+    failedFilesRef.current++;
+    markRunHadFailures();
+  };
   // 记录 translatedText 对应的目标语种,handleExportFile 用它生成文件名;
   // 多语言模式下 translatedText 是 previewLang(常规跑 = targetLangs[0];scoped
   // 重试时保持上一次预览的语种)而非主 targetLanguage,不记录的话导出文件名会
@@ -167,22 +178,9 @@ const MDTranslator = () => {
    * 2. 对每一行根据预设的占位符规则进行分割，只调用翻译 API 翻译非占位符片段；
    * 3. 组装翻译后的行，并最终将占位符还原为原始内容。
    */
-  // removeChars 工具:跳过占位符 token,只清理可见译文段(见调用处注释)
-  const applyRemoveChars = (text: string): string => {
-    if (!removeChars.trim()) return text;
-    const charsToRemove = splitBySpaces(removeChars);
-    return text
-      .split(PLACEHOLDER_SPLIT_REGEX)
-      .map((seg) => {
-        if (PLACEHOLDER_TEST_REGEX.test(seg)) return seg;
-        let cleaned = seg;
-        charsToRemove.forEach((char) => {
-          cleaned = cleaned.replaceAll(char, "");
-        });
-        return cleaned;
-      })
-      .join("");
-  };
+  // removeChars 工具:跳过占位符 token,只清理可见译文段(实现在
+  // formats/markdown,与 CLI 共用同一份 —— 见调用处注释)
+  const applyRemoveChars = (text: string): string => applyRemoveCharsToMarkdown(text, removeChars);
 
   const performTranslation = async (sourceText: string, fileNameSet?: string, fileIndex?: number, totalFiles?: number) => {
     // On a failure-panel retry (runRetry) this is narrowed to the langs still
@@ -190,10 +188,9 @@ const MDTranslator = () => {
     const targetLangs = getActiveTargetLangs();
     if (multiLanguageMode && targetLangs.length === 0) {
       message.error(t("noTargetLanguage"));
-      failedFilesRef.current++;
-      // 不标记失败的话 runTranslation 返回 true → 绿色"已处理"toast 跟错误
-      // toast 同屏自相矛盾。
-      markRunHadFailures();
+      // noteFileFailure 已含 markRunHadFailures:不标记的话 runTranslation
+      // 返回 true → 绿色"已处理"toast 跟错误 toast 同屏自相矛盾。
+      noteFileFailure();
       return;
     }
     const fileName = fileNameSet || multipleFiles[0]?.name || "markdown.md";
@@ -223,56 +220,28 @@ const MDTranslator = () => {
     let hasFailedLang = false;
 
     for (const currentTargetLang of targetLangs) {
+      // 取消刹车:translateBatch 的入口守卫本来也会把后续语言逐个抛掉(级联标记
+      // → 下面 catch 静默 continue),在这里刹住只是不做那 N 次空转。
+      if (isCancelRequested()) break;
       let translatedTextWithPlaceholders = "";
       try {
         if (!effectiveRawMode) {
           // 对每一行进行处理，分割占位符与普通文本，仅翻译普通文本部分。不处理加粗文本格式，否则对语义伤害较大。
-          // 第一步：收集所有待翻译片段及其位置信息
-          const textsToTranslate: string[] = [];
-          // 与 textsToTranslate 平行:每个片段所在的源文件物理行号(同一行拆出
-          // 的多个片段共享行号)。失败面板靠它指向真实源行 —— 片段序数跟行号
-          // 无关(链接/代码拆分后一行多段,且折叠占位符一行顶多行)。
-          const textLineNumbers: number[] = [];
-          const lineSegments: { segments: string[]; mapping: ({ type: "placeholder" | "empty"; value: string } | { type: "text"; index: number; leading: string; trailing: string })[] }[] = [];
-
-          contentLines.forEach((line, lineIdx) => {
-            const segments = line.split(PLACEHOLDER_SPLIT_REGEX);
-            const mapping: (typeof lineSegments)[number]["mapping"] = [];
-            for (const segment of segments) {
-              if (PLACEHOLDER_TEST_REGEX.test(segment)) {
-                mapping.push({ type: "placeholder", value: segment });
-              } else {
-                const leadingSpace = segment.match(/^\s*/)?.[0] || "";
-                const trailingSpace = segment.match(/\s*$/)?.[0] || "";
-                const trimmedSegment = segment.trim();
-                if (!trimmedSegment) {
-                  mapping.push({ type: "empty", value: segment });
-                } else {
-                  mapping.push({ type: "text", index: textsToTranslate.length, leading: leadingSpace, trailing: trailingSpace });
-                  textLineNumbers.push(sourceLineNumbers[lineIdx]);
-                  textsToTranslate.push(trimmedSegment);
-                }
-              }
-            }
-            lineSegments.push({ segments, mapping });
-          });
+          // 第一步：收集所有待翻译片段及其位置信息(切分/回填在 lib/translation/formats/markdown，与 CLI 共用)
+          const { textsToTranslate, textLineNumbers, lineSegments } = splitMarkdownSegments(contentLines, sourceLineNumbers);
 
           // 第二步：一次性翻译所有片段（translateBatch 内部已有 pLimit 并发控制）
-          const translatedTexts = await translateBatch(textsToTranslate, translationMethod, currentTargetLang, fileIndex, totalFiles, undefined, { lineNumbers: textLineNumbers, fileName });
+          const softFilled = new Set<number>();
+          const translatedTexts = await translateBatch(textsToTranslate, translationMethod, currentTargetLang, fileIndex, totalFiles, undefined, { lineNumbers: textLineNumbers, fileName, collectSoftFilled: softFilled });
 
-          // 第三步：回填翻译结果
-          const finalTranslatedLines = lineSegments.map(({ mapping }) =>
-            mapping
-              .map((entry) => {
-                if (entry.type === "text") return entry.leading + translatedTexts[entry.index] + entry.trailing;
-                return entry.value;
-              })
-              .join(""),
-          );
+          // 第三步：逐片段清理 removeChars(软填片段原样保留),再回填
           // removeChars 必须在占位符还原【之前】应用,且跳过占位符 token 本身
           // —— 还原后应用会损坏受保护的代码块/链接/LaTeX;字符命中 <<<…>>>
-          // 会毁掉占位符导致泄漏。
-          translatedTextWithPlaceholders = applyRemoveChars(finalTranslatedLines.join("\n"));
+          // 会毁掉占位符导致泄漏。合并【之前】做:合并后的字符串里定位不到软填
+          // 片段的边界,只能整行豁免,同行成功译出的片段会跟着留下 removeChars
+          // 字符(共用助手,CLI markdown handler 走同一份)。
+          const cleanedTexts = applyRemoveCharsToSegments(translatedTexts, softFilled, removeChars);
+          translatedTextWithPlaceholders = mergeMarkdownSegments(lineSegments, cleanedTexts).join("\n");
 
           // 单次正则扫描 + Map 查表还原所有占位符 (O(text.length))。
           // 因为占位符自带 <<<...>>> 分隔符,literal 比较不会发生 prefix 重叠,
@@ -293,8 +262,10 @@ const MDTranslator = () => {
           // Raw text mode: translate all lines
           // If context mode is enabled, use context-aware translation with markdown type
           // (lines 就是完整物理行数组,行号走 i+1 默认值,只需带上文件名)
-          const translatedLines = await translateBatch(lines, translationMethod, currentTargetLang, fileIndex, totalFiles, contextAware ? "markdown" : undefined, { fileName });
-          translatedTextWithPlaceholders = applyRemoveChars(translatedLines.join("\n"));
+          const rawSoftFilled = new Set<number>();
+          const translatedLines = await translateBatch(lines, translationMethod, currentTargetLang, fileIndex, totalFiles, contextAware ? "markdown" : undefined, { fileName, collectSoftFilled: rawSoftFilled });
+          // raw 模式下 1:1 对应,软填行逐行跳过。
+          translatedTextWithPlaceholders = mapSkippingSoftFilled(translatedLines, rawSoftFilled, applyRemoveChars).join("\n");
         }
 
         // Create language-specific file name for download
@@ -328,7 +299,7 @@ const MDTranslator = () => {
       }
     }
 
-    if (hasFailedLang) failedFilesRef.current++;
+    if (hasFailedLang) noteFileFailure();
   };
 
   const handleMultipleTranslate = async () => {
@@ -366,15 +337,29 @@ const MDTranslator = () => {
             // Decode/read failure: mark this file failed (so succeeded=total-failed is
             // accurate) and unblock the loop.
             () => {
-              failedFilesRef.current++;
+              noteFileFailure();
               resolve();
             }
           );
         });
         // 中途导航离开:后续文件只会逐个快速级联失败,汇总 toast 也会弹在
-        // 用户切去的页面上 —— 直接收工。
-        if (isDisposed()) return;
+        // 用户切去的页面上 —— 直接收工。取消同理:requestCancel 已弹过提示,
+        // 「已导出 (n/m)」的汇总只会把一次主动喊停说成一次半失败。
+        if (isDisposed() || isCancelRequested()) return;
       }
+
+      // 非取消结束时把进度钉到 100%,与 JSONTranslator 一致。
+      // 不钉的话:批量里有文件被跳过(格式不支持 / 解码失败)时进度只走到
+      // (成功文件数/总数)*100 —— 进度条据 percent<100 判为 stopped,对着一次用户
+      // 【没有】取消的运行打「已停止」,并把 failed / lineFailures 两个信号整个
+      // 丢掉(doneWithFailures 以 done 为前提),正是 noteFileFailure 与
+      // translateDoneIncomplete 要覆盖的场景。
+      // 取消的 run 不钉:钉上去等于替一次主动喊停亮绿灯。
+      // `p > 0 ? 100 : p` 与 runTranslation 的单文件钉【同一条规则】:批量里
+      // 每个文件都在发请求前就失败时(格式不支持 / 解码失败),makeUpdateProgress
+      // 从未跑过、percent 恒为 0,无条件钉会显示 100% 的琥珀色「INCOMPLETE」——
+      // 声称有行保留了原文,而失败面板是空的。进度动过才钉。
+      if (!isCancelRequested()) setProgressPercent((p) => (p > 0 ? 100 : p));
 
       // 部分/全失败时不报"已导出"(per-file error toast 已经告知细节),只在有成功时显示汇总。
       // hadRunFailures() 覆盖行级软失败(provider 故障时文件是原文副本)。
@@ -456,6 +441,7 @@ const MDTranslator = () => {
             }
             style={cardStyle}>
             <Dragger
+              disabled={isTranslating}
               customRequest={({ file }) => {
                 clearResults();
                 handleFileUpload(file as File);
@@ -481,6 +467,7 @@ const MDTranslator = () => {
 
             {uploadMode === "single" && (
               <SourceArea
+                locked={isTranslating}
                 sourceText={sourceText}
                 setSourceText={setSourceText}
                 stats={sourceStats}
@@ -510,6 +497,20 @@ const MDTranslator = () => {
                 </Button>
               )}
             </Flex>
+
+            <TranslationProgressStrip
+              isTranslating={isTranslating}
+              percent={progressPercent}
+              onCancel={requestCancel}
+              resumable={useCache}
+              onDismiss={resetProgress}
+              multiLanguageMode={multiLanguageMode}
+              targetLanguageCount={targetLanguages.length}
+              failed={failedCount > 0 || failedLangs.length > 0 || runHadFailures}
+              lineFailures={failedCount > 0}
+              currentCount={progressInfo.current}
+              totalCount={progressInfo.total}
+            />
           </Card>
         </Col>
 
@@ -559,6 +560,7 @@ const MDTranslator = () => {
                 handleSwapLanguages={handleSwapLanguages}
                 setTargetLanguages={setTargetLanguages}
                 setMultiLanguageMode={setMultiLanguageMode}
+                disabled={isTranslating}
               />
             </Form>
 
@@ -606,6 +608,7 @@ const MDTranslator = () => {
                               <span>{tMarkdown("tFrontmatter")}</span>
                             </Tooltip>
                             <Switch
+                              disabled={isTranslating}
                               size="small"
                               checked={mdOptions.translateFrontmatter}
                               onChange={(checked) => setMdOptions((prev) => ({ ...prev, translateFrontmatter: checked }))}
@@ -617,6 +620,7 @@ const MDTranslator = () => {
                               <span>{tMarkdown("tCodeBlocks")}</span>
                             </Tooltip>
                             <Switch
+                              disabled={isTranslating}
                               size="small"
                               checked={mdOptions.translateMultilineCode}
                               onChange={(checked) => setMdOptions((prev) => ({ ...prev, translateMultilineCode: checked }))}
@@ -628,6 +632,7 @@ const MDTranslator = () => {
                               <span>{tMarkdown("tLatex")}</span>
                             </Tooltip>
                             <Switch
+                              disabled={isTranslating}
                               size="small"
                               checked={mdOptions.translateLatex}
                               onChange={(checked) => setMdOptions((prev) => ({ ...prev, translateLatex: checked }))}
@@ -639,6 +644,7 @@ const MDTranslator = () => {
                               <span>{tMarkdown("tLinkText")}</span>
                             </Tooltip>
                             <Switch
+                              disabled={isTranslating}
                               size="small"
                               checked={mdOptions.translateLinkText}
                               onChange={(checked) => setMdOptions((prev) => ({ ...prev, translateLinkText: checked }))}
@@ -662,7 +668,7 @@ const MDTranslator = () => {
                           <Tooltip title={tMarkdown("rawTranslationModeTooltip")}>
                             <span>{tMarkdown("rawTranslationMode")}</span>
                           </Tooltip>
-                          <Switch size="small" checked={effectiveRawMode} onChange={setRawMode} disabled={contextAwareActive} aria-label={tMarkdown("rawTranslationMode")} />
+                          <Switch size="small" checked={effectiveRawMode} onChange={setRawMode} disabled={contextAwareActive || isTranslating} aria-label={tMarkdown("rawTranslationMode")} />
                         </Flex>
                       </section>
                     </Flex>
@@ -678,6 +684,7 @@ const MDTranslator = () => {
                   ),
                   children: (
                     <AdvancedTranslationSettings
+                      disabled={isTranslating}
                       customFileName={customFileName}
                       setCustomFileName={setCustomFileName}
                       removeChars={removeChars}
@@ -705,7 +712,6 @@ const MDTranslator = () => {
         lines={failedLines}
         failedLangs={failedLangs}
         reason={failedReason}
-        onClose={clearFailures}
         disabled={isTranslating}
         onRetry={() => runRetry(() => (uploadMode === "single" ? handleSingleTranslate() : handleMultipleTranslate()))}
       />
@@ -755,16 +761,6 @@ const MDTranslator = () => {
           </Row>
         </div>
       )}
-
-      <TranslationProgressModal
-        isTranslating={isTranslating}
-        percent={progressPercent}
-        onDismiss={resetProgress}
-        multiLanguageMode={multiLanguageMode}
-        targetLanguageCount={targetLanguages.length}
-        currentCount={progressInfo.current}
-        totalCount={progressInfo.total}
-      />
 
       <MultiLanguageSettingsModal
         open={multiLangModalOpen}

@@ -1,4 +1,5 @@
-import { splitTextIntoLines } from "@/app/utils";
+import { splitTextIntoLines, splitBySpaces } from "@/app/utils/textUtils";
+import { mapSkippingSoftFilled } from "../softFill";
 
 /**
  * Markdown 翻译选项配置
@@ -13,6 +14,23 @@ export interface MarkdownOptions {
   /** 是否翻译链接文本 */
   translateLinkText: boolean;
 }
+
+/**
+ * Markdown 翻译的默认值 —— 网页端(MDTranslator 的 useLocalStorage 初值)与
+ * CLI(cliFormat 的 markdown handler,flag 只做显式覆盖)共用的单一来源。
+ * 曾经两边各写一份、靠 CLAUDE.md 一句「要一起动」对齐 —— 改这里,两边一起变。
+ * contextAware 默认关:Markdown 结构化保护(占位符)与上下文批处理互斥,
+ * 开上下文即隐含 raw,不该是默认。
+ */
+export const MARKDOWN_DEFAULTS: { contextAware: boolean; options: MarkdownOptions } = {
+  contextAware: false,
+  options: {
+    translateFrontmatter: false,
+    translateMultilineCode: false,
+    translateLatex: false,
+    translateLinkText: true,
+  },
+};
 
 /**
  * 占位符类型模式（单一来源，修改此处即可更新所有正则）
@@ -541,4 +559,103 @@ export const restorePlaceholders = (text: string, maps: PlaceholderMaps): string
     out = next;
   }
   return out;
+};
+
+/** 一行拆出的片段回填计划:占位符/空白原样返回,text 片段按 index 取译文。 */
+export type MarkdownLineSegments = {
+  mapping: ({ type: "placeholder" | "empty"; value: string } | { type: "text"; index: number; leading: string; trailing: string })[];
+};
+
+/**
+ * 结构化模式的 removeChars:【逐片段】清理译文,软填片段原样保留。
+ *
+ * 在【合并之前】做,而不是清理合并后的行。合并后那个字符串里已经没法定位软填
+ * 片段的边界(它的内容可能与同行别的片段重复),只能整行豁免 —— 于是一行里
+ * 一个片段瞬时 5xx,同行其它【成功译出】的片段也跟着保留 removeChars 字符,
+ * 用户明确要求删掉的东西留在产物里,且没有任何迹象表明这跟另一个片段的失败有关。
+ *
+ * 逐片段与整行清理【输出等价】(所以这不是行为变更,只是把豁免范围收窄到该
+ * 豁免的那一个片段):合并后的行 = 占位符 + 首尾空白 + 译文片段,而占位符本就
+ * 不清理、空白也永远不会被清理(splitBySpaces 决定了 removeChars 的 token 不含
+ * 空白)。Markdown 语法(`## `、`- ` 等)在 trim 后属于 text 片段本身,照样清到。
+ *
+ * 走 mapSkippingSoftFilled(softFill.ts)而不是自己写跳过:那条「软填槽位不加工」
+ * 的规则收在一处,五个消费者共用。
+ */
+export const applyRemoveCharsToSegments = (translatedTexts: string[], softFilled: Set<number>, removeChars: string): string[] =>
+  mapSkippingSoftFilled(translatedTexts, softFilled, (text) => applyRemoveCharsToMarkdown(text, removeChars));
+
+/**
+ * 结构化模式第一步:把每个内容行按占位符切开,只把【普通文本片段】收进待翻译
+ * 列表。占位符(代码/链接/LaTeX/HTML …)与纯空白片段不进 wire —— 送去翻译会
+ * 被模型改写或吞掉,还原时就对不上了。不拆加粗等行内格式:对语义伤害更大。
+ *
+ * textLineNumbers 与 textsToTranslate 平行:同一行拆出的多个片段共享源行号,
+ * 失败面板据此指向真实物理行(片段序数与行号无关 —— 一行可拆多段,折叠占位符
+ * 一行又可顶多行)。
+ *
+ * 组件与 CLI 共用,避免两处各写一份切分/回填(错位只会在其中一处显形)。
+ */
+export const splitMarkdownSegments = (contentLines: string[], sourceLineNumbers: number[]): { textsToTranslate: string[]; textLineNumbers: number[]; lineSegments: MarkdownLineSegments[] } => {
+  const textsToTranslate: string[] = [];
+  const textLineNumbers: number[] = [];
+  const lineSegments: MarkdownLineSegments[] = [];
+
+  contentLines.forEach((line, lineIdx) => {
+    const segments = line.split(PLACEHOLDER_SPLIT_REGEX);
+    const mapping: MarkdownLineSegments["mapping"] = [];
+    for (const segment of segments) {
+      if (PLACEHOLDER_TEST_REGEX.test(segment)) {
+        mapping.push({ type: "placeholder", value: segment });
+      } else {
+        const leadingSpace = segment.match(/^\s*/)?.[0] || "";
+        const trailingSpace = segment.match(/\s*$/)?.[0] || "";
+        const trimmedSegment = segment.trim();
+        if (!trimmedSegment) {
+          mapping.push({ type: "empty", value: segment });
+        } else {
+          mapping.push({ type: "text", index: textsToTranslate.length, leading: leadingSpace, trailing: trailingSpace });
+          textLineNumbers.push(sourceLineNumbers[lineIdx]);
+          textsToTranslate.push(trimmedSegment);
+        }
+      }
+    }
+    // 只留 mapping:原实现同时存了 segments,但回填只读 mapping,从未被使用。
+    lineSegments.push({ mapping });
+  });
+
+  return { textsToTranslate, textLineNumbers, lineSegments };
+};
+
+/** 结构化模式第三步:按切分计划回填译文,原样保留占位符与首尾空白。 */
+export const mergeMarkdownSegments = (lineSegments: MarkdownLineSegments[], translatedTexts: string[]): string[] =>
+  lineSegments.map(({ mapping }) =>
+    mapping
+      .map((entry) => {
+        if (entry.type === "text") return entry.leading + translatedTexts[entry.index] + entry.trailing;
+        return entry.value;
+      })
+      .join(""),
+  );
+
+/**
+ * removeChars 的 Markdown 版:跳过 <<<…>>> 占位符 token,只清理可见译文段。
+ * 网页端(MDTranslator)与 CLI 共用同一份 —— 字符命中占位符会毁掉 token,
+ * restorePlaceholders 匹配不上,受保护块整块丢失且字面 token 泄漏进输出。
+ * 必须在 restorePlaceholders【之前】调用(还原后清理会损坏受保护正文)。
+ */
+export const applyRemoveCharsToMarkdown = (text: string, removeChars: string): string => {
+  if (!removeChars.trim()) return text;
+  const charsToRemove = splitBySpaces(removeChars);
+  return text
+    .split(PLACEHOLDER_SPLIT_REGEX)
+    .map((seg) => {
+      if (PLACEHOLDER_TEST_REGEX.test(seg)) return seg;
+      let cleaned = seg;
+      charsToRemove.forEach((char) => {
+        cleaned = cleaned.replaceAll(char, "");
+      });
+      return cleaned;
+    })
+    .join("");
 };
