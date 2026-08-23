@@ -164,7 +164,7 @@ const useTranslationState = () => {
   };
 
   // Extracted concerns
-  const { isTranslating, setIsTranslating, progressPercent, setProgressPercent, progressInfo, abortControllerRef, disposedRef, makeUpdateProgress, resetProgress } = useTranslationProgress();
+  const { isTranslating, setIsTranslating, progressPercent, setProgressPercent, progressInfo, abortControllerRef, disposedRef, makeUpdateProgress, resetProgress, liveLinesStore, clearLiveLines, recordLiveLine, markLiveLinesFailed } = useTranslationProgress();
 
   // ─── 取消 ────────────────────────────────────────────────────────────────
   // 取消【完全复用】既有的级联中止链路:abort 本轮 controller → 在飞请求与
@@ -395,9 +395,11 @@ const useTranslationState = () => {
   //    try/finally 统一管;这里自己开关会与外层冲突,触发 progress modal 闪烁。
   // 2. 语言不支持只报错,不自动改 translationMethod(旧版偷偷 fallback 到
   //    DEFAULT_API,用户察觉不到 method 被换);换语言还是换 method 交给用户。
-  // 3. test ping 只对 deepl/deeplx/llm/gtxFreeAPI/translategemma(免费/自托管/
-  //    本地,可用性不稳)提前探测;付费 API 假定 key 可用,出错让翻译请求自己报。
-  // 4. ping 失败只有 deeplx 自动 fallback(自托管代理最易配错/挂);其余 4 个
+  // 3. test ping 只对 PREFLIGHT_PROBE_METHODS(免费共享 / 自托管本地,可用性
+  //    不稳且探测免费)提前探测;付费 API 假定 key 可用,出错让翻译请求自己报。
+  //    成员清单与判据都在 registry.ts 那个集合的注释里 —— 这里【不再罗列】,
+  //    抄一份名字到注释里的下场是它已经漏掉过 edgeFreeAPI。
+  // 4. ping 失败只有 deeplx 自动 fallback(自托管代理最易配错/挂);其余成员
   //    失败通常是真问题(key 错、服务真不可用),fallback 没意义。
   const validate = async () => {
     // 每轮 run 的唯一共用入口(runTranslation 与三个工具的自有循环都先走这里):
@@ -627,6 +629,15 @@ const useTranslationState = () => {
         setRunHadFailures(true);
         setFailedCount((prev) => prev + outcome.failures.length);
         setFailedLines((prev) => [...prev, ...outcome.failures]);
+        // 实时面板把已上屏的槽按 index 标记为「未译出」。绝大多数失败行压根
+        // 没上过屏(引擎不发射失败行),markLiveLinesFailed 对它们是 no-op;
+        // 真正要处理的是【先成功后作废】的槽 —— 上下文路径补发过缓存命中的
+        // 行、随后整批 purge 重译又失败,面板上那一行必须翻成琥珀,不能留着
+        // 一份看起来译好了的旧译文。
+        // ⚠ 只喂【本次 outcome】的 failures,不是累计值:index 是文件内下标,
+        // 多语言/多文件循环里换个文件就换了一套坐标,喂累计值会照着上一个
+        // 文件的下标去标本文件的行。
+        markLiveLinesFailed(outcome.failures.map((f) => f.index).filter((i): i is number => i !== undefined));
         if (lastErrorRef.current) setFailedReason(lastErrorRef.current);
       }
 
@@ -776,6 +787,13 @@ const useTranslationState = () => {
     // 自行开关。Progress modal 在 validate 的 test ping 阶段也保持可见,体验连续。
     setIsTranslating(true);
     resetProgress();
+    // ⚠ 必须在这里清实时行,不能只靠下游 performTranslation 的语言循环 ——
+    // isTranslating 一置真面板就挂载,而紧接着的 `await validate()` 是一次
+    // 【真实网络探测】(macrotask,慢端点可达数秒),React 早已提交渲染:
+    // 这段时间面板会带着【上一个文件】的译文当作本轮的实时输出展示。批量路径
+    // (工具页的 handleMultipleTranslate)本来就在 validate 前清,两个入口必须
+    // 对称,否则只有单文件路径复现,而它才是默认用法。
+    clearLiveLines();
     glossarySnapshotRef.current = new Map();
     try {
       const isValid = await validate();
@@ -858,6 +876,11 @@ const useTranslationState = () => {
     isTranslating,
     setIsTranslating,
     resetProgress,
+    liveLinesStore,
+    clearLiveLines,
+    recordLiveLine,
+    // markLiveLinesFailed 【不】导出:失败标记只有引擎回包这一个正确时机
+    // (translateBatch 里那处),从外面驱动就又是一个「就标一行」的口子。
     apiSettingsOpen,
     setApiSettingsOpen,
     progressPercent,

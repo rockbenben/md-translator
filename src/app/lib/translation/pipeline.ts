@@ -27,17 +27,18 @@ import { generateCacheKey, generateCacheSuffix } from "./cache";
 import { cleanTranslatedText, splitTextIntoChunks } from "./utils";
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_USER_PROMPT } from "./config";
 import { applyGlossaryToText, buildGlossaryPromptBlock, buildStrictGlossaryPromptBlock, filterTermsMatchingText, findGlossaryViolations, type GlossaryTerm } from "./glossary";
-import { getRetryConfig, rateLimitGate, abortableSleep, isAuthError, DEFAULT_BATCH_SIZE, DEFAULT_RETRY_COUNT, DEFAULT_RETRY_TIMEOUT, type UserRetryConfig } from "./retry";
-import { extractTranslatedLinesWithNumbers, buildContextPrompt, isBlankLine, prefillFromLineCache } from "./contextTranslation";
+import { getRetryConfig, rateLimitGate, abortableSleep, isAuthError, isRetryableError, DEFAULT_BATCH_SIZE, DEFAULT_RETRY_COUNT, DEFAULT_RETRY_TIMEOUT, type UserRetryConfig } from "./retry";
+// 自托管的那几家（llm / translategemma / milmmt）跑在本地运行时上，超时的主导
+// 原因不是网络/云服务，而是请求在单槽服务器上排队、或模型卡在复读循环，
+// 所以给专门的提示而不是通用的“服务慢，换一个”。
+// ⚠ 【直接用 URL_IS_PRIMARY_CRED，不另维一份名单】—— 这里曾经有个
+// LOCAL_TIMEOUT_HINT_METHODS，与它逐字相等：“哪几家是自托管”就是同一件事，
+// 两份名单分在两个文件里，下一个自托管 provider 志必只加一处，而漏掉这一
+// 处只会让错误提示退化（静默）。PREFLIGHT_PROBE_METHODS 同类，已记在 CLAUDE.md。
+import { URL_IS_PRIMARY_CRED } from "./registry";
+import { extractTranslatedLinesWithNumbers, findAdjacentDuplicateSlots, buildContextPrompt, isBlankLine, prefillFromLineCache } from "./contextTranslation";
 import { isAbortError, formatErrorWithCause } from "@/app/utils/errorUtils";
 
-// Methods that run against a LOCAL runtime (Ollama / LM Studio / llama.cpp),
-// where a per-request timeout most often means the model stalled in a repeat
-// loop or is just slow — NOT a network/cloud-service issue. A timeout on these
-// gets a method-specific hint (lower max_tokens, check source language) instead
-// of the generic "service slow, try another" message. translategemma always
-// runs local; `llm` Custom's primary audience is local self-hosters.
-const LOCAL_TIMEOUT_HINT_METHODS: ReadonlySet<string> = new Set(["translategemma", "llm"]);
 // Caps context window padding around a batch — without this, a large
 // contextWindow would request hundreds of neighbor lines per batch and blow
 // past the model's context limit on long inputs.
@@ -133,6 +134,17 @@ export type TranslateBatchMeta = {
   lineNumbers?: number[];
   fileName?: string;
   /**
+   * 本批的实时结果 streamer —— 引擎每定稿一行就推一个事件,网页壳据此在整批
+   * 返回【之前】逐行上屏。通过 meta 传入而非 PipelineDeps:它是「这一行的
+   * 内容」这种【本批】信号,而依赖只听 onProgress / onRateLimit 这类【计数】
+   * 信号(后者被每个文件、每个语种复用,塞进去会逼所有调用方构造它)。
+   * CLI handler 不传 —— 缺省即整条实时链路是 no-op。
+   *
+   * ⚠ 只发【成功】的槽位。失败行统一由 PipelineOutcome.failures + 软填约定
+   * 呈现在失败面板里,这里再发一份"原文副本"会让用户以为它译出来了。
+   */
+  onLineTranslated?: (result: LineTranslatedEvent) => void;
+  /**
    * 【出参】调用方传一个空 Set,引擎把本次软填(保留原文)的槽位下标写进去。
    *
    * 为什么是出参而不是返回值:translateBatch 返回 string[],被三个工具页和四条
@@ -143,6 +155,31 @@ export type TranslateBatchMeta = {
    */
   collectSoftFilled?: Set<number>;
 };
+
+/**
+ * 一行定稿的实时事件 —— 引擎逐行发出,消费方(网页壳)立即上屏。
+ *
+ * ⚠ `index` 恒为【contentLines 里的下标】(0-based),与 FailedLine.index 同一
+ * 空间 —— 网页壳正是靠这一点把 outcome.failures 的 index 对回已上屏的行。
+ * chunk 路径内部按【非空行】下标 k 走,发射前必须经 sourceIdx[k] 换回来;
+ * 直接发 k 会在含空行的文件里指向别人家的行(空行数就是偏移量)。
+ *
+ * ⚠ `line`(物理源行号)【必须】带上,不能以"消费方手里有 meta.lineNumbers、
+ * 让它自己映射"为由省掉 —— 那正是上一版的做法,而没有任何消费方真的去映射:
+ * 面板于是打 contentLines 序数(cue #12),正下方失败面板打真实行号(47),
+ * 两者同样式并排,用户照着面板跳过去落在时间轴上。同一份数据的两种坐标同屏
+ * 出现,就得由【发出方】统一,不能指望每个消费方各自记得换算。
+ */
+export interface LineTranslatedEvent {
+  /** Index of the source line within this batch's contentLines (0-based). */
+  index: number;
+  /** Physical source line number (meta.lineNumbers), same value as FailedLine.line. */
+  line?: number;
+  /** The original source text of the line (pristine — not the flattened wire form). */
+  original: string;
+  /** The final translation (after glossary enforcement / newline flattening). */
+  translation: string;
+}
 
 export type PipelineRuntimeConfig = TranslationConfig & {
   translationMethod: string;
@@ -271,6 +308,8 @@ type RunCtx = {
   onRateLimit?: () => void;
   onAuthAbort?: () => void;
   getGlossaryTerms: (targetLang: string) => GlossaryTerm[];
+  /** Live per-line stream (batch-level, from TranslateBatchMeta.onLineTranslated). */
+  emitLine?: (result: LineTranslatedEvent) => void;
   noteError: (error: unknown) => void;
   noteRateLimited: () => void;
   wasRateLimited: () => boolean;
@@ -443,9 +482,15 @@ const translateSingle = async (text: string, cacheSuffix: string, config: Pipeli
     ...extras,
   } as TranslateTextParams;
 
+  // 实际发出的尝试次数(≠ retryCount 上限)。非重试类错误(401/403、CORS、
+  // max_tokens…)只试一次就停 —— 日志必须说【真实次数】:写死上限会让
+  // 「快停正常工作」和「快停被改坏、真重试了 N 次」打印得一模一样,
+  // 排查凭据/限流问题时还会误导成"用坏 key 打了 3 次"。
+  let attemptsMade = 0;
   try {
     return await pRetry(
       async () => {
+        attemptsMade++;
         // Check abort before each attempt — against THIS run's controller
         // (a retry interval can span a run boundary).
         // shouldStop:重试间隔(可达 30s)可能跨越 provider 卸载,而自带循环
@@ -477,7 +522,7 @@ const translateSingle = async (text: string, cacheSuffix: string, config: Pipeli
           // run.signal.aborted is set then — that's not a slow-model timeout, so
           // exclude it. Set before the rethrow so the soft-fail catch upstream
           // (noteError → describeError) localizes the right guidance.
-          if (isAbortError(error) && !run?.signal.aborted && LOCAL_TIMEOUT_HINT_METHODS.has(config.translationMethod)) {
+          if (isAbortError(error) && !run?.signal.aborted && URL_IS_PRIMARY_CRED.has(config.translationMethod)) {
             (error as { errorHintKey?: string }).errorHintKey = "translationTimeoutLocal";
           }
 
@@ -515,7 +560,11 @@ const translateSingle = async (text: string, cacheSuffix: string, config: Pipeli
         signal: run?.signal,
         onFailedAttempt: ({ error, attemptNumber, retriesLeft }) => {
           const textPreview = text.length > 30 ? `${text.substring(0, 30)}...` : text;
-          console.warn(`Translation attempt ${attemptNumber} failed for "${textPreview}": ${(error as Error).message} (${retriesLeft} retries left)`);
+          // retriesLeft 是【预算】,不是承诺:不可重试的错误(401/403、CORS 提示、
+          // max_tokens…)当场就停。说清哪一种,否则"还剩 3 次"后面直接终结,
+          // 读日志的人会以为重试链断了。
+          const willRetry = retriesLeft > 0 && isRetryableError(error);
+          console.warn(`Translation attempt ${attemptNumber} failed for "${textPreview}": ${(error as Error).message}` + (willRetry ? ` (${retriesLeft} retries left)` : " (not retryable — giving up)"));
         },
       },
     );
@@ -534,7 +583,11 @@ const translateSingle = async (text: string, cacheSuffix: string, config: Pipeli
     // 堆栈,以及引擎挂上去的 .status / .retryAfterMs / .errorHintKey。只留字符串
     // 的话,429(带 Retry-After)、422(拒绝 thinking 参数)、500 在控制台里
     // 长得一模一样,排查时无从下手。
-    console.error(`All ${retryCount} translation attempts failed for: "${textPreview}": ${formatErrorWithCause(error)}`, error);
+    // ⚠ retryCount 是【重试】次数,总尝试上限 = retryCount + 1(pRetry 的
+    // `retries` 语义)。旧文案直接印 retryCount 当"尝试次数",两个方向都报错了数:
+    // 401 只试 1 次却说 3 次,可重试的 500 试了 4 次也说 3 次。
+    const maxAttempts = retryCount + 1;
+    console.error(`Translation failed after ${attemptsMade} of max ${maxAttempts} attempt(s)${attemptsMade < maxAttempts ? " (stopped early — not retryable)" : ""} for: "${textPreview}": ${formatErrorWithCause(error)}`, error);
     throw error; // No fallback to original text - fail explicitly
   }
 };
@@ -578,9 +631,17 @@ const enforceGlossaryOnLine = async (sourceLine: string, rawTranslated: string, 
 // 暴露给 JSONTranslator 的自带循环),它把并发、节流、进度、失败收集全部还给
 // 调用方,调用方于是长成第二个 pipeline 并且真的漂移过(delayTime)。自带循环
 // 的工具一律「收集 → translateLines → 回写」,别再开单行口子。
-const translateSingleWithGlossary = async (text: string, cacheSuffix: string, config: PipelineRuntimeConfig, ctx: RunCtx, fullText?: string): Promise<string> => {
+//
+// ⚠ index 是【contentLines 下标】,必填。曾经是 `index?` + 发射时 `index ?? 0`:
+// 漏传的调用方不会报错,而是把每一行都发成 index 0,面板里永远只有一行在原地
+// 被覆盖 —— 一个静默到极点的失效。必填让漏传变成编译错误。
+const translateSingleWithGlossary = async (text: string, cacheSuffix: string, config: PipelineRuntimeConfig, ctx: RunCtx, index: number, fullText?: string): Promise<string> => {
   const raw = await translateSingle(text, cacheSuffix, config, ctx, fullText);
-  return enforceGlossaryOnLine(text, raw ?? "", cacheSuffix, config, ctx, fullText);
+  const final = await enforceGlossaryOnLine(text, raw ?? "", cacheSuffix, config, ctx, fullText);
+  // 实时流:术语表处理完毕后的【最终】译文在此可见。失败行不在此发射 ——
+  // 它们走 failure 面板的统一呈现(catch 在调用方,到不了这里)。
+  ctx.emitLine?.({ index, original: text, translation: final });
+  return final;
 };
 
 /** deps.translate wins; otherwise the built-in cache-aware translateCore. */
@@ -649,6 +710,17 @@ const translateWithContext = async (
     );
   }
 
+  // 实时流:此刻【已经定稿】的槽位(上一轮缓存命中的行)一次性补发 —— 它们
+  // 永远到不了下面的模型调用点,不在这里发的话续跑一份翻过的文件会是:进度条
+  // 一路走到 100%,实时面板从头到尾停在「等待第一行译文…」。全命中时
+  // translateSingleBatch 更是整批 early-return,一个事件都不会有。
+  // (空行也在已定稿之列,由 emitLine 接缝统一挡掉。)
+  if (ctx.emitLine) {
+    for (let i = 0; i < contentLines.length; i++) {
+      if (translatedLines[i] !== undefined) ctx.emitLine({ index: i, original: contentLines[i], translation: translatedLines[i] });
+    }
+  }
+
   const translateSingleBatch = async (batchStart: number, batchEnd: number, contextWindow: number): Promise<boolean> => {
     // Every target slot already decided (pre-filled from cache or an earlier
     // batch) → skip the model call entirely; sending it would re-translate
@@ -702,6 +774,39 @@ const translateWithContext = async (
       // verbatim (the NHK 红白 ≈+9 misalignment), not just within-batch echoes.
       const translatedBatch = extractTranslatedLinesWithNumbers(result || "", batchEnd - batchStart, batchSources, contextLines);
 
+      // 「相邻同译」修复(subtitle-translator#44 的残余形态:合并且补齐下一槽,
+      // 块数正确、无缺口,提取层守卫全部放行)。检测只当【触发器】,裁决交给
+      // 【独立单行复译】—— 单行请求里合并物理上不可能;合法同译(不同源文
+      // 恰好译成同一句)复译后结果不变,内容一字不动。误报的最坏代价是几个
+      // 多余请求,永远不是丢内容(上次撤销的包含检测错就错在启发式直接清槽)。
+      // 串行 + delayTime 节流,同 chunk 逐行营救的既有纪律:模型刚在这段内容上
+      // 出了怪,满并发轰回去是错误的反射。复译为空/失败 → 置 "" 落进下方既有的
+      // 缺口机制(软填/降窗重试);批级缓存先清,否则重试从缓存重放同一个坏响应。
+      // 只修【未定稿】的槽(write-once):已预填的槽提交时本来就会被丢弃。
+      const dupSlots = findAdjacentDuplicateSlots(translatedBatch, batchSources).filter((j) => translatedLines[batchStart + j] === undefined);
+      if (dupSlots.length > 0) {
+        ctx.noteError(
+          new Error(
+            `adjacent duplicate translations at lines ${dupSlots.map((j) => batchStart + j + 1).join(", ")} (sources differ) — the model likely merged lines; re-translating each independently.`,
+          ),
+        );
+        if (cache) await cache.delete(generateCacheKey(contextWithMarkers, cacheSuffix));
+        for (let d = 0; d < dupSlots.length; d++) {
+          const j = dupSlots[d];
+          if (run?.signal.aborted) throw new Error("Translation aborted");
+          try {
+            const one = await translateSingle(batchSources[j], cacheSuffix, runtimeConfig, ctx, fullText);
+            // 换行拍平成空格,同 chunk 营救:单行译文里混进换行会破坏逐行装配。
+            translatedBatch[j] = one && one.trim() ? one.replace(/\r?\n/g, " ") : "";
+          } catch (err) {
+            if (isAuthError(err)) throw err;
+            ctx.noteError(err);
+            translatedBatch[j] = "";
+          }
+          if (d < dupSlots.length - 1) await abortableSleep(runtimeConfig.delayTime || 200, run?.signal);
+        }
+      }
+
       // A response that failed extraction anywhere is useless to replay, but
       // the cache layer already stored it (every 200 is a "success" there —
       // extraction happens later, here). Purge it so retries with the same
@@ -724,7 +829,10 @@ const translateWithContext = async (
           // slots get soft-filled with the raw source later (see "Final
           // soft-fail"), so a fully-failed line stays the untouched original
           // instead of a half-localized mix like "斯派克, hi".
-          translatedLines[batchStart + j] = await enforceGlossaryOnLine(batchSources[j], translatedBatch[j], cacheSuffix, runtimeConfig, ctx, fullText);
+          const enforced = await enforceGlossaryOnLine(batchSources[j], translatedBatch[j], cacheSuffix, runtimeConfig, ctx, fullText);
+          translatedLines[batchStart + j] = enforced;
+          // 实时流:这一槽立刻可见,不等整批 20-60s 的请求全部回来。
+          ctx.emitLine?.({ index: batchStart + j, original: batchSources[j], translation: enforced });
           // Cache the finalized line by its source text so a future run skips
           // it (see prefillFromLineCache above). Survives the batch-level purge
           // because it's keyed by the single line, not the batch window.
@@ -1050,6 +1158,14 @@ const runTranslateLines = async (
     onRateLimit: deps.onRateLimit,
     // NOT deps.onAuthAbort: inside translateLines the run controller is
     // pipeline-internal; aborting it already tears down every peer of THIS run.
+    // 实时流的【唯一接缝】—— 两件横切的事都在这里做一遍,不在四个发射点各写
+    // 一遍(发射点还会增加:现在是行路径 / 上下文批 / 上下文缓存补发 / chunk
+    // 块,漏一个的症状都只在特定文件上才看得见):
+    //   ① 空行不上屏 —— 它们是原样穿过的占位,发出去就是一排空行夹在译文里。
+    //   ② 补上物理行号 —— 发射点手里只有批内下标;`meta.lineNumbers` 只有这
+    //      一层有。缺了它面板就只能打序数,和失败面板的行号对不上(见
+    //      LineTranslatedEvent 的注释)。
+    emitLine: meta?.onLineTranslated ? (event) => void (isBlankLine(event.original) || meta.onLineTranslated!({ ...event, line: event.line ?? failureLine(config, meta, event.index) })) : undefined,
     getGlossaryTerms: deps.getGlossaryTerms ?? (() => []),
     noteError: (error) => {
       state.lastError = error;
@@ -1142,7 +1258,7 @@ const runTranslateLines = async (
           if (runController.signal.aborted) throw new Error("Translation aborted");
           try {
             // Glossary on success only; the catch below soft-fills the raw source.
-            translatedLines[index] = await translateSingleWithGlossary(line, cacheSuffix, runtimeConfig, ctx, fullText);
+            translatedLines[index] = await translateSingleWithGlossary(line, cacheSuffix, runtimeConfig, ctx, index, fullText);
           } catch (error) {
             // Auth error already tripped THIS run's controller inside translateSingle.
             // It must propagate raw so Promise.all kills the batch and the caller's
@@ -1316,6 +1432,34 @@ const runTranslateLines = async (
         // 损坏 —— 不削的话行数不符会命中上面的分支,走逐行营救。
         processed = produced.join("\n");
       }
+      // 实时流:本块定稿后【在这里】一次性发射 —— 三条分支(行数正好 / 请求
+      // 失败 / 逐行营救)出来时 processed 的行数都已等于 chunkLineCount,这是
+      // 唯一同时覆盖它们的收口点。上一版把发射写在营救分支【里】,于是 chunk
+      // 路径的默认服务(gtxFreeAPI)跑正常的一轮时一行都不出:只有服务并/拆
+      // 了行、触发营救,面板才会有内容。
+      // failedK 的槽位跳过 —— 它们装的是保留下来的原文,不是译文。
+      // ⚠ 换回 contentLines 空间(sourceIdx[k]),且 original 取【原始】
+      // contentLines[i] 而非 chunkSourceLines[j]:后者是进 wire 前压过的
+      // (换行→空格、deeplx 的 "<>"→"< >"),拿它上屏等于把降级后的形态当原文
+      // 展示给用户。
+      // ⚠ 发射前必须过 applyGlossary,判据必须和下面重组时的 `unusable` 一致 ——
+      // 这两件事都在【本循环之后】才对输出做,发射点在循环【之内】,漏掉哪个
+      // 面板就和最终文件对不上:
+      //   · 不过 applyGlossary → 配了术语表时面板显示未强制术语的译文,用户看
+      //     着「Spike」下载下来却是「斯派克」(chunk 是默认服务 gtxFreeAPI 的路)
+      //   · 只跳 failedK → 服务把某槽吐成空串时,它在这里还没进 failedK(要等
+      //     下面 `unusable` 才判),于是被当成功行发出去,面板渲染成「原文 +
+      //     空白译文」,像渲染坏了,而同一行随后被记为失败
+      if (ctx.emitLine) {
+        const finalLines = processed.split("\n");
+        for (let j = 0; j < chunkLineCount; j++) {
+          const k = chunkStartK + j;
+          const translated = finalLines[j];
+          if (failedK.has(k) || translated === undefined || translated.trim() === "") continue;
+          const i = sourceIdx[k];
+          ctx.emitLine({ index: i, original: contentLines[i], translation: applyGlossary(ctx, translated, config.targetLanguage) });
+        }
+      }
       translatedChunks.push(processed);
       chunkStartK += chunkLineCount;
       chunkLinesDone += chunkLineCount;
@@ -1395,7 +1539,20 @@ export const runReachabilityProbe = async (translationMethod: TranslationMethod,
     ...(userPrompt && { userPrompt }),
     ...(signal && { signal }),
   };
-  const result = await translationServices[translationMethod](params);
-  if (!result) throw new Error("Translation Test failed, no result received.");
-  return result;
+  try {
+    const result = await translationServices[translationMethod](params);
+    if (!result) throw new Error("Translation Test failed, no result received.");
+    return result;
+  } catch (error) {
+    // max_tokens 截断【不算不可达】—— 服务器已经回答了，而可达性正是
+    // 这个探测唯一要测的东西。不特判的话：自托管 MT 的输出上限按输入长度
+    // 缩放，探测文本 "Hello, world!" 只能拿到地板值 64 tokens，模型一旦没及时
+    // 发 eos 就会 finish_reason==="length" → 该消息在 NON_RETRYABLE_MESSAGES 里
+    // → 预检闸走硬阻断分支，而成功才会 memoize，于是【每次重试都再烧
+    // 一次生成、永远开不了工】。而逐行跑时同一个错误只是单行软失败 ——
+    // 恰好违反 PREFLIGHT_PROBE_METHODS 自己声明的契约：“单发探测不得比它所
+    // 守护的翻译更严”(见 retry.ts isRetryableError 的注释)。
+    if (error instanceof Error && error.message.includes("max_tokens reached")) return "";
+    throw error;
+  }
 };
