@@ -603,7 +603,7 @@ const MDTranslator = () => {
                           {tMarkdown("translateContentGroup")}
                         </Text>
                         <Flex vertical gap="small">
-                          <Flex justify="space-between" align="center">
+                          <Flex component="label" className="cursor-pointer" justify="space-between" align="center">
                             <Tooltip title={tMarkdown("tFrontmatterTooltip")}>
                               <span>{tMarkdown("tFrontmatter")}</span>
                             </Tooltip>
@@ -615,7 +615,7 @@ const MDTranslator = () => {
                               aria-label="Frontmatter"
                             />
                           </Flex>
-                          <Flex justify="space-between" align="center">
+                          <Flex component="label" className="cursor-pointer" justify="space-between" align="center">
                             <Tooltip title={tMarkdown("tCodeBlocksTooltip")}>
                               <span>{tMarkdown("tCodeBlocks")}</span>
                             </Tooltip>
@@ -627,7 +627,7 @@ const MDTranslator = () => {
                               aria-label={tMarkdown("tCodeBlocks")}
                             />
                           </Flex>
-                          <Flex justify="space-between" align="center">
+                          <Flex component="label" className="cursor-pointer" justify="space-between" align="center">
                             <Tooltip title={tMarkdown("tLatexTooltip")}>
                               <span>{tMarkdown("tLatex")}</span>
                             </Tooltip>
@@ -639,7 +639,7 @@ const MDTranslator = () => {
                               aria-label={tMarkdown("tLatex")}
                             />
                           </Flex>
-                          <Flex justify="space-between" align="center">
+                          <Flex component="label" className="cursor-pointer" justify="space-between" align="center">
                             <Tooltip title={tMarkdown("tLinkText")}>
                               <span>{tMarkdown("tLinkText")}</span>
                             </Tooltip>
@@ -664,7 +664,7 @@ const MDTranslator = () => {
                         <Text strong style={{ display: "block", marginBottom: token.marginXS, fontSize: token.fontSizeSM }}>
                           {tMarkdown("formatModeGroup")}
                         </Text>
-                        <Flex justify="space-between" align="center">
+                        <Flex component="label" className="cursor-pointer" justify="space-between" align="center">
                           <Tooltip title={tMarkdown("rawTranslationModeTooltip")}>
                             <span>{tMarkdown("rawTranslationMode")}</span>
                           </Tooltip>
