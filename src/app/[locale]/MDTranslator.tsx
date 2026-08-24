@@ -467,6 +467,7 @@ const MDTranslator = () => {
 
             {uploadMode === "single" && (
               <SourceArea
+                textDirection="auto"
                 locked={isTranslating}
                 sourceText={sourceText}
                 setSourceText={setSourceText}
@@ -729,7 +730,7 @@ const MDTranslator = () => {
                   lineCount={resultStats.lineCount}
                   onCopy={() => copyToClipboard(translatedText)}
                   onExport={handleExportFile}
-                  textDirection={getLangDir(targetLanguage)}
+                  textDirection={getLangDir(translatedTextLang ?? targetLanguage)}
                 />
               </Col>
             )}
@@ -754,7 +755,7 @@ const MDTranslator = () => {
                       </Button>
                     </Space>
                   }>
-                  <TextArea value={extractedText} rows={10} readOnly aria-label={t("extractedText")} />
+                  <TextArea value={extractedText} rows={10} readOnly dir="auto" aria-label={t("extractedText")} />
                 </Card>
               </Col>
             )}
