@@ -152,7 +152,7 @@
     "copyAllFailed": "Salin semua",
     "closeFailedLinesModal": "Tutup",
     "failedLanguagesTitle": "{count} bahasa target gagal",
-    "failedLanguagesDesc": "Semua batch untuk bahasa-bahasa ini gagal — biasanya karena masalah LLM lokal, batas tingkat API, atau penolakan model terhadap bahasa tertentu. Salin kode dan jalankan ulang hanya untuk mereka (tempelkan di Entri Cepat melalui Kode Bahasa); yang lain akan dilewati dari cache.",
+    "failedLanguagesDesc": "Semua batch untuk bahasa-bahasa ini gagal — biasanya karena masalah LLM lokal, batas tingkat API, atau penolakan model terhadap bahasa tertentu. Salin kode dan jalankan ulang hanya untuk mereka (tempelkan di 'Pengaturan Multi-Bahasa'); yang lain akan dilewati dari cache.",
     "copyAllFailedLanguages": "Salin kode bahasa",
     "apiStatusFreeApi": "Free API",
     "apiStatusNeedsConfig": "Perlu konfig.",
@@ -308,7 +308,7 @@
     },
     "jsonTranslate": {
       "title": "Penerjemah JSON i18n",
-      "description": "Alat terjemahan JSON multi-bahasa yang efisien"
+      "description": "Terjemahan file bahasa i18n batch, dengan pencocokan JSONPath dan pemetaan kunci"
     },
     "mdTranslator": {
       "title": "Penerjemah Markdown",
@@ -330,7 +330,7 @@
         },
         {
           "q": "Bagaimana menerjemahkan README GitHub atau seluruh situs dokumentasi VitePress / Docusaurus?",
-          "a": "Unggah batch direktori docs/ Anda. Field Front Matter seperti title dan description dapat diterjemahkan dengan mengaktifkan 'Terjemahkan Front Matter'; field slug dan permalink dipertahankan. Blok kode, contoh CLI, dan endpoint API otomatis dilewati — hanya komentar dan prosa yang diterjemahkan. Letakkan file terjemahan kembali ke direktori asli dan framework Anda akan mengambilnya melalui konfigurasi i18n.locales. VitePress menggunakan subfolder zh/, en/; Docusaurus menggunakan struktur i18n/{locale}/."
+          "a": "Unggah batch direktori docs/ Anda. Field Front Matter seperti title dan description dapat diterjemahkan dengan mengaktifkan 'Terjemahkan frontmatter'; field slug dan permalink dipertahankan. Blok kode, contoh CLI, dan endpoint API otomatis dilewati — hanya komentar dan prosa yang diterjemahkan. Letakkan file terjemahan kembali ke direktori asli dan framework Anda akan mengambilnya melalui konfigurasi i18n.locales. VitePress menggunakan subfolder zh/, en/; Docusaurus menggunakan struktur i18n/{locale}/."
         },
         {
           "q": "Apakah mendukung dialek Markdown seperti GFM, MDX, atau Astro?",

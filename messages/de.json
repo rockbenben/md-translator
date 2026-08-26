@@ -165,7 +165,7 @@
     "copyAllFailed": "Alle kopieren",
     "closeFailedLinesModal": "Schließen",
     "failedLanguagesTitle": "{count} Zielsprache(n) fehlgeschlagen",
-    "failedLanguagesDesc": "Alle Batches für diese Sprachen sind fehlgeschlagen — meist durch lokale LLM-Störungen, API-Ratenbegrenzungen oder Modellverweigerung einer bestimmten Sprache. Codes kopieren und nur damit erneut ausführen (in Schnelleingabe via Sprachcodes einfügen); die anderen werden aus dem Cache übersprungen.",
+    "failedLanguagesDesc": "Alle Batches für diese Sprachen sind fehlgeschlagen — meist durch lokale LLM-Störungen, API-Ratenbegrenzungen oder Modellverweigerung einer bestimmten Sprache. Codes kopieren und nur damit erneut ausführen (in 'Mehrsprachige Einstellungen' einfügen); die anderen werden aus dem Cache übersprungen.",
     "copyAllFailedLanguages": "Sprachcodes kopieren",
     "apiStatusFreeApi": "Free API",
     "apiStatusNeedsConfig": "Konfig. erforderlich",
@@ -308,7 +308,7 @@
     },
     "jsonTranslate": {
       "title": "i18n JSON-Übersetzer",
-      "description": "Effizientes mehrsprachiges JSON-Übersetzungstool"
+      "description": "i18n-Sprachdateien im Batch übersetzen, mit JSONPath-Abgleich und Schlüssel-Mapping"
     },
     "mdTranslator": {
       "title": "Markdown-Übersetzer",
@@ -330,7 +330,7 @@
         },
         {
           "q": "Wie übersetze ich eine GitHub-README oder eine komplette VitePress-/Docusaurus-Doku-Site?",
-          "a": "Laden Sie Ihr docs/-Verzeichnis im Batch hoch. Front-Matter-Felder wie title und description können mit 'Front Matter übersetzen' einbezogen werden; slug- und permalink-Felder bleiben erhalten. Codeblöcke, CLI-Beispiele und API-Endpunkte werden automatisch übersprungen — nur Kommentare und Prosa werden übersetzt. Legen Sie übersetzte Dateien zurück ins Originalverzeichnis und Ihr Framework erkennt sie über die i18n.locales-Konfiguration. VitePress nutzt zh/-, en/-Unterordner; Docusaurus nutzt die i18n/{locale}/-Struktur."
+          "a": "Laden Sie Ihr docs/-Verzeichnis im Batch hoch. Front-Matter-Felder wie title und description können mit 'Frontmatter übersetzen' einbezogen werden; slug- und permalink-Felder bleiben erhalten. Codeblöcke, CLI-Beispiele und API-Endpunkte werden automatisch übersprungen — nur Kommentare und Prosa werden übersetzt. Legen Sie übersetzte Dateien zurück ins Originalverzeichnis und Ihr Framework erkennt sie über die i18n.locales-Konfiguration. VitePress nutzt zh/-, en/-Unterordner; Docusaurus nutzt die i18n/{locale}/-Struktur."
         },
         {
           "q": "Unterstützt es GFM-, MDX- oder Astro-Markdown-Dialekte?",

@@ -152,7 +152,7 @@
     "copyAllFailed": "Sao chép tất cả",
     "closeFailedLinesModal": "Đóng",
     "failedLanguagesTitle": "{count} ngôn ngữ đích thất bại",
-    "failedLanguagesDesc": "Tất cả các lô cho các ngôn ngữ này đã thất bại — thường do trục trặc LLM cục bộ, giới hạn tốc độ API hoặc mô hình từ chối ngôn ngữ cụ thể. Sao chép mã và chạy lại chỉ cho chúng (dán vào Nhập nhanh bằng mã ngôn ngữ); những ngôn ngữ khác sẽ được bỏ qua từ bộ nhớ đệm.",
+    "failedLanguagesDesc": "Tất cả các lô cho các ngôn ngữ này đã thất bại — thường do trục trặc LLM cục bộ, giới hạn tốc độ API hoặc mô hình từ chối ngôn ngữ cụ thể. Sao chép mã và chạy lại chỉ cho chúng (dán vào 'Cài đặt đa ngôn ngữ'); những ngôn ngữ khác sẽ được bỏ qua từ bộ nhớ đệm.",
     "copyAllFailedLanguages": "Sao chép mã ngôn ngữ",
     "apiStatusFreeApi": "Free API",
     "apiStatusNeedsConfig": "Cần cấu hình",
@@ -308,7 +308,7 @@
     },
     "jsonTranslate": {
       "title": "Dịch giả JSON i18n",
-      "description": "Công cụ dịch JSON đa ngôn ngữ hiệu quả"
+      "description": "Dịch tệp ngôn ngữ i18n hàng loạt, với đối sánh JSONPath và ánh xạ khóa"
     },
     "mdTranslator": {
       "title": "Dịch giả Markdown",
@@ -330,7 +330,7 @@
         },
         {
           "q": "Cách dịch README trên GitHub hoặc cả một trang tài liệu VitePress / Docusaurus?",
-          "a": "Tải hàng loạt thư mục docs/. Các trường Front Matter như title, description có thể được dịch khi bật 'Dịch Front Matter'; các trường slug và permalink được giữ nguyên. Khối mã, ví dụ CLI và endpoint API được tự động bỏ qua — chỉ bình luận và nội dung văn bản được dịch. Đặt các tệp đã dịch trở lại thư mục gốc và framework sẽ nhận diện qua cấu hình i18n.locales. VitePress dùng thư mục con zh/, en/; Docusaurus dùng cấu trúc i18n/{locale}/."
+          "a": "Tải hàng loạt thư mục docs/. Các trường Front Matter như title, description có thể được dịch khi bật 'Dịch frontmatter'; các trường slug và permalink được giữ nguyên. Khối mã, ví dụ CLI và endpoint API được tự động bỏ qua — chỉ bình luận và nội dung văn bản được dịch. Đặt các tệp đã dịch trở lại thư mục gốc và framework sẽ nhận diện qua cấu hình i18n.locales. VitePress dùng thư mục con zh/, en/; Docusaurus dùng cấu trúc i18n/{locale}/."
         },
         {
           "q": "Có hỗ trợ các phương ngữ Markdown như GFM, MDX, Astro không?",

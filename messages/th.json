@@ -152,7 +152,7 @@
     "copyAllFailed": "คัดลอกทั้งหมด",
     "closeFailedLinesModal": "ปิด",
     "failedLanguagesTitle": "ภาษาเป้าหมาย {count} ภาษาล้มเหลว",
-    "failedLanguagesDesc": "แบตช์ทั้งหมดสำหรับภาษาเหล่านี้ล้มเหลว — โดยปกติเกิดจากปัญหา LLM ในเครื่อง ขีดจำกัดอัตรา API หรือโมเดลปฏิเสธภาษาเฉพาะ คัดลอกรหัสและเรียกใช้ใหม่เฉพาะภาษาเหล่านั้น (วางในการป้อนด่วนผ่านรหัสภาษา) ภาษาอื่นๆ จะถูกข้ามจากแคช",
+    "failedLanguagesDesc": "แบตช์ทั้งหมดสำหรับภาษาเหล่านี้ล้มเหลว — โดยปกติเกิดจากปัญหา LLM ในเครื่อง ขีดจำกัดอัตรา API หรือโมเดลปฏิเสธภาษาเฉพาะ คัดลอกรหัสและเรียกใช้ใหม่เฉพาะภาษาเหล่านั้น (วางใน 'ตั้งค่าหลายภาษา') ภาษาอื่นๆ จะถูกข้ามจากแคช",
     "copyAllFailedLanguages": "คัดลอกรหัสภาษา",
     "apiStatusFreeApi": "Free API",
     "apiStatusNeedsConfig": "ต้องการการตั้งค่า",
@@ -308,7 +308,7 @@
     },
     "jsonTranslate": {
       "title": "ตัวแปล JSON i18n",
-      "description": "เครื่องมือแปล JSON หลายภาษาที่มีประสิทธิภาพ"
+      "description": "แปลไฟล์ภาษา i18n เป็นชุด พร้อมการจับคู่ JSONPath และแมปคีย์"
     },
     "mdTranslator": {
       "title": "ตัวแปล Markdown",
@@ -330,7 +330,7 @@
         },
         {
           "q": "แปล README ของ GitHub หรือเว็บไซต์เอกสาร VitePress / Docusaurus ทั้งหมดอย่างไร?",
-          "a": "อัปโหลด directory docs/ ของคุณเป็นชุด ฟิลด์ Front Matter เช่น title และ description แปลได้โดยเปิด 'แปล Front Matter'; ฟิลด์ slug และ permalink ถูกเก็บไว้ บล็อกโค้ด ตัวอย่าง CLI และ API endpoint ถูกข้ามอัตโนมัติ — แปลเฉพาะคอมเมนต์และเนื้อหาบรรยาย วางไฟล์ที่แปลแล้วกลับไปที่ directory เดิมและเฟรมเวิร์กของคุณจะรับไฟล์เหล่านั้นผ่านคอนฟิก i18n.locales VitePress ใช้ subfolder zh/, en/; Docusaurus ใช้โครงสร้าง i18n/{locale}/"
+          "a": "อัปโหลด directory docs/ ของคุณเป็นชุด ฟิลด์ Front Matter เช่น title และ description แปลได้โดยเปิด 'แปล frontmatter'; ฟิลด์ slug และ permalink ถูกเก็บไว้ บล็อกโค้ด ตัวอย่าง CLI และ API endpoint ถูกข้ามอัตโนมัติ — แปลเฉพาะคอมเมนต์และเนื้อหาบรรยาย วางไฟล์ที่แปลแล้วกลับไปที่ directory เดิมและเฟรมเวิร์กของคุณจะรับไฟล์เหล่านั้นผ่านคอนฟิก i18n.locales VitePress ใช้ subfolder zh/, en/; Docusaurus ใช้โครงสร้าง i18n/{locale}/"
         },
         {
           "q": "รองรับ Markdown dialect เช่น GFM, MDX หรือ Astro ไหม?",

@@ -165,7 +165,7 @@
     "copyAllFailed": "Tout copier",
     "closeFailedLinesModal": "Fermer",
     "failedLanguagesTitle": "Échec de la traduction de {count} langue(s)",
-    "failedLanguagesDesc": "Tous les lots de ces langues ont échoué — généralement à cause de défauts de LLM local, de limites de débit API ou du refus du modèle pour une langue spécifique. Copiez les codes et relancez uniquement avec elles (collez dans Saisie rapide par codes de langue) ; les autres utiliseront le cache et seront ignorées.",
+    "failedLanguagesDesc": "Tous les lots de ces langues ont échoué — généralement à cause de défauts de LLM local, de limites de débit API ou du refus du modèle pour une langue spécifique. Copiez les codes et relancez uniquement avec elles (collez dans 'Paramètres multilingues') ; les autres utiliseront le cache et seront ignorées.",
     "copyAllFailedLanguages": "Copier les codes de langue",
     "apiStatusFreeApi": "Free API",
     "apiStatusNeedsConfig": "Config. requise",
@@ -308,7 +308,7 @@
     },
     "jsonTranslate": {
       "title": "Traducteur JSON i18n",
-      "description": "Outil de traduction JSON multilingue efficace"
+      "description": "Traduction par lot des fichiers de langue i18n, avec correspondance JSONPath et mappage de clés"
     },
     "mdTranslator": {
       "title": "Traducteur Markdown",
@@ -330,7 +330,7 @@
         },
         {
           "q": "Comment traduire un README GitHub ou un site de docs VitePress / Docusaurus complet ?",
-          "a": "Importez en lot votre répertoire docs/. Les champs Front Matter comme title et description peuvent être traduits en activant 'Traduire le Front Matter' ; les champs slug et permalink sont préservés. Les blocs de code, exemples CLI et endpoints API sont ignorés automatiquement — seuls commentaires et prose sont traduits. Replacez les fichiers traduits dans le répertoire d'origine et votre framework les reconnaîtra via sa configuration i18n.locales. VitePress utilise les sous-dossiers zh/, en/ ; Docusaurus utilise la structure i18n/{locale}/."
+          "a": "Importez en lot votre répertoire docs/. Les champs Front Matter comme title et description peuvent être traduits en activant 'Traduire frontmatter' ; les champs slug et permalink sont préservés. Les blocs de code, exemples CLI et endpoints API sont ignorés automatiquement — seuls commentaires et prose sont traduits. Replacez les fichiers traduits dans le répertoire d'origine et votre framework les reconnaîtra via sa configuration i18n.locales. VitePress utilise les sous-dossiers zh/, en/ ; Docusaurus utilise la structure i18n/{locale}/."
         },
         {
           "q": "Prend-il en charge les dialectes Markdown GFM, MDX ou Astro ?",

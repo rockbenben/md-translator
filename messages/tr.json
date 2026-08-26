@@ -152,7 +152,7 @@
     "copyAllFailed": "Tümünü kopyala",
     "closeFailedLinesModal": "Kapat",
     "failedLanguagesTitle": "{count} hedef dil başarısız oldu",
-    "failedLanguagesDesc": "Bu diller için tüm yığınlar başarısız oldu — genellikle yerel LLM aksaklıkları, API hız sınırları veya modelin belirli bir dili reddetmesi nedeniyle. Kodları kopyalayın ve yalnızca onlar için yeniden çalıştırın (Dil Kodları ile Hızlı Giriş alanına yapıştırın); diğerleri önbellekten atlanacak.",
+    "failedLanguagesDesc": "Bu diller için tüm yığınlar başarısız oldu — genellikle yerel LLM aksaklıkları, API hız sınırları veya modelin belirli bir dili reddetmesi nedeniyle. Kodları kopyalayın ve yalnızca onlar için yeniden çalıştırın ('Çok Dilli Ayarlar' bölümüne yapıştırın); diğerleri önbellekten atlanacak.",
     "copyAllFailedLanguages": "Dil kodlarını kopyala",
     "apiStatusFreeApi": "Free API",
     "apiStatusNeedsConfig": "Yapılandırma gerekli",
@@ -308,7 +308,7 @@
     },
     "jsonTranslate": {
       "title": "i18n JSON Çevirici",
-      "description": "Verimli çok dilli JSON çeviri aracı"
+      "description": "Toplu i18n dil dosyası çevirisi, JSONPath eşleştirme ve anahtar eşleme ile"
     },
     "mdTranslator": {
       "title": "Markdown Çevirici",
@@ -330,7 +330,7 @@
         },
         {
           "q": "Bir GitHub README'yi veya tüm bir VitePress / Docusaurus belge sitesini nasıl çeviririm?",
-          "a": "docs/ dizininizi toplu yükleyin. Front Matter'daki title, description gibi alanlar 'Front Matter'ı çevir' seçeneği açılarak çevrilebilir; slug ve permalink alanları korunur. Kod blokları, CLI örnekleri ve API uç noktaları otomatik atlanır — yalnızca yorumlar ve düz metin çevrilir. Çevrilen dosyaları orijinal dizine geri bırakın ve çerçeve, i18n.locales yapılandırması üzerinden bunları algılar. VitePress zh/, en/ alt klasörlerini kullanır; Docusaurus ise i18n/{locale}/ yapısını kullanır."
+          "a": "docs/ dizininizi toplu yükleyin. Front Matter'daki title, description gibi alanlar 'Frontmatter'ı çevir' seçeneği açılarak çevrilebilir; slug ve permalink alanları korunur. Kod blokları, CLI örnekleri ve API uç noktaları otomatik atlanır — yalnızca yorumlar ve düz metin çevrilir. Çevrilen dosyaları orijinal dizine geri bırakın ve çerçeve, i18n.locales yapılandırması üzerinden bunları algılar. VitePress zh/, en/ alt klasörlerini kullanır; Docusaurus ise i18n/{locale}/ yapısını kullanır."
         },
         {
           "q": "GFM, MDX veya Astro Markdown lehçelerini destekliyor mu?",
