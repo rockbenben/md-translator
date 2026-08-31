@@ -16,7 +16,7 @@ const ClientPage = () => {
 
   return (
     <TranslationProvider>
-      <ToolPage icon={<FileMarkdownOutlined />} toolKey="mdTranslator" description={tMarkdown("clientDescription")} guideUrl={userGuideUrl}>
+      <ToolPage showExportFolder icon={<FileMarkdownOutlined />} toolKey="mdTranslator" description={tMarkdown("clientDescription")} guideUrl={userGuideUrl}>
         <MDTranslator />
       </ToolPage>
       <ApiSettingsDrawer />

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Select, Input, Button, Tag, Space, Flex, Typography, Tooltip, App, theme } from "antd";
-import { ApiOutlined, BookOutlined, ThunderboltOutlined } from "@ant-design/icons";
+import { ApiOutlined, BookOutlined, DatabaseOutlined, ThunderboltOutlined } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import { categorizedOptions, findMethodLabel, getConfigStatus, isApiKeyOptional, supportsGlossary, testTranslationWithTimeout, DEFAULT_SYSTEM_PROMPT, DEFAULT_USER_PROMPT } from "@/app/lib/translation";
 import { describeError } from "@/app/utils";
@@ -25,7 +25,7 @@ const ApiStatusBlock = ({ disabled = false }: ApiStatusBlockProps) => {
   const { message } = App.useApp();
   const { token } = theme.useToken();
   const isMobile = useIsMobile();
-  const { translationMethod, setTranslationMethod, getSelectedConfig, handleConfigChange, systemPrompt, userPrompt, setApiSettingsOpen, glossaryEnabled, activeGlossaryPreset, requestTimeoutSec } = useTranslationContext();
+  const { translationMethod, setTranslationMethod, getSelectedConfig, handleConfigChange, systemPrompt, userPrompt, setApiSettingsOpen, glossaryEnabled, activeGlossaryPreset, requestTimeoutSec, useCache, setUseCache } = useTranslationContext();
 
   const config = getSelectedConfig();
   const methodLabel = findMethodLabel(translationMethod);

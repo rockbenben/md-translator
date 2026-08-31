@@ -39,6 +39,8 @@ import TranslateFailurePanel from "@/app/components/TranslateFailurePanel";
 
 import MultiLanguageSettingsModal from "@/app/components/MultiLanguageSettingsModal";
 import SourceArea from "@/app/components/SourceArea";
+import { useFileExport } from "@/app/hooks/useFileExport";
+import { useLockExportFolder } from "@/app/components/ExportFolder";
 
 const { TextArea } = Input;
 const { Dragger } = Upload;
@@ -114,9 +116,15 @@ const MDTranslator = () => {
     requestTimeoutSec,
     setRequestTimeoutSec,
   } = useTranslationContext();
+
+  // 运行中锁住页面级「导出目录」入口:写入是每个文件现读句柄,跑到一半改目录
+  // 会把同一批产物劈进两个文件夹。控件在 ToolPage 里,prop 传不上去,故用环境锁。
+  useLockExportFolder(isTranslating);
   const { message } = App.useApp();
+  const exportFile = useFileExport();
   const { token } = theme.useToken();
   const cardStyle: React.CSSProperties = { boxShadow: token.boxShadowTertiary };
+
 
   const sourceStats = useTextStats(sourceText);
   const resultStats = useTextStats(translatedText);
@@ -391,8 +399,7 @@ const MDTranslator = () => {
     // 所以 handleExportFile 触发时 translatedTextLang 必非 null —— ?? 仅作类型收窄兜底
     const langLabel = translatedTextLang ?? targetLanguage;
     const fileName = generateFileName(uploadFileName, langLabel, undefined, multiLanguageMode);
-    void downloadFile(translatedText, fileName);
-    message.success(t("fileExported", { fileName }));
+    void exportFile(translatedText, fileName);
   };
 
   const handleExtractText = () => {

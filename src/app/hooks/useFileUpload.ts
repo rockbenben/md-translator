@@ -3,6 +3,7 @@ import { useState, useRef } from "react";
 import { App } from "antd";
 import { useTranslations } from "next-intl";
 import { normalizeNewlines, decodeFileBytes, getErrorMessage } from "@/app/utils";
+import { useLocalStorage } from "@/app/hooks/useLocalStorage";
 import type { UploadFile, UploadProps } from "antd";
 
 // Shared dedup predicate: match by name + size
