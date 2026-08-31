@@ -245,6 +245,37 @@ const ApiStatusBlock = ({ disabled = false }: ApiStatusBlockProps) => {
               : tGlossary("title")}
           </Tag>
           )}
+          {/* 「缓存已关」—— 只在关闭时出现,点一下就开回来。
+              关闭缓存现在会跨会话记住(translation-useCache 落盘),代价也跟着跨会话:
+              之后每一轮都重复计费,中断还无法从断点继续(进度条的 resumable 同源于它)。
+              ⚠ 别把这个标签当成"开关藏得太深"的补丁 —— 折叠面板的展开状态本身也落盘
+              (*-collapseKeys),用户下次多半还能看见那个开关。区别在于:开关显示的是
+              【状态】(一排控件里一个灰色的关态 Switch),这个琥珀标签显示的是【代价】,
+              且只在异常态出现、就在状态区顶部、点一下即还原。
+              ⚠ 解药是【可见 + 一键还原】,不是"下次自动开回来":自动改状态与
+              「运行跑在点击那一刻的快照」这条承诺打架,而且与用户自己关掉不可区分。 */}
+          {!useCache && (
+            <Tooltip title={t("cacheOffTooltip")}>
+              <Tag
+                color="warning"
+                role="button"
+                tabIndex={disabled ? -1 : 0}
+                aria-disabled={disabled}
+                aria-label={t("cacheOff")}
+                style={{ cursor: disabled ? "not-allowed" : "pointer", margin: 0, opacity: disabled ? 0.5 : 1 }}
+                onClick={disabled ? undefined : () => setUseCache(true)}
+                onKeyDown={(e) => {
+                  if (disabled) return;
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setUseCache(true);
+                  }
+                }}>
+                <DatabaseOutlined style={{ marginInlineEnd: 4 }} />
+                {t("cacheOff")}
+              </Tag>
+            </Tooltip>
+          )}
         </Space>
         {/* 运行中锁住抽屉入口 —— 抽屉内部因此完全不用锁:mask 保证「抽屉开着时
             开不了跑」(翻译按钮在遮罩后面),入口锁保证「跑着时开不了抽屉」。

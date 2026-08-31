@@ -68,7 +68,7 @@ const MDTranslator = () => {
     handleUploadRemove,
     handleUploadChange,
     resetUpload,
-  } = useFileUpload();
+  } = useFileUpload("md-translator");
   const {
     exportSettings,
     importSettings,
