@@ -10,7 +10,7 @@ import {
   isThinkingModel,
   isApiKeyOptional,
   pickThinkingLevel,
-  relayWouldServe,
+  relayHintWouldHelp,
   resolveWireEndpoint,
   OPENAI_COMPAT_KEYS,
   OPENAI_COMPAT_PROVIDERS,
@@ -19,17 +19,22 @@ import {
   type OpenAICompatProviderKey,
   type OpenAICompatProviderSpec,
 } from "../registry";
-import { getAIModelPrompt } from "../utils";
+import { getAIModelPromptParts } from "../utils";
 import { isNetworkError } from "@/app/utils/errorUtils";
 
-import { fetchJSON, normalizeNumber, normalizePrompt, requireApiKey, requireUrl, completeOpenAICompatUrl, PROXY_ENDPOINTS, getOpenAICompatContent, getClaudeContent, RELAY_HINT_MARKER, RELAY_HINT_MESSAGE } from "./shared";
+import { fetchJSON, normalizeNumber, normalizePrompt, requireApiKey, requireUrl, completeOpenAICompatUrl, PROXY_ENDPOINTS, getOpenAICompatContent, getClaudeContent, RELAY_HINT_MARKER } from "./shared";
 
-// Prepare prompts common to all LLM services
-const preparePrompts = (params: { text: string; targetLanguage: string; sourceLanguage: string; systemPrompt?: string; userPrompt?: string; fullText?: string }) => {
+// Prepare prompts common to all LLM services. The user prompt comes back both
+// joined (`prompt`) and split at ${content} (`promptPrefix` / `promptSuffix`):
+// the prefix is byte-stable across requests and is what provider prefix
+// caching keys on (subtitle-translator#53). Anything per-request — today the
+// glossary block — goes on the suffix side, never into the prefix or system.
+const preparePrompts = (params: { text: string; targetLanguage: string; sourceLanguage: string; systemPrompt?: string; userPrompt?: string; fullText?: string; glossaryBlock?: string }) => {
   const effectiveSystemPrompt = normalizePrompt(params.systemPrompt, DEFAULT_SYSTEM_PROMPT);
   const effectiveUserPrompt = normalizePrompt(params.userPrompt, DEFAULT_USER_PROMPT);
-  const prompt = getAIModelPrompt(params.text, effectiveUserPrompt, params.targetLanguage, params.sourceLanguage, params.fullText);
-  return { effectiveSystemPrompt, prompt };
+  const { prefix: promptPrefix, suffix } = getAIModelPromptParts(params.text, effectiveUserPrompt, params.targetLanguage, params.sourceLanguage, params.fullText);
+  const promptSuffix = params.glossaryBlock ? `${params.glossaryBlock}\n\n${suffix}` : suffix;
+  return { effectiveSystemPrompt, prompt: promptPrefix + promptSuffix, promptPrefix, promptSuffix };
 };
 
 // Common OpenAI-compatible request helper (named-parameter config object)
@@ -298,42 +303,12 @@ const THINKING_BUILDERS: Partial<Record<OpenAICompatProviderKey, ExtraBodyBuilde
 // disable payload). Returns {} for providers with no builder.
 export const buildThinkingExtraBody = (service: OpenAICompatProviderKey, params: TranslateTextParams): Record<string, unknown> => THINKING_BUILDERS[service]?.(params) ?? {};
 
-// Wrap a relay-capable provider's service so a browser network/CORS TypeError
-// with relay OFF is rewritten into the actionable relay hint. Applied generically
-// to every relay-capable provider — not just DeepSeek — so they all get the hint
-// (and the non-retryable classification) instead of a raw doomed retry.
-// isNetworkError covers all three engines' wording (Chrome "Failed to fetch",
-// Firefox "NetworkError when attempting…", Safari "Load failed") — matching only
-// Chrome's left FF/Safari users burning 3 retries on a doomed CORS error and
-// then seeing a generic "service unreachable" instead of the relay remediation.
-// 「建议打开中转」的两个前置:中转还没开,而且开了确实有用(registry.relayWouldServe
-// —— 与端点解析、界面文案同一个判据,bare host / 官方变体 / 自建中转的取舍
-// 不在这里重算)。指人去开一个开了也没用的开关,比不提示更糟。
-// ⚠ 别退回成 `&& !params.url`:那是旧的「自定义 endpoint 压过开关」优先级留下的,
-// 会连"填的就是官方地址"和"自己有中转"这两种真能获益的情况一起吃掉。
-const relayHintWouldHelp = (params: TranslateTextParams, providerKey: string): boolean =>
-  !params.useRelay && relayWouldServe(providerKey, { url: params.url, relayBase: params.relayBase });
-
-const withRelayHint = (service: TranslationService, providerKey: string): TranslationService => async (params) => {
-  try {
-    return await service(params);
-  } catch (error) {
-    if (relayHintWouldHelp(params, providerKey) && isNetworkError(error)) {
-      // errorHintKey → describeError renders the localized common.errorHintRelay
-      // text; the English message stays as the console/log fallback and carries
-      // RELAY_HINT_MARKER for retry.ts's non-retryable classification.
-      throw Object.assign(new Error(RELAY_HINT_MESSAGE), { errorHintKey: "errorHintRelay" });
-    }
-    throw error;
-  }
-};
-
 // Factory: generate a TranslationService from a provider spec key, optionally
-// wiring in a thinking extra-body builder. Relay-capable providers are wrapped
-// with the shared CORS → relay-hint rewriter.
+// wiring in a thinking extra-body builder. 网络错误 → 可行动提示的改写不在
+// 这里 —— 它对每个服务都一样,统一在 withNetworkHint(services/index.ts)。
 const makeOpenAICompat = (key: OpenAICompatProviderKey, extraBodyBuilder?: ExtraBodyBuilder): TranslationService => {
   const spec = OPENAI_COMPAT_PROVIDERS[key] as OpenAICompatProviderSpec;
-  const base: TranslationService = async (params) =>
+  return async (params) =>
     openAICompatRequest({
       params,
       serviceName: spec.label,
@@ -343,10 +318,6 @@ const makeOpenAICompat = (key: OpenAICompatProviderKey, extraBodyBuilder?: Extra
       extraHeaders: spec.extraHeaders,
       extraBody: extraBodyBuilder?.(params),
     });
-  // Every relay-capable provider gets the hint wrap: a CORS failure with the
-  // toggle off (incl. a default-on provider the user switched to direct) is
-  // remediated by turning the relay (back) on.
-  return spec.defaultUseRelay !== undefined ? withRelayHint(base, key) : base;
 };
 
 // Auto-generate every OpenAI-compat service: each provider gets a base service,
@@ -354,8 +325,9 @@ const makeOpenAICompat = (key: OpenAICompatProviderKey, extraBodyBuilder?: Extra
 const openAICompatServicesBase = Object.fromEntries(OPENAI_COMPAT_KEYS.map((k) => [k, makeOpenAICompat(k, THINKING_BUILDERS[k])])) as Record<OpenAICompatProviderKey, TranslationService>;
 
 // DeepSeek extra wrap: the generic relay-hint (CORS → "API Relay") already comes
-// from the factory; DeepSeek additionally rewrites a 403 (its direct endpoint
-// blocks some browser origins outright) into the same relay remediation hint.
+// from withNetworkHint (services/index.ts); DeepSeek additionally rewrites a 403
+// (its direct endpoint blocks some browser origins outright) into the same relay
+// remediation hint — a 403 is NOT a network error, so that wrapper never sees it.
 export const deepseek: TranslationService = async (params) => {
   try {
     return await openAICompatServicesBase.deepseek(params);
@@ -365,7 +337,7 @@ export const deepseek: TranslationService = async (params) => {
     // 字面匹配漏掉的恰是最常见的浏览器源被拦场景。fetchJSON 已 Object.assign
     // 附 status。
     const status = (error as { status?: number } | null)?.status;
-    if (relayHintWouldHelp(params, "deepseek") && (status === 403 || (error instanceof Error && error.message.includes("[403]")))) {
+    if (relayHintWouldHelp("deepseek", params) && (status === 403 || (error instanceof Error && error.message.includes("[403]")))) {
       // ⚠ 【status 必须带上】。这里换了一个新 Error,原来的 status 就丢了 ——
       // 而整轮凭据快停(isDefiniteAuthFailure)只认数值 401/403,不认消息文本
       // (消息里一个 "Forbidden" 就掐掉整批太危险,见 retry.ts 那段注释)。
@@ -555,7 +527,7 @@ export const buildYandexModelUri = (model: string | undefined, folderId: string 
 // 使用。这里派生而不是再抄一遍字面量,三处就不可能漂移。
 export const YANDEX_DIRECT_ENDPOINT = getProviderEndpoints("yandex")![0].url;
 
-export const yandex: TranslationService = withRelayHint(async (params) => {
+export const yandex: TranslationService = async (params) => {
   const model = buildYandexModelUri(params.model, params.folderId);
   return openAICompatRequest({
     params: { ...params, model },
@@ -564,7 +536,7 @@ export const yandex: TranslationService = withRelayHint(async (params) => {
     defaultModel: model,
     defaultTemperature: defaultConfigs.yandex.temperature as number,
   });
-}, "yandex");
+};
 
 // NVIDIA NIM wraps thinking params in `chat_template_kwargs` (vs native APIs
 // which use top-level `reasoning_effort` / `thinking`). Orchestrator-level gate
@@ -638,11 +610,10 @@ export const llm: TranslationService = async (params) => {
 
   // sendSystemPrompt=false: omit the system ROLE for chat templates that
   // reject it (Gemma family) — but the system prompt's CONTENT must survive,
-  // prepended to the user message. The glossary block lives ONLY in the system
-  // prompt (per-request composition in translateSingle), so dropping the
-  // message entirely silently disabled the glossary's primary mechanism for
-  // the exact audience the toggle exists for. undefined defaults to include
-  // (pre-toggle configs).
+  // prepended to the user message: dropping the message entirely once
+  // silently disabled the glossary (then composed into system) for the exact
+  // audience the toggle exists for. undefined defaults to include (pre-toggle
+  // configs).
   const messages =
     sendSystemPrompt === false
       ? [{ role: "user", content: `${effectiveSystemPrompt}\n\n${prompt}` }]
@@ -691,6 +662,16 @@ export const CLAUDE_DIRECT_ENDPOINT = getProviderEndpoints("claude")![0].url;
  * disable 路径的杀伤力:enable 至少要用户主动选,disable 是所有人的默认态。
  */
 export const buildGeminiThinkingConfig = (model: string, directive: ThinkingDirective | undefined): Record<string, unknown> => {
+  // thinkingLevel 是 Gemini 3.x 起才有的字段,打到 2.x/1.x 上是 400
+  // "Thinking level is not supported for this model."(2026-09-01 实测 gemini-2.5-flash)。
+  // ⚠ 别照 docs/thinking 那张档位表判 —— 它把 2.5 列成支持 low/medium/high,但那页写的是
+  // Interactions API(/v1beta/interactions,扁平 generation_config.thinking_level,服务端
+  // 替你映射成 budget);本仓走 generateContent,那里的字段参考写的是 "Use with earlier
+  // models results in an error"。两页都是官方且同期更新,取哪页看打的是哪个端点。
+  // 旧世代已从 models[] 移除,只可能是用户手填 —— 一律不发思考参数、跟服务端默认走,
+  // 不做 budget mapping(那正是当初移除 2.5 时刻意避开的复杂度)。
+  // 代价:界面那个档位下拉对 2.x 是空操作(手填 SKU 本来就是"自己负责"那一档)。
+  if (/^gemini-[12]\./.test(model)) return {};
   const out: Record<string, unknown> = {};
   const level = (want?: ReasoningEffort) => pickThinkingLevel("gemini", model, want);
   if (isThinkingModel("gemini", model)) {
@@ -747,25 +728,32 @@ export const buildClaudeThinkingBody = (model: string, directive: ThinkingDirect
   return { maxTokens: mayThink ? 16384 : 8096, body };
 };
 
-export const claude: TranslationService = withRelayHint(async (params) => {
+export const claude: TranslationService = async (params) => {
   const { apiKey, model, reasoningEffort, useRelay } = params;
-  const { effectiveSystemPrompt, prompt } = preparePrompts(params);
+  const { effectiveSystemPrompt, promptPrefix, promptSuffix } = preparePrompts(params);
 
   const key = requireApiKey("Claude", apiKey);
   const effectiveModel = model || defaultConfigs.claude.model!;
   const { maxTokens, body: thinkingBody } = buildClaudeThinkingBody(effectiveModel, reasoningEffort);
 
-  // `system` as a block array (not a plain string) is the form that accepts
-  // `cache_control` — required since Claude is the ONLY provider where prompt
-  // caching is off by default. Anthropic silently no-ops the marker when the
-  // prompt is below the cacheable threshold (~1024 tokens for Sonnet/Haiku,
-  // 2048 for Opus), so short default prompts cost nothing extra; long custom
-  // prompts (glossaries, style guides) get ~90% input discount on cache hits.
+  // Block arrays (not plain strings) are the form that accepts `cache_control`
+  // — required since Claude is the ONLY provider where prompt caching is off
+  // by default. Two breakpoints: the system prompt, and the STATIC prefix of
+  // the user message (everything the template renders before ${content} —
+  // with ${fullText} that is the whole episode, resent on every batch;
+  // subtitle-translator#53). The dynamic tail (glossary block + content) stays
+  // unmarked. Anthropic silently no-ops a marker below the per-model cacheable
+  // minimum, so short prompts cost nothing extra; hits are ~90% off input.
+  // Empty text blocks are rejected (400), hence the guards.
   // Doc: docs.anthropic.com/en/docs/build-with-claude/prompt-caching
+  const userContent = [
+    ...(promptPrefix ? [{ type: "text", text: promptPrefix, cache_control: { type: "ephemeral" } }] : []),
+    ...(promptSuffix ? [{ type: "text", text: promptSuffix }] : []),
+  ];
   const requestBody: Record<string, unknown> = {
     model: effectiveModel,
     system: [{ type: "text", text: effectiveSystemPrompt, cache_control: { type: "ephemeral" } }],
-    messages: [{ role: "user", content: prompt }],
+    messages: [{ role: "user", content: userContent }],
     max_tokens: maxTokens,
     ...thinkingBody,
   };
@@ -790,4 +778,4 @@ export const claude: TranslationService = withRelayHint(async (params) => {
     signal: params.signal,
   });
   return getClaudeContent(data);
-}, "claude");
+};

@@ -36,8 +36,8 @@
   },
   "common": {
     "exportFolder": "Cartella di esportazione",
-    "exportFolderDefault": "Le esportazioni finiscono nella cartella dei download del browser. Chrome non accetta Desktop, Documenti, Download e la cartella utente stessa: scegli una sottocartella o un'altra cartella.",
-    "exportFolderDownloads": "Cartella dei download del browser",
+    "exportFolderDefault": "Le esportazioni finiscono nella cartella dei download predefinita.",
+    "exportFolderBlocked": "Il browser non accetta Desktop, Documenti, Download e la cartella utente stessa: scegli una sottocartella o un'altra cartella.",
     "exportFolderCurrent": "Le esportazioni finiscono in {dir}",
     "exportFolderReset": "Torna alla cartella dei download",
     "exportFolderFailed": "Impossibile impostare la cartella di esportazione.",
@@ -217,6 +217,7 @@
     "errorHint5xx": "Errore del server, riprova più tardi",
     "errorHintRelay": "Errore di rete (probabilmente CORS): attiva \"Relay API\" in «Altre impostazioni Provider»",
     "errorHintRelay403": "L'API ha restituito 403 Forbidden: attiva \"Relay API\" in «Altre impostazioni Provider»",
+    "errorHintCors": "Impossibile raggiungere questo indirizzo: controlla l'indirizzo e che il servizio consenta richieste cross-origin (CORS). I gateway self-hosted e i modelli locali devono abilitarlo, oppure usa il tuo Relay API",
     "errorHintGeminiKey": "Impossibile raggiungere Gemini: controlla prima la rete (alcune reti non raggiungono direttamente i servizi Google). Se la rete funziona, dal 19 giugno 2026 Google rifiuta le chiavi API senza restrizioni — rigenera la chiave in AI Studio (limitata per impostazione predefinita) o aggiungi una restrizione Gemini API alla vecchia chiave nella console Google Cloud",
     "rateLimitCooldown": "Limite di richieste raggiunto — breve pausa, nuovo tentativo automatico"
   },

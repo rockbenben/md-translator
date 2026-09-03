@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useSyncExternalStore } from "react";
 import { App, Button, Space, Tooltip } from "antd";
 import { FolderOpenOutlined, UndoOutlined } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
-import { supportsExportDir, getExportDirName, pickExportDir, clearExportDir } from "@/app/utils";
+import { supportsExportDir, isNativeExportDir, getExportDirName, pickExportDir, clearExportDir } from "@/app/utils";
 
 /**
  * 「导出目录」—— 让导出落进用户指定的文件夹。后端见 utils/exportDir.ts；
@@ -122,7 +122,11 @@ export const ExportFolderButton = ({ toolKey }: { toolKey: string }) => {
         // 「没选成」既可能是取消，也可能撞上 Chrome 的目录黑名单（桌面 / 文档 / 下载 /
         // 用户目录【本身】选不了）。两者都抛 AbortError，分不开，只能给一句兼顾的提示；
         // 已经设过目录时这次点击只是想换个地方，取消什么也没改变，那句提示反而添乱。
-        if (currentDir === null) message.info(t("exportFolderDefault"));
+        // 黑名单这句（exportFolderBlocked）只活在这条 toast 里 —— 它是【失败之后】才有用的
+        // 补救说明；放进每次 hover 的 tooltip 就是提前上课，tooltip 只回答一件事：现在导出落在哪。
+        // 而那个黑名单是 File System Access 这条路独有的：外壳注入原生选择器后根本没这回事，
+        // 那里「没选成」只可能是取消 —— 再提一句就是在桌面版里说假话。
+        if (currentDir === null) message.info(isNativeExportDir() ? t("exportFolderDefault") : `${t("exportFolderDefault")} ${t("exportFolderBlocked")}`);
         return;
       }
       publishDir(picked);
@@ -154,8 +158,16 @@ export const ExportFolderButton = ({ toolKey }: { toolKey: string }) => {
       <Tooltip title={dir ? t("exportFolderCurrent", { dir }) : t("exportFolderDefault")}>
         {/* || undefined:显式 false 会顶掉外层 ConfigProvider 的锁 */}
         <Button type="text" size="small" icon={<FolderOpenOutlined />} onClick={choose} disabled={locked || undefined} aria-label={t("exportFolder")}>
-          {/* 目录名直接写在按钮上:这个设置决定几十个文件落在哪,藏进 tooltip 太轻 */}
-          {dir ?? t("exportFolder")}
+          {/* 目录直接写在按钮上：这个设置决定几十个文件落在哪，藏进 tooltip 太轻。
+              浏览器只给文件夹名，桌面壳给的是完整路径（`C:\Users\…\subs`）—— 后者可以很长，
+              而标题行是 flex：实测一条 100 字符的路径在 640px 可用宽（桌面窗口最小 720）下
+              会直接溢出整行。所以给个上限 + 省略号 —— 截断无损，tooltip（exportFolderCurrent）
+              拿的是同一个 `dir`，完整路径在那里。
+              ⚠ 不能写成 `min(100%, 34ch)`：百分比会让按钮仍按 max-content 定宽（实测 span 被
+              截到 297px，按钮还是 718px，照样溢出）。就写字符宽。 */}
+          <span style={{ display: "inline-block", maxWidth: "34ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", verticalAlign: "bottom" }}>
+            {dir ?? t("exportFolder")}
+          </span>
         </Button>
       </Tooltip>
       {dir !== null && (

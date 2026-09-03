@@ -487,20 +487,22 @@ export const PROVIDERS = {
     // defaults-key-only 合并会清掉用户已存的旧值。
     defaults: { apiKey: "", model: "gemini-3.7-flash", batchSize: 20, contextBatchSize: 3, contextWindow: 50, thinkingEffort: {} },
     // 仅收录 Gemini 3.x 系列 (2.5 已过时，且参数协议不同需要 budget mapping 增加
-    // service 复杂度，精简掉)。Gemini 3 thinking 通过
+    // service 复杂度，精简掉 —— 手填旧世代由 buildGeminiThinkingConfig 的守卫兜住:
+    // thinkingLevel 打到 2.x 上是确定性 400,理由写在那里)。Gemini 3 thinking 通过
     // `generationConfig.thinkingConfig.thinkingLevel` 控制,默认开启且【没有关闭值】,
     // off 时传该 SKU 收得下的最低档;档位集合按 SKU 不同,就声明在下方每行的
     // thinkingLevels 里,解析统一走 pickThinkingLevel。
     // 默认 3.7-flash:2026-08-13 GA,官方称 "latest and most capable Flash";
     // 3.5-flash 已被官方页降称 "previous-generation Flash model"。
     // thinkingLevels 抄自官方【逐模型表】(ai.google.dev/gemini-api/docs/thinking,
-    // 2026-08-20 核对),由低到高。加 SKU 时对着那张表补这一行 —— 别再用
+    // 2026-09-01 全表复核),由低到高。加 SKU 时对着那张表补这一行 —— 别再用
     // "名字里有 -pro 就只收 low/high" 这类正则近似:官方表里 3-pro-preview 确实
     // 只收 low/high,但 3.1-pro-preview 收 low/medium/high,按名字归并会把用户
     // 选的 Medium 静默降级成 Low(与 grok 全线钳 medium 同一类 bug)。
     models: [
       { label: "Gemini 3.1 Pro (Preview)", value: "gemini-3.1-pro-preview", thinking: true, thinkingLevels: ["low", "medium", "high"] },
       { label: "Gemini 3.7 Flash", value: "gemini-3.7-flash", thinking: true, thinkingLevels: ["low", "medium", "high"] },
+      { label: "Gemini 3.6 Flash", value: "gemini-3.6-flash", thinking: true, thinkingLevels: ["minimal", "low", "medium", "high"] },
       { label: "Gemini 3.5 Flash", value: "gemini-3.5-flash", thinking: true, thinkingLevels: ["minimal", "low", "medium", "high"] },
       { label: "Gemini 3.5 Flash Lite", value: "gemini-3.5-flash-lite", thinking: true, thinkingLevels: ["minimal", "low", "medium", "high"] },
     ],
@@ -2069,6 +2071,43 @@ export const classifyEndpointUrl = (service: string, url: string | undefined): E
  */
 export const relayWouldServe = (service: string, opts: { url?: string; relayBase?: string }): boolean =>
   !usesBuiltinRelay(opts.relayBase) || classifyEndpointUrl(service, opts.url).kind !== "custom";
+
+/**
+ * 这个 provider 界面上有没有中转开关。withNetworkHint(services/index.ts)用它决定
+ * 该不该提「请开启中转」—— 指人去拨一个他那个 provider 根本没有的开关,
+ * 比不提示更糟。
+ *
+ * ⚠ 判据是【默认配置里有没有 useRelay 字段】,不是 `spec.defaultUseRelay`:
+ * 后者只是 openai-compat 工厂的输入(buildOpenAICompatDefault 据此填字段),
+ * 而手写 kind 的 claude / yandex 直接把 useRelay 写在自己的 defaults 里 ——
+ * 按 defaultUseRelay 判会把这两家当成「没有中转」。这里与 TranslationSettings
+ * 决定该不该渲染那个 Switch 的判据(config?.useRelay !== undefined)同源。
+ */
+const isRelayCapable = (service: string): boolean => getDefaultConfig(service)?.useRelay !== undefined;
+
+/**
+ * 「指他去开中转」这句话到底有没有用 —— withNetworkHint(services/index.ts)的
+ * CORS 改写与 deepseek 的 403 改写(services/llm.ts)共用这一个判据。
+ * 三个前置缺一不可:有那个开关、现在没开、开了真会路由到位（relayWouldServe
+ * —— 与端点解析、界面文案同一个判据,bare host / 官方变体 / 自建中转的取舍
+ * 不在这里重算）。
+ *
+ * ⚠ 别退回成 `&& !opts.url`:那是旧的「自定义 endpoint 压过开关」优先级留下的,
+ * 会连"填的就是官方地址"和"自己有中转"这两种真能获益的情况一起吃掉。
+ */
+export const relayHintWouldHelp = (service: string, opts: { useRelay?: boolean; url?: string; relayBase?: string }): boolean =>
+  isRelayCapable(service) && !opts.useRelay && relayWouldServe(service, opts);
+
+/**
+ * 「这个地址是用户自己的」—— withNetworkHint(services/index.ts)据此把网络错误改写成
+ * CORS 提示(中转帮不上,补救在对面服务器上)。两种形态缺一不可:
+ * URL_IS_PRIMARY_CRED 那几家根本没有官方默认端点(填什么都是他的);其余家
+ * 则看他是不是填了个非官方地址。
+ * ⚠ 单靠 kind==="custom" 会漏掉最常撞 CORS 的那批:LM Studio / Ollama 等
+ * 本地运行时地址在 llm 的 endpoints[] 里有芯片,会被判成 "variant"。
+ */
+export const isUserSuppliedEndpoint = (service: string, url: string | undefined): boolean =>
+  URL_IS_PRIMARY_CRED.has(service) || classifyEndpointUrl(service, url).kind === "custom";
 
 /**
  * THE wire-endpoint resolution —— 所有走中转开关的服务(openai-compat 工厂 +
