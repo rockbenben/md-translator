@@ -1,18 +1,8 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { Flex, Card, Button, Typography, Input, Upload, Form, Space, App, Tooltip, Spin, Row, Col, Divider, Switch, Collapse, theme } from "antd";
-import { SettingOutlined, CopyOutlined,
-  InboxOutlined,
-  FileTextOutlined,
-  ClearOutlined,
-  FormatPainterOutlined,
-  GlobalOutlined,
-  ImportOutlined,
-  InfoCircleOutlined,
-  SaveOutlined,
-  FileMarkdownOutlined,
-  ControlOutlined, } from "@ant-design/icons";
+import React, { useState } from "react";
+import { Flex, Card, Button, Typography, Form, Space, App, Tooltip, Spin, Row, Col, Divider, Switch, Collapse, theme } from "antd";
+import { SettingOutlined, FormatPainterOutlined, GlobalOutlined, ImportOutlined, InfoCircleOutlined, SaveOutlined, FileMarkdownOutlined, ControlOutlined } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import { getLangDir } from "rtl-detect";
 import { useCopyToClipboard } from "@/app/hooks/useCopyToClipboard";
@@ -22,28 +12,27 @@ import { useLocalStorage } from "@/app/hooks/useLocalStorage";
 import { useTextStats } from "@/app/hooks/useTextStats";
 import { useExportFilename } from "@/app/hooks/useExportFilename";
 
-import { splitTextIntoLines, downloadFile, describeError, isAbortError, isCascadedAbort, isNetworkError, getFileTypePresetConfig } from "@/app/utils";
+import { splitTextIntoLines, downloadFile, getFileTypePresetConfig } from "@/app/utils";
 import { MARKDOWN_DEFAULTS, filterMarkdownLines, PLACEHOLDER_REPLACE_REGEX, restorePlaceholders, splitMarkdownSegments, mergeMarkdownSegments, applyRemoveCharsToMarkdown, applyRemoveCharsToSegments } from "@/app/lib/translation/formats/markdown";
 import { LLM_MODELS } from "@/app/lib/translation";
 import { mapSkippingSoftFilled } from "@/app/lib/translation/softFill";
 import { delay } from "@/app/lib/translation/retry";
-import { useLanguageOptions } from "@/app/components/languages";
+import ToggleRow from "@/app/components/styled/ToggleRow";
 import LanguageSelector from "@/app/components/LanguageSelector";
 import ApiStatusBlock from "@/app/components/ApiStatusBlock";
 import ContextTranslationBlock from "@/app/components/ContextTranslationBlock";
 import { useTranslationContext } from "@/app/components/TranslationContext";
 import ResultCard from "@/app/components/ResultCard";
+import Section from "@/app/components/styled/Section";
 import TranslationProgressStrip from "@/app/components/TranslationProgressStrip";
 import AdvancedTranslationSettings from "@/app/components/AdvancedTranslationSettings";
 import TranslateFailurePanel from "@/app/components/TranslateFailurePanel";
 
 import MultiLanguageSettingsModal from "@/app/components/MultiLanguageSettingsModal";
-import SourceArea from "@/app/components/SourceArea";
+import UploadSourceCard from "@/app/components/UploadSourceCard";
 import { useFileExport } from "@/app/hooks/useFileExport";
 import { useLockExportFolder } from "@/app/components/ExportFolder";
 
-const { TextArea } = Input;
-const { Dragger } = Upload;
 const { Text } = Typography;
 
 const uploadFileTypes = getFileTypePresetConfig("markdownText");
@@ -52,23 +41,17 @@ const MDTranslator = () => {
   const tMarkdown = useTranslations("MDTranslator");
   const t = useTranslations("common");
 
-  const { sourceOptions } = useLanguageOptions();
   const { copyToClipboard } = useCopyToClipboard();
+  const upload = useFileUpload("md-translator");
   const {
     isFileProcessing,
-    fileList,
     multipleFiles,
     readFile,
     sourceText,
-    setSourceText,
     uploadMode,
     singleFileMode,
     setSingleFileMode,
-    handleFileUpload,
-    handleUploadRemove,
-    handleUploadChange,
-    resetUpload,
-  } = useFileUpload("md-translator");
+  } = upload;
   const {
     exportSettings,
     importSettings,
@@ -90,31 +73,27 @@ const MDTranslator = () => {
     failedCount,
     failedLines,
     failedLangs,
-    setFailedLangs,
     failedReason,
     clearFailures,
-    markRunHadFailures,
     runHadFailures,
-    hadRunFailures,
     runRetry,
     isScopedRetry,
     getActiveTargetLangs,
-    isDisposed,
     isTranslating,
-    setIsTranslating,
     resetProgress,
     progressPercent,
-    setProgressPercent,
     progressInfo,
     handleLanguageChange,
     handleSwapLanguages,
-    validate,
     requestCancel,
     isCancelRequested,
     retryCount,
     setRetryCount,
     requestTimeoutSec,
     setRequestTimeoutSec,
+    runBatchTranslation,
+    reportLangFailure,
+    noteFileFailure,
   } = useTranslationContext();
 
   // 运行中锁住页面级「导出目录」入口:写入是每个文件现读句柄,跑到一半改目录
@@ -123,8 +102,6 @@ const MDTranslator = () => {
   const { message } = App.useApp();
   const exportFile = useFileExport();
   const { token } = theme.useToken();
-  const cardStyle: React.CSSProperties = { boxShadow: token.boxShadowTertiary };
-
 
   const sourceStats = useTextStats(sourceText);
   const resultStats = useTextStats(translatedText);
@@ -148,17 +125,6 @@ const MDTranslator = () => {
   const [multiLangModalOpen, setMultiLangModalOpen] = useState(false);
   // 提取出的纯文本预览 — tool-local,不放在共享 TranslationContext 里。
   const [extractedText, setExtractedText] = useState("");
-  // 批量翻译时统计失败文件数;handleMultipleTranslate 开始时重置,结束时读取以决定汇总消息。
-  // 单文件模式(runTranslation 路径)下也会被写,但不会被读,无副作用。
-  const failedFilesRef = useRef(0);
-  // 【记一次文件级失败,只走这一个入口】。此前是两套并行记账:failedFilesRef
-  // 只喂末尾的汇总 toast,markRunHadFailures 才是进度条能看见的信号 —— 结果
-  // 批量里第一个文件格式不支持时只 bump 了 ref,进度条照样打绿色「翻译完成
-  // 100%」,正压在「已导出 (4/5)」上面。合成一个函数,漏不掉。
-  const noteFileFailure = () => {
-    failedFilesRef.current++;
-    markRunHadFailures();
-  };
   // 记录 translatedText 对应的目标语种,handleExportFile 用它生成文件名;
   // 多语言模式下 translatedText 是 previewLang(常规跑 = targetLangs[0];scoped
   // 重试时保持上一次预览的语种)而非主 targetLanguage,不记录的话导出文件名会
@@ -293,96 +259,11 @@ const MDTranslator = () => {
           await delay(500);
         }
       } catch (error: unknown) {
-        if (isCascadedAbort(error)) continue;
-        hasFailedLang = true;
-        markRunHadFailures(); // so runTranslation reports this hard failure → no contradictory success toast
-        // De-duped: multi-file batch can fire catch for the same lang per file.
-        setFailedLangs((prev) => (prev.includes(currentTargetLang) ? prev : [...prev, currentTargetLang]));
-        const friendly = isNetworkError(error) ? t("networkUnavailable") : isAbortError(error) ? t("translationTimeout") : null;
-        const langLabel = sourceOptions.find((o) => o.value === currentTargetLang)?.label || currentTargetLang;
-        const messageText = friendly ? `${friendly} (${langLabel})` : [describeError(error, t), langLabel, t("translationError")].join(" ");
-        // Shared key: failed languages roll into one toast instead of stacking N high
-        // — the TranslateFailurePanel keeps the full per-lang list.
-        message.error({ content: messageText, key: "translate-lang-fail", duration: 10 });
+        if (reportLangFailure(error, currentTargetLang)) hasFailedLang = true;
       }
     }
 
     if (hasFailedLang) noteFileFailure();
-  };
-
-  const handleMultipleTranslate = async () => {
-    if (multipleFiles.length === 0) {
-      message.error(t("noFileUploaded"));
-      return;
-    }
-
-    // validate 不再自管 isTranslating, 这里 try/finally 兜底
-    // 让 progress modal 在 test ping → 文件循环之间保持连续可见。
-    setIsTranslating(true);
-    // resetProgress 而非裸 setProgressPercent(0):progressInfo 的 {current,
-    // total} 不清,进度弹窗会在新一轮首批返回前一直显示上一轮的最终计数。
-    resetProgress();
-    failedFilesRef.current = 0;
-    // Batch path doesn't go through the hook's runTranslation — reset ALL failure
-    // state (not just langs) so counts don't accumulate across runs and the failure
-    // warning re-fires on a fresh batch.
-    clearFailures();
-
-    try {
-      const isValid = await validate();
-      if (!isValid) return;
-
-      for (let i = 0; i < multipleFiles.length; i++) {
-        const currentFile = multipleFiles[i];
-        await new Promise<void>((resolve) => {
-          readFile(
-            currentFile,
-            async (text) => {
-              await performTranslation(text, currentFile.name, i, multipleFiles.length);
-              await delay(1500);
-              resolve();
-            },
-            // Decode/read failure: mark this file failed (so succeeded=total-failed is
-            // accurate) and unblock the loop.
-            () => {
-              noteFileFailure();
-              resolve();
-            }
-          );
-        });
-        // 中途导航离开:后续文件只会逐个快速级联失败,汇总 toast 也会弹在
-        // 用户切去的页面上 —— 直接收工。取消同理:requestCancel 已弹过提示,
-        // 「已导出 (n/m)」的汇总只会把一次主动喊停说成一次半失败。
-        if (isDisposed() || isCancelRequested()) return;
-      }
-
-      // 非取消结束时把进度钉到 100%,与 JSONTranslator 一致。
-      // 不钉的话:批量里有文件被跳过(格式不支持 / 解码失败)时进度只走到
-      // (成功文件数/总数)*100 —— 进度条据 percent<100 判为 stopped,对着一次用户
-      // 【没有】取消的运行打「已停止」,并把 failed / lineFailures 两个信号整个
-      // 丢掉(doneWithFailures 以 done 为前提),正是 noteFileFailure 与
-      // translateDoneIncomplete 要覆盖的场景。
-      // 取消的 run 不钉:钉上去等于替一次主动喊停亮绿灯。
-      // `p > 0 ? 100 : p` 与 runTranslation 的单文件钉【同一条规则】:批量里
-      // 每个文件都在发请求前就失败时(格式不支持 / 解码失败),makeUpdateProgress
-      // 从未跑过、percent 恒为 0,无条件钉会显示 100% 的琥珀色「INCOMPLETE」——
-      // 声称有行保留了原文,而失败面板是空的。进度动过才钉。
-      if (!isCancelRequested()) setProgressPercent((p) => (p > 0 ? 100 : p));
-
-      // 部分/全失败时不报"已导出"(per-file error toast 已经告知细节),只在有成功时显示汇总。
-      // hadRunFailures() 覆盖行级软失败(provider 故障时文件是原文副本)。
-      const total = multipleFiles.length;
-      const failed = failedFilesRef.current;
-      const succeeded = total - failed;
-      if (failed === 0 && !hadRunFailures()) {
-        message.success(t("translationExported"), 10);
-      } else if (succeeded > 0) {
-        message.warning(`${t("translationExported")} (${succeeded}/${total})`, 10);
-      }
-      // 全失败:per-file error toast 已显示,无需再叠加 message
-    } finally {
-      setIsTranslating(false);
-    }
   };
 
   // Single-file translation just shows the result (no per-file export toast), so confirm
@@ -423,67 +304,7 @@ const MDTranslator = () => {
       <Row gutter={[24, 24]}>
         {/* Left Column: Upload and Main Actions */}
         <Col xs={24} lg={14} xl={15}>
-          <Card
-            title={
-              <Space>
-                <InboxOutlined /> {t("sourceArea")}
-              </Space>
-            }
-            extra={
-              <Tooltip title={t("resetUploadTooltip")}>
-                <Button
-                  type="text"
-                  danger
-                  disabled={isTranslating}
-                  onClick={() => {
-                    resetUpload();
-                    clearResults();
-                    message.success(t("resetUploadSuccess"));
-                  }}
-                  icon={<ClearOutlined />}
-                  aria-label={t("clearAll")}>
-                  {t("clearAll")}
-                </Button>
-              </Tooltip>
-            }
-            style={cardStyle}>
-            <Dragger
-              disabled={isTranslating}
-              customRequest={({ file }) => {
-                clearResults();
-                handleFileUpload(file as File);
-              }}
-              accept={uploadFileTypes.accept}
-              multiple={!singleFileMode}
-              showUploadList
-              beforeUpload={singleFileMode ? resetUpload : undefined}
-              onRemove={(file) => {
-                clearResults();
-                return handleUploadRemove(file);
-              }}
-              onChange={handleUploadChange}
-              fileList={fileList}>
-              <p className="ant-upload-drag-icon">
-                <InboxOutlined />
-              </p>
-              <p className="ant-upload-text">{t("dragAndDropText")}</p>
-              <p className="ant-upload-hint">
-                {t("supportedFormats")} {uploadFileTypes.fullLabel}
-              </p>
-            </Dragger>
-
-            {uploadMode === "single" && (
-              <SourceArea
-                textDirection="auto"
-                locked={isTranslating}
-                sourceText={sourceText}
-                setSourceText={setSourceText}
-                stats={sourceStats}
-                placeholder={t("pasteUploadContent")}
-                ariaLabel={t("sourceArea")}
-                className="mt-1"
-              />
-            )}
+          <UploadSourceCard upload={upload} stats={sourceStats} fileTypes={uploadFileTypes} formatsHint={uploadFileTypes.fullLabel} multiFile textDirection="auto" locked={isTranslating} onClear={clearResults} onSourceChange={clearResults}>
 
             <Divider />
 
@@ -493,7 +314,7 @@ const MDTranslator = () => {
                 size="large"
                 icon={<GlobalOutlined spin={isTranslating} />}
                 className="flex-1"
-                onClick={() => (uploadMode === "single" ? handleSingleTranslate() : handleMultipleTranslate())}
+                onClick={() => (uploadMode === "single" ? handleSingleTranslate() : runBatchTranslation(performTranslation, multipleFiles, readFile, t("noFileUploaded")))}
                 disabled={isTranslating}
                 loading={isTranslating}>
                 {multiLanguageMode ? `${t("translate")} | ${t("totalLanguages")}${targetLanguages.length || 0}` : t("translate")}
@@ -519,14 +340,13 @@ const MDTranslator = () => {
               currentCount={progressInfo.current}
               totalCount={progressInfo.total}
             />
-          </Card>
+          </UploadSourceCard>
         </Col>
 
         {/* Right Column: Settings and Configuration */}
         <Col xs={24} lg={10} xl={9}>
           <Card
             title={<Space><SettingOutlined /> {t("configuration")}</Space>}
-            style={cardStyle}
             extra={
               <Space>
                 <Tooltip title={t("exportSettingTooltip")}>
@@ -600,21 +420,12 @@ const MDTranslator = () => {
                   ),
                   children: (
                     <Flex vertical gap="middle">
-                      <section
-                        style={{
-                          padding: token.paddingSM,
-                          background: "transparent",
-                          border: `1px solid ${token.colorBorderSecondary}`,
-                          borderRadius: token.borderRadiusLG,
-                        }}>
+                      <Section noGap>
                         <Text strong style={{ display: "block", marginBottom: token.marginXS, fontSize: token.fontSizeSM }}>
                           {tMarkdown("translateContentGroup")}
                         </Text>
                         <Flex vertical gap="small">
-                          <Flex component="label" className="cursor-pointer" justify="space-between" align="center">
-                            <Tooltip title={tMarkdown("tFrontmatterTooltip")}>
-                              <span>{tMarkdown("tFrontmatter")}</span>
-                            </Tooltip>
+                          <ToggleRow label={tMarkdown("tFrontmatter")} tooltip={tMarkdown("tFrontmatterTooltip")}>
                             <Switch
                               disabled={isTranslating}
                               size="small"
@@ -622,11 +433,8 @@ const MDTranslator = () => {
                               onChange={(checked) => setMdOptions((prev) => ({ ...prev, translateFrontmatter: checked }))}
                               aria-label="Frontmatter"
                             />
-                          </Flex>
-                          <Flex component="label" className="cursor-pointer" justify="space-between" align="center">
-                            <Tooltip title={tMarkdown("tCodeBlocksTooltip")}>
-                              <span>{tMarkdown("tCodeBlocks")}</span>
-                            </Tooltip>
+                          </ToggleRow>
+                          <ToggleRow label={tMarkdown("tCodeBlocks")} tooltip={tMarkdown("tCodeBlocksTooltip")}>
                             <Switch
                               disabled={isTranslating}
                               size="small"
@@ -634,11 +442,8 @@ const MDTranslator = () => {
                               onChange={(checked) => setMdOptions((prev) => ({ ...prev, translateMultilineCode: checked }))}
                               aria-label={tMarkdown("tCodeBlocks")}
                             />
-                          </Flex>
-                          <Flex component="label" className="cursor-pointer" justify="space-between" align="center">
-                            <Tooltip title={tMarkdown("tLatexTooltip")}>
-                              <span>{tMarkdown("tLatex")}</span>
-                            </Tooltip>
+                          </ToggleRow>
+                          <ToggleRow label={tMarkdown("tLatex")} tooltip={tMarkdown("tLatexTooltip")}>
                             <Switch
                               disabled={isTranslating}
                               size="small"
@@ -646,11 +451,8 @@ const MDTranslator = () => {
                               onChange={(checked) => setMdOptions((prev) => ({ ...prev, translateLatex: checked }))}
                               aria-label={tMarkdown("tLatex")}
                             />
-                          </Flex>
-                          <Flex component="label" className="cursor-pointer" justify="space-between" align="center">
-                            <Tooltip title={tMarkdown("tLinkText")}>
-                              <span>{tMarkdown("tLinkText")}</span>
-                            </Tooltip>
+                          </ToggleRow>
+                          <ToggleRow label={tMarkdown("tLinkText")} tooltip={tMarkdown("tLinkText")}>
                             <Switch
                               disabled={isTranslating}
                               size="small"
@@ -658,27 +460,18 @@ const MDTranslator = () => {
                               onChange={(checked) => setMdOptions((prev) => ({ ...prev, translateLinkText: checked }))}
                               aria-label={tMarkdown("tLinkText")}
                             />
-                          </Flex>
+                          </ToggleRow>
                         </Flex>
-                      </section>
+                      </Section>
 
-                      <section
-                        style={{
-                          padding: token.paddingSM,
-                          background: "transparent",
-                          border: `1px solid ${token.colorBorderSecondary}`,
-                          borderRadius: token.borderRadiusLG,
-                        }}>
+                      <Section noGap>
                         <Text strong style={{ display: "block", marginBottom: token.marginXS, fontSize: token.fontSizeSM }}>
                           {tMarkdown("formatModeGroup")}
                         </Text>
-                        <Flex component="label" className="cursor-pointer" justify="space-between" align="center">
-                          <Tooltip title={tMarkdown("rawTranslationModeTooltip")}>
-                            <span>{tMarkdown("rawTranslationMode")}</span>
-                          </Tooltip>
+                        <ToggleRow label={tMarkdown("rawTranslationMode")} tooltip={tMarkdown("rawTranslationModeTooltip")}>
                           <Switch size="small" checked={effectiveRawMode} onChange={setRawMode} disabled={contextAwareActive || isTranslating} aria-label={tMarkdown("rawTranslationMode")} />
-                        </Flex>
-                      </section>
+                        </ToggleRow>
+                      </Section>
                     </Flex>
                   ),
                 },
@@ -721,7 +514,7 @@ const MDTranslator = () => {
         failedLangs={failedLangs}
         reason={failedReason}
         disabled={isTranslating}
-        onRetry={() => runRetry(() => (uploadMode === "single" ? handleSingleTranslate() : handleMultipleTranslate()))}
+        onRetry={() => runRetry(() => (uploadMode === "single" ? handleSingleTranslate() : runBatchTranslation(performTranslation, multipleFiles, readFile, t("noFileUploaded"))))}
       />
 
       {/* Results Section */}
@@ -732,9 +525,8 @@ const MDTranslator = () => {
               <Col xs={24} lg={extractedText ? 12 : 24}>
                 <ResultCard
                   title={t("translationResult")}
-                  content={resultStats.displayText}
-                  charCount={resultStats.charCount}
-                  lineCount={resultStats.lineCount}
+                  content={translatedText}
+                  stats={resultStats}
                   onCopy={() => copyToClipboard(translatedText)}
                   onExport={handleExportFile}
                   textDirection={getLangDir(translatedTextLang ?? targetLanguage)}
@@ -744,26 +536,7 @@ const MDTranslator = () => {
 
             {extractedText && (
               <Col xs={24} lg={translatedText ? 12 : 24}>
-                <Card
-                  title={
-                    <Space>
-                      <FileTextOutlined /> {t("extractedText")}
-                    </Space>
-                  }
-                  className="h-full"
-                  style={{ boxShadow: token.boxShadowTertiary }}
-                  extra={
-                    <Space wrap>
-                      <Button type="text" icon={<CopyOutlined />} onClick={() => copyToClipboard(extractedText)}>
-                        {t("copy")}
-                      </Button>
-                      <Button type="text" icon={<CopyOutlined />} onClick={() => copyToClipboard(taggedText)}>
-                        {tMarkdown("textWithPlaceholders")}
-                      </Button>
-                    </Space>
-                  }>
-                  <TextArea value={extractedText} rows={10} readOnly dir="auto" aria-label={t("extractedText")} />
-                </Card>
+                <ResultCard title={t("extractedText")} content={extractedText} textDirection="auto" showStats={false} onCopy={() => copyToClipboard(extractedText)} onCopyNode={() => copyToClipboard(taggedText)} copyNodeLabel={tMarkdown("textWithPlaceholders")} />
               </Col>
             )}
           </Row>
