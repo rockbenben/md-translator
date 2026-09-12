@@ -140,7 +140,9 @@ const MDTranslator = () => {
 
   // 作废上一轮翻译产物:Clear All 与换/删上传文件时调用,使译文结果、语种标记、
   // 失败面板回到"未翻译"初始态。extractedText 由上面的 prevSourceText 复位。
+  // resetProgress 不能漏:完成后常驻的 TranslationProgressStrip 只认自己的 ✕。
   const clearResults = () => {
+    resetProgress();
     setTranslatedText("");
     setTranslatedTextLang(null);
     clearFailures();
