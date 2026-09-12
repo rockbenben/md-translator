@@ -431,7 +431,7 @@ const MDTranslator = () => {
                               size="small"
                               checked={mdOptions.translateFrontmatter}
                               onChange={(checked) => setMdOptions((prev) => ({ ...prev, translateFrontmatter: checked }))}
-                              aria-label="Frontmatter"
+                              aria-label={tMarkdown("tFrontmatter")}
                             />
                           </ToggleRow>
                           <ToggleRow label={tMarkdown("tCodeBlocks")} tooltip={tMarkdown("tCodeBlocksTooltip")}>
