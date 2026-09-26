@@ -42,6 +42,7 @@ const OG_LOCALE_MAP: Record<string, string> = {
   bn: "bn_BD",
   id: "id_ID",
   it: "it_IT",
+  hu: "hu_HU",
 };
 
 /** Convert internal locale to OpenGraph locale format (e.g. "zh" → "zh_CN") */

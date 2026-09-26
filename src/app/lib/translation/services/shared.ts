@@ -259,6 +259,22 @@ export const completeOpenAICompatUrl = (url: string): string => {
 };
 
 /**
+ * Azure OpenAI v1 GA：用户填的是【资源根】(https://<resource>.openai.azure.com，
+ * 官方文档明写 https://<resource>.services.ai.azure.com 同形也收)，固定路径
+ * /openai/v1/chat/completions 由我们拼。也接受用户直接贴 OpenAI 客户端示例里
+ * 的 base_url 形态 (…/openai/v1) 或完整 chat/completions 全地址 —— 后两者旧实现
+ * (裸字符串拼接)会拼出双份路径，这里顺带修正。APIM 网关等自定义前缀按旧行为
+ * 处理:整体当 base 再拼固定路径。
+ */
+export const completeAzureUrl = (url: string): string => {
+  const cleaned = url.trim().replace(/\/+$/, "");
+  if (!cleaned) return cleaned;
+  if (cleaned.endsWith("/chat/completions")) return cleaned;
+  if (cleaned.endsWith("/openai/v1")) return `${cleaned}/chat/completions`;
+  return `${cleaned}/openai/v1/chat/completions`;
+};
+
+/**
  * 「这个 relayBase 实际指向的是不是内置公共中转」。空 = 内置;⚠ 非空但写的就是
  * 内置地址【也是内置】—— 它是输入框的 placeholder,用户"把默认写明白"是最顺手
  * 的操作,把它当"自建"会绕过 registry.relayWouldServe 的保护:带密钥的自定义
@@ -335,7 +351,7 @@ export const requireUrl = (serviceName: string, url: string | undefined): string
 // 注意:这里【不再】拼接用户提示文案。每个状态码代表的可行动问题由展示层
 // 的 describeError(utils/errorUtils.ts)按错误对象的 .status 查 i18n 键
 // (common.errorHint*)生成 —— 纯 TS 的 service 层拿不到 locale,文案烤进
-// message 只能双语硬编码,搬到显示侧后 18 语种全覆盖。本函数只负责把
+// message 只能双语硬编码,搬到显示侧后 19 语种全覆盖。本函数只负责把
 // 响应体里的真实错误信息提炼成 `[status] message` 形态。
 export const formatHttpError = (data: unknown, status: number): string => {
   const obj = data as Record<string, unknown> | null;

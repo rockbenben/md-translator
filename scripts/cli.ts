@@ -23,7 +23,7 @@ import { homedir } from "node:os";
 import { buildRuntimeConfig, translateLines, type PipelineCache, type PipelineRuntimeConfig, type PipelineOutcome, type TranslateBatchMeta } from "../src/app/lib/translation/pipeline";
 import { CliFileFormatError, CLI_FORMAT_HANDLERS, triState, type CliFormatContext } from "../src/app/lib/translation/cliFormat";
 import { appendBilingualSuffix } from "../src/app/lib/translation/formats/subtitle";
-import { getDefaultConfig, defaultConfigs, LLM_MODELS } from "../src/app/lib/translation/registry";
+import { getDefaultConfig, defaultConfigs, isUiHiddenMethod, findMethodLabel, LLM_MODELS } from "../src/app/lib/translation/registry";
 import { isValidLanguageValue } from "../src/app/lib/translation/utils";
 import { REQUIRES_EXPLICIT_SOURCE, isMethodSupportedForLanguage } from "../src/app/lib/translation/languages-data";
 import { isDefiniteAuthFailure } from "../src/app/lib/translation/retry";
@@ -64,6 +64,9 @@ Subtitle files:
       --bilingual           Bilingual output (default: translated only).
       --original-first      Original above/before the translation in bilingual output.
       --bilingual-format <ass|srt>  Bilingual format for srt/vtt sources. Default: ass.
+      --no-ass-auto-wrap    Disable width-aware line wrapping in bilingual ASS output
+                            (default: on — long lines get deterministic \N breaks at
+                            punctuation, like the web tool).
       --no-context          Disable context-aware LLM batching (default: on, like the web tool).
 
 Markdown files:
@@ -90,6 +93,8 @@ const parseCliArgs = () =>
       bilingual: { type: "boolean" },
       "original-first": { type: "boolean" },
       "bilingual-format": { type: "string" },
+      // 只注册非默认侧:assAutoWrap 默认开(SUBTITLE_DEFAULTS),--no-ass-auto-wrap 关闭。
+      "no-ass-auto-wrap": { type: "boolean" },
       "md-raw": { type: "boolean" },
       // 每项只注册【非默认那一侧】的 flag —— 反向 flag 在当前默认下是空操作
       // (--md-no-code 关掉的是本来就关着的东西),加了只是给用户 4 个按了没反应
@@ -297,7 +302,30 @@ const main = async (): Promise<number> => {
     return 0;
   }
   if (args["list-methods"]) {
-    console.log(Object.keys(defaultConfigs).join("\n"));
+    // hidden provider(用途受限的订阅套餐端点)与网页选择器同一判据,不列;
+    // 显式 -m 指定或设置文件里选中仍然可用(defaultConfigs 全量包含)。
+    //
+    // ⚠ 第二列必须打 label,不能只打 key —— 同一个厂商的两条产品线在这里会长得
+    // 很像:`opencodeZen`(Zen,余额按量)与 `opencodeGo`(订阅套餐线)。网页选择器
+    // 显示的是 label("OpenCode Zen" / "OpenCode Go"),一眼能分;CLI 若只打 key,
+    // 用户看到的就是「opencodeZen / opencodeGo」,得先知道内部命名才猜得出谁是谁。
+    // key 放第一列(它是 -m 要传的值),与 --list-formats 的 `${id}\t…` 同形。
+    //
+    // ⚠ 一般不要为了"自解释"去改 provider key:它是持久化标识(settings.json 存档、
+    // 下游目录的 key 字段),改名会打断已存档的设置 —— doubao/alibaba 换套餐时
+    // 特意保住了旧 key,同一个判据。
+    // 但 `opencode` → `opencodeZen` 是一次**明知故犯**的例外:那个 key 单独出现时
+    // 读不出是 Zen 还是 Go(正是它让人以为两条产品线该合成一个 provider),而
+    // ① 它的用户极少,② 过期值会优雅回落(getDefaultConfig 判不过就回 DEFAULT_API,
+    // 且不写回 localStorage),③ 同一厂商的姊妹条目已经叫 opencodeGo。
+    // 代价要说清:下游三个 app 存档里的 "opencode" 会失效,且 Worker 必须重新部署
+    // (/api/opencode → /api/opencodeZen)。
+    console.log(
+      Object.keys(defaultConfigs)
+        .filter((k) => !isUiHiddenMethod(k))
+        .map((k) => `${k}\t${findMethodLabel(k)}`)
+        .join("\n"),
+    );
     return 0;
   }
   if (args["list-formats"]) {

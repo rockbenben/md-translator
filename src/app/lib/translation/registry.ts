@@ -4,18 +4,50 @@
 // TRANSLATION_PROVIDERS (UI list), LLM_MODELS, defaultConfigs, categorizedOptions,
 // OPENAI_COMPAT_PROVIDERS (factory input), findMethodLabel, getDefaultConfig,
 // and the TranslationMethod union type are all derived views over PROVIDERS.
+//
+// ⚠ 选品规则：AI provider（category: llm / aggregator）里【不放专属翻译模型】。
+//   专属 MT 只属于 category: "machine-translation" 的那几个 provider（qwenMt /
+//   translategemma / milmmt / deepl / google …）—— 它们是按 MT 的调用契约【单独实现】的
+//   （固定提示词、关掉上下文与术语表开关、逐 SKU 的语种支持表）。挂在 llm 类 provider 下
+//   只是"多一个能选的 id"，却拿不到那套契约，而且会误导人：本工具支持 100+ 语种，这类
+//   模型的覆盖面小得多（实测 command-a-translate 只有 23 种、上下文 8K、官方还要求生产
+//   使用先联系销售）。要 MT 质量 → 让用户去选 machine-translation 类。
+//
+// ⚠ 每次更新模型清单，除了加/删 SKU，必须逐条确认这三件事：
+//   ① defaultModel 仍在 models[] 里（registry.test 会拦，但别等测试）；
+//   ② 默认模型【近期没有下架计划】—— 默认是最要命的那一条：它烂掉等于整个 provider
+//      开箱即坏。实例见 nvidia 条目（当时的默认模型挂着 `DEPRECATION: 09/19/2026`，
+//      两天后死；只有实拉 /v1/models 才看得见）；
+//   ③ 该条目的 docs 链接仍指向在售型号（下架常伴随文档改版，链接会先 404）。
+//   厂商事实怎么核（哪些端点不带 key 也能实拉、弃用标记藏在页面哪一段）见各条目
+//   注释里的先例：nvidia（/v1/models 实拉 + 页面内嵌 isDeprecated/DEPRECATION）、
+//   opencodeZen / opencodeGo / atlascloud（官方 /v1/models 不带 key 即返回全量目录）、
+//   以及官方文档里的「即将下线 / deprecated」标记。
 
 import type { ReasoningEffort, ThinkingDirective, TranslationConfig, TranslationProvider } from "./types";
-// 纯 URL 工具,放在零依赖的 services/shared 里 —— 端点解析(拼 ?endpoint=)与
-// 这里的分类必须用【同一个】规范化,否则界面判成官方、线上却因大小写/尾斜杠
-// 被中转 allowlist 精确匹配拒掉(exact match)。
-import { canonicalEndpoint, completeClaudeUrl, completeOpenAICompatUrl, relayUrl, usesBuiltinRelay } from "./services/shared";
+// 纯 URL 工具，放在零依赖的 services/shared 里 —— 端点解析 (拼 ?endpoint=) 与
+// 这里的分类必须用【同一个】规范化，否则界面判成官方、线上却因大小写/尾斜杠
+// 被中转 allowlist 精确匹配拒掉 (exact match)。
+import { canonicalEndpoint, completeAzureUrl, completeClaudeUrl, completeOpenAICompatUrl, relayUrl, usesBuiltinRelay } from "./services/shared";
 
 export type ServiceCategory = "machine-translation" | "llm" | "aggregator";
 
 type BaseProvider = {
   label: string;
   category: ServiceCategory;
+  /**
+   * UI 默认隐藏的 provider。服务/缓存/重试/CLI 等一切【行为层】视图照常包含
+   * (导入设置选中后全套功能可用),只从网页的服务选择器与「已配置」chips 里过滤，
+   * 用户在 TranslationSettings 里显式打开开关后才出现 (getVisibleCategorizedOptions
+   * 是唯一过滤点)。
+   *
+   * 存在理由不是"实验性功能",而是【目录下发】:365 系列的 legend-talk 把
+   * 订阅套餐端点 (火山 Coding Plan、阿里 Token Plan) 当一等公民，那些厂商事实
+   * (模型 id、思考 wire) 需要一个单一事实源经 sync-provider-catalog 下发，
+   * 生成器不过滤 hidden。本工具自己不主动展示的原因见 volcengine / alibaba
+   * 条目注释 (官方文档的封号风险)。
+   */
+  hidden?: true;
   docs?: string;
   apiKeyUrl?: string;
   /**
@@ -28,23 +60,23 @@ type BaseProvider = {
    * that default — so the active tag highlights correctly.
    */
   /**
-   * `label` 的写法约定 —— 这些字符串【不走 i18n】,会原样显示给所有语言的用户,
-   * 所以不能写中文(tokenhub 曾写成「广州」「新加坡」,英文/日文界面上就是两个方块字)。
-   * 也不要在 label 里标「(默认)」:哪个在用由高亮表达(见 TranslationSettings 的
-   * 端点标签),写进文案就是同一事实编码两遍,而且各家标法还会不一致。
+   * `label` 的写法约定 —— 这些字符串【不走 i18n】,会原样显示给所有语言的用户，
+   * 所以不能写中文 (tokenhub 曾写成「广州」「新加坡」,英文/日文界面上就是两个方块字)。
+   * 也不要在 label 里标「(默认)」:哪个在用由高亮表达 (见 TranslationSettings 的
+   * 端点标签),写进文案就是同一事实编码两遍，而且各家标法还会不一致。
    * 一条原则:label 写【能把这个选项跟同组其他选项区分开的那个信息】,别写别处
-   * 已经有的。点中标签后完整地址就显示在下面的输入框里,所以能从地址读到的东西
-   * (端口、路径)通常不该进 label;provider 名也不该重复(LiteLLM 下面再挂个叫
-   * "LiteLLM" 的选项等于没说)。反过来,泛词(`Local`)或裸主机名(`translate-pa`)
+   * 已经有的。点中标签后完整地址就显示在下面的输入框里，所以能从地址读到的东西
+   * (端口、路径) 通常不该进 label;provider 名也不该重复 (LiteLLM 下面再挂个叫
+   * "LiteLLM" 的选项等于没说)。反过来，泛词 (`Local`) 或裸主机名 (`translate-pa`)
    * 同样不合格 —— 它们没说清那是什么。
-   * 落到几类上:
-   *   - 地域(同一服务的国内/海外节点):统一 `Mainland (CN)` / `International`
+   * 落到几类上：
+   *   - 地域 (同一服务的国内/海外节点):统一 `Mainland (CN)` / `International`
    *     / `US`,别用城市名 —— 用户关心的是"哪个区",不是机房在哪座城
-   *   - 产品线 / 协议(不是地域):照厂商叫法并点明区别,如 doubao
+   *   - 产品线 / 协议 (不是地域):照厂商叫法并点明区别，如 doubao
    *     `Pay-as-you-go` / `Token Plan (CN)`、gtxFreeAPI `Google translate-pa` /
-   *     `Google gtx (legacy)`(两者是两套协议,见 services/traditional.ts 的分流)
-   *   - 多个本地运行时 / 自建网关:产品名就是区分点,`LM Studio` / `Ollama` /
-   *     `llama.cpp` / `LiteLLM`,不必写端口(地址栏里有)
+   *     `Google gtx (legacy)`(两者是两套协议，见 services/traditional.ts 的分流)
+   *   - 多个本地运行时 / 自建网关：产品名就是区分点，`LM Studio` / `Ollama` /
+   *     `llama.cpp` / `LiteLLM`,不必写端口 (地址栏里有)
    *
    * ⚠ 这个数组同时是【中转侧的 allowlist】:relay provider 的 endpoints 必须与
    * scripts/llm-proxy-worker.js 里同名 provider 的 URL 集合完全一致
@@ -52,10 +84,10 @@ type BaseProvider = {
    * `?endpoint=` 传给 Worker,Worker 校验它属于该集合后转发 —— 所以【每个官方
    * 变体都能走中转】,不需要逐个手工开路由。
    *
-   * 曾经这里有个 `relayKey` 字段(变体各自对应一条 Worker 路由),已删除:它把
-   * 「用哪个官方端点」(provider 事实)和「走哪条中转路由」(传输细节)绑死,要求
-   * 每个变体手工 opt-in,结果 9 个变体(qwen 三地域、mimo 四档、moonshot 国际站
-   * Plan…)一选中就静默失去中转 —— 恰恰是网络受限用户最需要它的时候。
+   * 曾经这里有个 `relayKey` 字段 (变体各自对应一条 Worker 路由),已删除：它把
+   * 「用哪个官方端点」(provider 事实) 和「走哪条中转路由」(传输细节) 绑死，要求
+   * 每个变体手工 opt-in，结果 9 个变体 (qwen 三地域、mimo 四档、moonshot 国际站
+   * Plan…) 一选中就静默失去中转 —— 恰恰是网络受限用户最需要它的时候。
    */
   /**
    * `docs` 只给【一个芯片就是一个独立产品】的那种端点用（Custom 底下的
@@ -90,12 +122,12 @@ export type ProviderModel = {
   label: string;
   value: string;
   thinking?: boolean;
-    /**
-     * 该 SKU 接受的思考档位,【由低到高】。声明它的三家(gemini / grok / groq)有
-     * 共同特征:档位集合逐 SKU 不同,且厂商【不提供关闭开关】—— 所以这个字段
-     * 同时是 canDisableThinking 的判据。发一个该 SKU 不收的档位是确定性 400。
-     * 其余厂商要么全系同档、要么有真正的关闭值,不用声明。解析见 pickThinkingLevel。
-     */
+  /**
+   * 该 SKU 接受的思考档位，【由低到高】。声明它的三家 (gemini / grok / groq) 有
+   * 共同特征：档位集合逐 SKU 不同，且厂商【不提供关闭开关】—— 所以这个字段
+   * 同时是 canDisableThinking 的判据。发一个该 SKU 不收的档位是确定性 400。
+   * 其余厂商要么全系同档、要么有真正的关闭值，不用声明。解析见 pickThinkingLevel。
+   */
   thinkingLevels?: ReadonlyArray<"minimal" | "low" | "medium" | "high">;
 };
 
@@ -114,6 +146,17 @@ export type OpenAICompatProviderSpec = BaseProvider & {
   /** Extra headers to merge into every upstream request (OpenRouter attribution etc). */
   extraHeaders?: Record<string, string>;
   /**
+   * 这个 provider 要求把**本轮会话 id** 放进哪个请求头。只声明【头名】——
+   * 值由流水线每轮生成（`TranslateTextParams.sessionId`），registry 是静态数据填不了值。
+   *
+   * ⚠ 用这个字段而不是往 `extraHeaders` 里塞常量：会话 id 的语义是"每轮对话一个稳定值"，
+   * 常量等于谎称几千个不相关的对话是同一个会话。见 types.ts 里 sessionId 的注释。
+   * ⚠ 加了这个头的 relay provider，头名**必须**同时进 Worker 的 FORWARDED_HEADERS
+   * （那份集合兼作 CORS 允许列表，缺了就是"浏览器死在预检 + 中转静默剥掉"）——
+   * workerParity.test.ts 第三条断言机械校验这件事。
+   */
+  sessionHeader?: string;
+  /**
    * Factory default for the user's `useRelay` config toggle — the exact same
    * spec↔config pairing as defaultModel↔model and defaultTemperature↔temperature.
    * Presence = this provider has a Cloudflare relay route (UI renders the
@@ -126,12 +169,12 @@ export type OpenAICompatProviderSpec = BaseProvider & {
    *     verification date noted on the entry (tokenhub: preflight 404).
    * Members need a matching /api/{key} Worker route (scripts/llm-proxy-worker.js).
    *
-   * 【规范】固定端点的 openai-compat provider 一律带这个字段(通常 false):
-   * 逃生口与 url 字段同理全员配发 —— 谁会被上游拦无法预判,而且自部署 Worker 的
-   * 用户拿到的文件应当开箱全覆盖,不该要求他们会改代码。【缺席】只允许结构性
-   * 加不了的:端点由用户掌控(llm/azureopenai/nvidia —— 中转没有固定
+   * 【规范】固定端点的 openai-compat provider 一律带这个字段 (通常 false):
+   * 逃生口与 url 字段同理全员配发 —— 谁会被上游拦无法预判，而且自部署 Worker 的
+   * 用户拿到的文件应当开箱全覆盖，不该要求他们会改代码。【缺席】只允许结构性
+   * 加不了的：端点由用户掌控 (llm/azureopenai/nvidia —— 中转没有固定
    * 上游可写)、协议不是固定地址的 chat/completions(gemini 把 model 拼在 URL
-   * 路径里,pass-through 转发不了)。
+   * 路径里，pass-through 转发不了)。
    */
   defaultUseRelay?: boolean;
 };
@@ -139,40 +182,46 @@ export type OpenAICompatProviderSpec = BaseProvider & {
 // 【openai-compat 一律带可选 url 字段】(buildOpenAICompatDefault 无条件
 // `base.url = ""`)。这里曾有一条派生规则 acceptsCustomUrl(allowCustomUrl ||
 // 有中转路由),已连同 allowCustomUrl 字段一起删除 —— 那套机制把「用户有没有
-// 逃生口」交给两个与之无关的标志决定,结果 qianfan/cohere/openrouter/groq/
-// siliconflow/atlascloud 六家零退路,不是谁判断过，是漏了。而 DeepSeek 判例
-// (探测全绿、真实用户仍被上游按 origin 拦 403,见 services/llm.ts 的 403 重写)
+// 逃生口」交给两个与之无关的标志决定，结果 qianfan/cohere/openrouter/groq/
+// siliconflow/atlascloud 六家零退路，不是谁判断过，是漏了。而 DeepSeek 判例
+// (探测全绿、真实用户仍被上游按 origin 拦 403，见 services/llm.ts 的 403 重写)
 // 证明「谁会被拦」无法预判 —— 无法预判的风险就不该用"逐条记得写"的 opt-in
 // 分配退路，默认人人有才是与之匹配的设计。
-// url 的三种取值语义由 classifyEndpointUrl(见 getProviderEndpoints 附近)统一
-// 判定:空/官方默认、官方变体、真自定义 —— UI 与端点解析共用同一判据。
+// url 的三种取值语义由 classifyEndpointUrl(见 getProviderEndpoints 附近) 统一
+// 判定：空/官方默认、官方变体、真自定义 —— UI 与端点解析共用同一判据。
 
 // ─── docs / apiKeyUrl 的维护约定 ────────────────────────────────────────────
-// 全部 54 个链接在 2026-08-20 实测过一轮(curl -L 跟随重定向,带浏览器 UA)。
-// 无死链;修正了 7 处会重定向的地址,规则是【写最终落点,别让用户多跳一次】:
-//   · 域名迁移 → 直接写新域(console.anthropic.com → platform.claude.com、
+// 全部链接实测过两轮：2026-08-20 与 2026-09-25（后者带浏览器 UA + Accept-Language
+// 双探，bare 与 zh/en 各一遍）。
+// 无死链;修正会重定向的地址，规则是【写最终落点，别让用户多跳一次】:
+//   · 域名迁移 → 直接写新域 (console.anthropic.com → platform.claude.com、
 //     platform.moonshot.cn → platform.kimi.com)
-//   · 落到更具体的子页 → 直接指子页(deepl 的 request-translation、
-//     minimax 的 text-chat-openai、siliconflow 的 /cn/ 本地化路径)
-// ⚠ 【locale 段:能不写就不写】。本项目支持 18 语言,把任一 locale 写死都会
+//   · 落到更具体的子页 → 直接指子页 (deepl 的 request-translation、
+//     minimax 的 text-chat-openai)
+//   · 2026-09-25 改版迁移：火山文档站把数字文档号换成语义路径 (docs/82379/1330310
+//     → docs/ark/model-list、…/1928261 → docs/ark/coding-plan-personal-get-started，
+//     后者原本还写着 www 域、违反下面那条「必须用 docs.volcengine.com」的规则,一并修);
+//     SiliconFlow 文档站重构 (/cn/api-reference/… → /docs/api/chat-completions-post)。
+// ⚠ 【locale 段：能不写就不写】。本项目支持 19 语言，把任一 locale 写死都会
 // 让另一半用户落在读不懂的页面上。判据只有一条 —— 去掉 locale 段后仍可达
-// 且会按 Accept-Language 自动适配的,就不写(2026-08-20 逐条实测):
+// 且会按 Accept-Language 自动适配的，就不写 (2026-08-20 逐条实测):
 //   · 不写:learn.microsoft.com(zh→/zh-cn/、en→/en-us/)、help.aliyun.com
-//     (zh→/zh/、en→/en/)、www.deepl.com(zh→/zh/)、mimo.mi.com(无段直达)
+//     (zh→/zh/、en→/en/，2026-09-25 复测仍自适应)、www.deepl.com(zh→/zh/)、
+//     mimo.mi.com(无段直达)、docs.siliconflow.cn 新站 (无 locale 段，双语探同一落点)
 //   · 必须写:docs.bigmodel.cn/cn/、platform.claude.com/docs/en/ —— 去掉即
-//     404,locale 是路径的必需组成部分,不是本地化开关
-//   · docs.siliconflow.cn/cn/ 也保留:它只有中文版,任何语言都跳 /cn/
-// ⚠ curl 探测在这里【会骗人】:不发 Accept-Language 时微软/阿里都落到英文页,
-// 看着像"301 到 /en-us",据此"修正"就是把中文用户锁死(本仓库犯过:上一轮我
+//     404,locale 是路径的必需组成部分，不是本地化开关;platform.stepfun.com 的
+//     /zh/ 也是 (文档只有中文，去段 404)
+// ⚠ curl 探测在这里【会骗人】:不发 Accept-Language 时微软/阿里都落到英文页，
+// 看着像"301 到 /en-us",据此"修正"就是把中文用户锁死 (本仓库犯过：上一轮我
 // 按探测结果把 translator 改成 /en-us,azureopenai 则原本就写死 /zh-cn)。
 // 复查时务必带上语言头对比两次。
-// 【不改】的两类,别把它们当问题:
-//   · apiKeyUrl 跳登录/授权页(mistral、cohere、openrouter、siliconflow、
-//     腾讯、opencode、Google AI Studio):未登录时必然如此,登录后直达目标页。
-//   · yandex 跳验证码页:该站对脚本抓取一律返回验证码,浏览器打开正常
-//     (核对 SKU 必须用浏览器,见 yandex 条目注释)。
-// ⚠ 火山:必须用 docs.volcengine.com,www 域会 301 且脚本/扩展都读不到内容。
-// 复查方法:把本文件的 docs/apiKeyUrl 抽出来 curl -sSL -w '%{url_effective}',
+// 【不改】的两类，别把它们当问题：
+//   · apiKeyUrl 跳登录/授权页 (mistral、cohere、openrouter、siliconflow、
+//     腾讯、opencode、Google AI Studio):未登录时必然如此，登录后直达目标页。
+//   · yandex 跳验证码页：该站对脚本抓取一律返回验证码，浏览器打开正常
+//     (核对 SKU 必须用浏览器，见 yandex 条目注释)。
+// ⚠ 火山：必须用 docs.volcengine.com,www 域会 301 且脚本/扩展都读不到内容。
+// 复查方法：把本文件的 docs/apiKeyUrl 抽出来 curl -sSL -w '%{url_effective}',
 // 落点与原地址不同的就是候选 —— 再按上面两类规则判断改不改。
 
 /** Providers with hand-written implementations (Claude, Gemini, Azure OpenAI, Nvidia, Custom LLM, all MT). */
@@ -209,7 +258,7 @@ const LOCAL_RUNTIME_ENDPOINTS = [LM_STUDIO, OLLAMA, LLAMA_CPP, KOBOLDCPP] as con
  * 设计的保证是「服务端不再套任何模板」。
  *
  * ⚠ 【Ollama 不在这张表里，是结构性的，不是漏了】。Ollama 的 OpenAI 兼容层在
- * /v1/completions 上【仍然套 Modelfile 模板】—— 源码三行为证(2026-08-22 核对
+ * /v1/completions 上【仍然套 Modelfile 模板】—— 源码三行为证 (2026-08-22 核对
  * ollama/main)：
  *   1. api/types.go        `// Raw set to true means that no formatting will be applied to the prompt.`
  *   2. openai/openai.go    FromCompleteRequest 构造 api.GenerateRequest 时【没有设 Raw】→ 默认 false
@@ -335,9 +384,7 @@ export const PROVIDERS = {
     // → status starts as "needs-config" and forces
     // an explicit endpoint pick from the chips below.
     defaults: { url: "", apiKey: "", model: "translategemma-4b-it", batchSize: 10, delayTime: 200 },
-    endpoints: [
-      ...RAW_PROMPT_RUNTIME_ENDPOINTS,
-    ],
+    endpoints: [...RAW_PROMPT_RUNTIME_ENDPOINTS],
     models: [
       { label: "TranslateGemma 4B", value: "translategemma-4b-it" },
       { label: "TranslateGemma 12B", value: "translategemma-12b-it" },
@@ -372,9 +419,7 @@ export const PROVIDERS = {
     // greedy (temperature 0, top_k 1). The service hardcodes it so a runtime's
     // UI default (LM Studio ships 0.7-1.0) can't bleed in.
     defaults: { url: "", apiKey: "", model: "MiLMMT-46-4B-v1.0", batchSize: 10, delayTime: 200 },
-    endpoints: [
-      ...RAW_PROMPT_RUNTIME_ENDPOINTS,
-    ],
+    endpoints: [...RAW_PROMPT_RUNTIME_ENDPOINTS],
     // 4B is the default: it is the family's most-downloaded checkpoint by a
     // wide margin and the only one that fits comfortably on consumer VRAM
     // alongside a browser. 1B for CPU-only boxes, 12B for quality.
@@ -397,9 +442,10 @@ export const PROVIDERS = {
     docs: "https://api-docs.deepseek.com/",
     apiKeyUrl: "https://platform.deepseek.com/api_keys",
     defaultUseRelay: false,
-    // 官方说明 (2026-09)：模型名推荐使用 deepseek-flash（由 DeepSeek-V4.1-Flash 服务）。
+    // 官方说明 (2026-09 复核，2026-09-25 确认路由现状)：模型名推荐使用 deepseek-flash（由 DeepSeek-V4.1-Flash 服务）。
     // 旧模型名 deepseek-v4-flash 仍可调用，但已下线并路由到 V4.1 Flash；
-    // deepseek-v4-pro 于 2026-09-14 12:00 起全部路由到 V4.1 Flash，至未来 V4.1 Pro 上线。
+    // deepseek-v4-pro 在 2026-09-14~V4.1 Pro 上线前曾临时全部路由到 V4.1 Flash，
+    // 该临时路由【已结束】—— 现直接服务 Pro 档，不再是挂着 Pro 名跑 Flash。
     // 各模型均支持 thinking / non-thinking 两种模式 (docs.deepseek.com: "supporting both modes")。
     // 注：DeepSeek 另提供 Anthropic 兼容端点 (https://api.deepseek.com/anthropic)。
     models: [
@@ -412,8 +458,8 @@ export const PROVIDERS = {
     category: "llm",
     label: "OpenAI",
     endpoint: "https://api.openai.com/v1/chat/completions",
-    defaultModel: "gpt-5.6-luna",
-    // 无 defaultTemperature:GPT-5.x 全系为推理模型，拒绝非默认 temperature
+    defaultModel: "gpt-6-luna",
+    // 无 defaultTemperature:GPT-5.x/6.x 全系为推理模型，拒绝非默认 temperature
     // (400 "Only the default (1) value is supported",运行时实测，2026-07 核查;
     // effort:none 是否解锁在 5.4+ 未确认)。字段移除 → 请求不发、UI 不显示，
     // 服务端默认生效。
@@ -421,21 +467,22 @@ export const PROVIDERS = {
     apiKeyUrl: "https://platform.openai.com/api-keys",
     defaultUseRelay: false,
     // https://developers.openai.com/api/docs/models
-    // GPT-5.6 家族 (sol/terra/luna) 是当前主推旗舰，均支持 reasoning;上一代
-    // 5.5 / 5.4-mini 仍在售 (不在总览页推荐位，但详情页与 deprecations 页都确认
-    // 未停用),保留作对照/低成本档。5.6 无 mini 变体，luna 即低成本高并发档
-    // (官方原文点名 cost-sensitive/high-volume),故设为翻译默认。
+    // 当前主推就是 GPT-6 家族三档：astra(旗舰) / sol(复杂工作) / luna(省钱,
+    // 官方原文点名 cost-sensitive/high-volume → 翻译默认)。2026-09-25 官方
+    // models 页复核；第三方目录 (OpenCode Zen / Atlas / OpenRouter 周榜) 也已
+    // 全部在供 gpt-6-sol/luna —— 交叉印证在售。
+    // GPT-5.6 家族 (sol/terra/luna) 降为上一代，删出清单（未停用，手填仍可调;
+    // 6 家族没有 terra 变体，均衡档由 sol 承担）。更早的 5.5 / 5.4-mini 同判删除。
     // ⚠ reasoning.effort 的取值集合【按型号不同】,官方原文 "Supported values are
-    // model-dependent... Some models support only a subset":5.6 家族到 max,而
-    // 5.5 / 5.4-mini 最高只到 xhigh(无 max)。我方 ReasoningEffort 只有
-    // low/medium/high,三档对全系都安全 —— 要加 max/xhigh 档时必须按型号裁剪，
-    // 否则给 5.5 / 5.4-mini 发 max 会 400。
+    // model-dependent... Some models support only a subset":GPT-6 系 low..max。
+    // 我方 ReasoningEffort 只有 low/medium/high,三档对全系都安全 —— 要加
+    // max/xhigh 档时必须按型号裁剪，旧代(5.5/5.4-mini 只到 xhigh)会 400。
     models: [
-      { label: "GPT-5.6", value: "gpt-5.6", thinking: true },
-      { label: "GPT-5.6 Terra", value: "gpt-5.6-terra", thinking: true },
-      { label: "GPT-5.6 Luna", value: "gpt-5.6-luna", thinking: true },
-      { label: "GPT-5.5", value: "gpt-5.5", thinking: true },
-      { label: "GPT-5.4 Mini", value: "gpt-5.4-mini", thinking: true },
+      // ⚠ 用【Model ID】而不是别名：文档惯例是把裸家族名 (gpt-6) 标为某个变体的
+      // alias，别名会随版本迁移，写死变体 ID 更稳。
+      { label: "GPT-6 Astra", value: "gpt-6-astra", thinking: true },
+      { label: "GPT-6 Sol", value: "gpt-6-sol", thinking: true },
+      { label: "GPT-6 Luna", value: "gpt-6-luna", thinking: true },
     ],
   },
   claude: {
@@ -445,11 +492,11 @@ export const PROVIDERS = {
     docs: "https://platform.claude.com/docs/en/intro",
     apiKeyUrl: "https://platform.claude.com/settings/keys",
     // url 可选：自建中转 (转发到 api.anthropic.com/v1/messages 的自有 Worker)。
-    // 与中转开关正交:url 决定用哪个 endpoint,useRelay 决定走不走中转,二者互不覆盖。
-    // endpoints[] 只有官方这一个 —— 声明它不是为了给界面渲染芯片(单个不渲染),
-    // 而是让 classifyEndpointUrl 认得出官方地址:用户把文档上的地址原样贴进 url
-    // 框时,不该被判成"自定义"(界面文案会宣称"请求直连",而中转恰恰声明了它)。
-    // 服务层的 CLAUDE_DIRECT_ENDPOINT 从这里派生,中转 allowlist 由 workerParity 钉住。
+    // 与中转开关正交:url 决定用哪个 endpoint,useRelay 决定走不走中转，二者互不覆盖。
+    // endpoints[] 只有官方这一个 —— 声明它不是为了给界面渲染芯片 (单个不渲染),
+    // 而是让 classifyEndpointUrl 认得出官方地址：用户把文档上的地址原样贴进 url
+    // 框时，不该被判成"自定义"(界面文案会宣称"请求直连",而中转恰恰声明了它)。
+    // 服务层的 CLAUDE_DIRECT_ENDPOINT 从这里派生，中转 allowlist 由 workerParity 钉住。
     endpoints: [{ label: "Anthropic", url: "https://api.anthropic.com/v1/messages" }],
     // 无 temperature 字段:adaptive 世代 (Opus 5 / Sonnet 5 / Fable 5) 拒绝
     // 非默认 temperature(400，官方成文);统一 provider 级不发，服务端默认生效。
@@ -463,15 +510,16 @@ export const PROVIDERS = {
     // 接受该参数，但为简化统一不发，用服务端默认值。
     // 证据:platform.claude.com/docs/en/build-with-claude/adaptive-thinking
     //
-    // 默认仍是 Sonnet 5 而不是旗舰 Opus 5:逐行翻译是高频短请求，Sonnet 5
-    // ($3/$15 per MTok) 对这个负载的性价比明显优于 Opus 5 ($5/$25),要旗舰
-    // 质量的用户在下拉里一键就能切。
+    // 默认仍是 Sonnet 5 而不是旗舰 Opus 5.5:逐行翻译是高频短请求，Sonnet 5
+    // ($2/$10 per MTok，官方 models 总览 2026-09-25) 对这个负载的性价比明显优于
+    // Opus 5.5 ($4/$20),要旗舰质量的用户在下拉里一键就能切。
     // model id 一律用不带日期后缀的规范写法 (官方 model 表原文即完整 id);
     // 带日期的快照 id 仍可用户手填，isAdaptiveThinkingClaude 用子串匹配兜住。
-    // Opus 4.8 已随 Opus 5 上线移出清单 —— 同价位($5/$25)的上一代，留着只是噪音。
-    // 仍可手填 (isAdaptiveThinkingClaude 的 opus-4-[78] 分支照样判成 adaptive 世代)。
+    // 官方当前在售四支:fable-5-1 / opus-5-5 / sonnet-5 / haiku-4.5 —— 清单逐一对应。
+    // Opus 5 已被 Opus 5.5 取代且【更贵】($5/$25 vs $4/$20)，删出清单；仍可手填
+    // (子串正则照样判成 adaptive 世代)。Opus 4.8 更早同理移出。
     models: [
-      { label: "Claude Opus 5", value: "claude-opus-5", thinking: true },
+      { label: "Claude Opus 5.5", value: "claude-opus-5-5", thinking: true },
       { label: "Claude Sonnet 5", value: "claude-sonnet-5", thinking: true },
       { label: "Claude Haiku 4.5", value: "claude-haiku-4-5", thinking: true },
       { label: "Claude Fable 5.1", value: "claude-fable-5-1", thinking: true },
@@ -488,25 +536,26 @@ export const PROVIDERS = {
     // whats-new-gemini-3.5,AI Studio 已移除滑块)。service 层不发该参数 →
     // 服务端默认 1.0 生效;字段移除后 UI 输入框自动隐藏，migrateConfig 的
     // defaults-key-only 合并会清掉用户已存的旧值。
-    defaults: { apiKey: "", model: "gemini-3.7-flash", batchSize: 20, contextBatchSize: 3, contextWindow: 50, thinkingEffort: {} },
+    defaults: { apiKey: "", model: "gemini-3.8-flash", batchSize: 20, contextBatchSize: 3, contextWindow: 50, thinkingEffort: {} },
     // 仅收录 Gemini 3.x 系列 (2.5 已过时，且参数协议不同需要 budget mapping 增加
-    // service 复杂度，精简掉 —— 手填旧世代由 buildGeminiThinkingConfig 的守卫兜住:
-    // thinkingLevel 打到 2.x 上是确定性 400,理由写在那里)。Gemini 3 thinking 通过
-    // `generationConfig.thinkingConfig.thinkingLevel` 控制,默认开启且【没有关闭值】,
-    // off 时传该 SKU 收得下的最低档;档位集合按 SKU 不同,就声明在下方每行的
-    // thinkingLevels 里,解析统一走 pickThinkingLevel。
-    // 默认 3.7-flash:2026-08-13 GA,官方称 "latest and most capable Flash";
+    // service 复杂度，精简掉 —— 手填旧世代由 buildGeminiThinkingConfig 的守卫兜住：
+    // thinkingLevel 打到 2.x 上是确定性 400，理由写在那里)。Gemini 3 thinking 通过
+    // `generationConfig.thinkingConfig.thinkingLevel` 控制，默认开启且【没有关闭值】,
+    // off 时传该 SKU 收得下的最低档;档位集合按 SKU 不同，就声明在下方每行的
+    // thinkingLevels 里，解析统一走 pickThinkingLevel。
+    // 默认 3.8-flash:与 3.7 / 3.6 / 3.5-flash 同价($0.75/$3.75)，取最新那代；
     // 3.5-flash 已被官方页降称 "previous-generation Flash model"。
     // thinkingLevels 抄自官方【逐模型表】(ai.google.dev/gemini-api/docs/thinking,
     // 2026-09-01 全表复核),由低到高。加 SKU 时对着那张表补这一行 —— 别再用
-    // "名字里有 -pro 就只收 low/high" 这类正则近似:官方表里 3-pro-preview 确实
+    // "名字里有 -pro 就只收 low/high" 这类正则近似：官方表里 3-pro-preview 确实
     // 只收 low/high,但 3.1-pro-preview 收 low/medium/high,按名字归并会把用户
     // 选的 Medium 静默降级成 Low(与 grok 全线钳 medium 同一类 bug)。
     models: [
+      // 3.7/3.6/3.5-flash 与 3.8 同价（$0.75/$3.75），留着只是让下拉变长 —— 只留 3.8。
+      // ⚠ 3.8 的 thinkingLevels 抄的是 3.7 的窄集：宁可少给一个档，也别发它不收的档
+      //   （发错档是确定性 400，见 ProviderModel.thinkingLevels 的注释）。
       { label: "Gemini 3.1 Pro (Preview)", value: "gemini-3.1-pro-preview", thinking: true, thinkingLevels: ["low", "medium", "high"] },
-      { label: "Gemini 3.7 Flash", value: "gemini-3.7-flash", thinking: true, thinkingLevels: ["low", "medium", "high"] },
-      { label: "Gemini 3.6 Flash", value: "gemini-3.6-flash", thinking: true, thinkingLevels: ["minimal", "low", "medium", "high"] },
-      { label: "Gemini 3.5 Flash", value: "gemini-3.5-flash", thinking: true, thinkingLevels: ["minimal", "low", "medium", "high"] },
+      { label: "Gemini 3.8 Flash", value: "gemini-3.8-flash", thinking: true, thinkingLevels: ["low", "medium", "high"] },
       { label: "Gemini 3.5 Flash Lite", value: "gemini-3.5-flash-lite", thinking: true, thinkingLevels: ["minimal", "low", "medium", "high"] },
     ],
   },
@@ -515,7 +564,7 @@ export const PROVIDERS = {
     category: "llm",
     label: "Qwen",
     endpoint: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
-    defaultModel: "qwen3.7-plus",
+    defaultModel: "qwen3.8-flash",
     defaultTemperature: 0.7,
     docs: "https://help.aliyun.com/model-studio/qwen-api-via-openai-chat-completions",
     apiKeyUrl: "https://bailian.console.aliyun.com/?tab=model#/api-key",
@@ -527,32 +576,36 @@ export const PROVIDERS = {
     ],
     // https://help.aliyun.com/zh/model-studio/models (「选择模型」推荐页的三个头牌)
     // 全系混合思考模式、`enable_thinking` 可切换，且【默认开启思考】—— 所以三个
-    // 都打 thinking 标签,off 态才会发显式 enable_thinking:false(qwen 在
+    // 都打 thinking 标签，off 态才会发显式 enable_thinking:false(qwen 在
     // SERVER_DEFAULT_THINKING_ON 里)。语义 2026-08 复核无变化。
-    // ⚠ 官方坑:思考模式下 max_tokens 有效范围收窄为 [1, 32768],超出直接 400。
+    // ⚠ 官方坑：思考模式下 max_tokens 有效范围收窄为 [1, 32768],超出直接 400。
     //
-    // 3.7-max → 3.8-max:同价 (¥12/¥36),3.8 是当前旗舰且原生多模态,而 3.7-max
-    // 页面自述「当前开放纯文本模型能力供体验」,已不在推荐头牌里。
-    // 3.6-flash → 3.7-flash:同代升级且【便宜 2-6 倍】(≤32k 档 ¥0.2/¥0.8 vs
-    // 3.6 的 ¥1.2/¥7.2)。3.6-flash 未下线，只是被取代。
-    // 默认保持 qwen3.7-plus:官方三头牌里的高性价比档 (¥2/¥8, 1M 上下文)。
+    // 在列三款即「选择模型」推荐页头牌（2026-09-25 复核）。换代史一句话：3.7-max
+    // 已不在头牌（页面自述仅开放纯文本体验），flash 线逐代降价——3.8-flash 比 3.6
+    // 便宜约 6 倍（≤32k 档 ¥0.2/¥0.8 vs ¥1.2/¥7.2）,旧代 flash 未下线只是被取代。
     models: [
       { label: "Qwen3.8 Max", value: "qwen3.8-max", thinking: true },
+      { label: "Qwen3.8 Flash", value: "qwen3.8-flash", thinking: true },
       { label: "Qwen3.7 Plus", value: "qwen3.7-plus", thinking: true },
-      { label: "Qwen3.7 Flash", value: "qwen3.7-flash", thinking: true },
     ],
   },
   moonshot: {
     kind: "openai-compat",
     category: "llm",
-    // Kimi 在前、Moonshot 在括号:官方平台已自称「Kimi API 开放平台」,文档域
-    // 迁到 platform.kimi.com,模型全部是 kimi-* —— 主名跟着官方走。括号保留
-    // Moonshot 是因为老用户仍按"月之暗面/Moonshot"检索(同 xAI (Grok) 写法)。
+    // Kimi 在前、Moonshot 在括号：官方平台已自称「Kimi API 开放平台」,文档域
+    // 迁到 platform.kimi.com，模型全部是 kimi-* —— 主名跟着官方走。括号保留
+    // Moonshot 是因为老用户仍按"月之暗面/Moonshot"检索 (同 xAI (Grok) 写法)。
     // ⚠ registry key 与 endpoint 仍是 moonshot/api.moonshot.cn:key 换掉会让
-    // 存量配置与中转路由全部失效,而 API host 官方【未】迁移(见下方注释)。
+    // 存量配置与中转路由全部失效，而 API host 官方【未】迁移 (见下方注释)。
     label: "Kimi (Moonshot)",
     endpoint: "https://api.moonshot.cn/v1/chat/completions",
-    defaultModel: "kimi-k3",
+    // 默认 k2.6：$0.95/$4 只有 k3($3/$15) 的三分之一，而字幕翻译是高频碎请求、
+    // 逐行改写，262K 上下文完全够用；要旗舰质量选 k3。
+    // ⚠ k3 声明了 thinkingLevels，canDisableThinking("moonshot") 因此是 false，界面把
+    // 【整个 provider】的关闭档标成 Min —— 这个保守标签也落在默认的 k2.6 上（它其实真能
+    // 关，wire 上发的就是 thinking:{type:"disabled"}）。标 Min 而实际关掉了不骗人，
+    // 标 Off 却关不掉才是计费的谎，所以这个方向可以接受。
+    defaultModel: "kimi-k2.6",
     // 无 defaultTemperature:kimi-k2.x 全系 temperature 锁定 (thinking 1.0 /
     // non-thinking 0.6),传其他值直接报错 (platform.kimi.ai 迁移指南原文
     // "any other value will result in an error",官方建议不传)。字段移除 →
@@ -567,33 +620,25 @@ export const PROVIDERS = {
       { label: "Mainland (CN)", url: "https://api.moonshot.cn/v1/chat/completions" },
       { label: "International", url: "https://api.moonshot.ai/v1/chat/completions" },
     ],
-    // K2.6 / K2.5 都通过扁平 `thinking: {type}` 切换思考模式,两者都【默认开启
-    // 思考】,故都打标签 —— off 态才会发显式 disabled(moonshot 在
-    // SERVER_DEFAULT_THINKING_ON 里)。
-    // ⚠ 修正:此前注释写「K2.5 不支持参数切换 thinking」是错的。官方参数表里
-    // k2.5 与 k2.6 的 `thinking.type` 同为 "enabled"(默认)/"disabled";k2.5 真正
-    // 不支持的是 **Preserved Thinking**(`thinking.keep`),不是开关本身。因为写错
-    // 而漏打标签，gated() 走 listed-but-untagged 分支【省略】thinking 参数 →
-    // 用户关着思考、k2.5 却按服务端默认一直在推理。同 DeepSeek「10M tokens」事故。
-    // kimi-k2-thinking 系列已 2026-05-25 退役，不收录。
+    // K2.x 用扁平 `thinking: {type: enabled(默认)|disabled}`，都【默认开启思考】、
+    // 都打标签 —— off 态才会发显式 disabled(moonshot 在 SERVER_DEFAULT_THINKING_ON 里)。
+    // ⚠ 纪律（k2.5 时代踩过两次）：漏打标签 = gated() 走 listed-but-untagged 分支
+    // 【省略】thinking 参数 = 用户关着思考、服务端默认却一直推理计费。同 DeepSeek
+    // 「10M tokens」事故。k2.5 已停服下线（pre-offline 实证），k2-thinking 系退役，均不收录。
     //
-    // ⚠ kimi-k3 与 K2.x【协议不同】,是本 provider 唯一需要按 SKU 分流的地方:
+    // ⚠ kimi-k3 与 K2.x【协议不同】,是本 provider 唯一需要按 SKU 分流的地方：
     // K2.x 用扁平 thinking:{type},k3 仅思考模式、【不接受 thinking 参数】,改用
-    // 顶层 reasoning_effort(low/high/max,默认 max —— 官方 platform.kimi.com/docs)。
-    // 因为 k3 没有关闭值,它走【逐 SKU 档位表】那条路(thinkingLevels +
-    // pickThinkingLevel,同 gemini/grok/groq):关闭态发最低档 low。
+    // 顶层 reasoning_effort(low/high/max，默认 max —— 官方 platform.kimi.com/docs)。
+    // 因为 k3 没有关闭值，它走【逐 SKU 档位表】那条路 (thinkingLevels +
+    // pickThinkingLevel，同 gemini/grok/groq):关闭态发最低档 low。
     // max 不写进表里 —— 同 grok 的 xhigh:ReasoningEffort 只有 low/medium/high,
-    // 我们发不出它;写进去也只是死数据(want 最高是 high,本就命中 high)。
+    // 我们发不出它;写进去也只是死数据 (want 最高是 high，本就命中 high)。
     // (2026-08-20 复核 platform.kimi.com/docs/api/chat:「Kimi K3 始终启用思考」,
-    //  无 off/none;models.dev 给 k3 标 toggle=true 与官方原文冲突,别照它改。)
+    //  无 off/none;models.dev 给 k3 标 toggle=true 与官方原文冲突，别照它改。)
     // 声明了 thinkingLevels ⇒ canDisableThinking("moonshot") 为 false ⇒ 界面把
-    // 该档标成 Min —— 这对 K2.x 略显保守(它们真能关),但一个 provider 只有一个
-    // 标签,宁可保守:标 Off 却关不掉是计费可见的谎,标 Min 而实际关掉了不骗人。
-    // service 层按 isThinkingModel + 型号分流,见 services/llm.ts 的 moonshotEffort。
-    //
-    // kimi-k2.5 已下线:官方模型页写明「停止向新注册用户开放」+ 平台 8-31 停服,
-    // TokenHub 的 /v1/models 实拉也把它标成 status="pre-offline"(2026-08-20 实测),
-    // 而 k2.6 / k2.7-code / k3 均为 online。留着等于给用户一个 11 天后必死的选项。
+    // 该档标成 Min —— 这对 K2.x 略显保守 (它们真能关),但一个 provider 只有一个
+    // 标签，宁可保守：标 Off 却关不掉是计费可见的谎，标 Min 而实际关掉了不骗人。
+    // service 层按 isThinkingModel + 型号分流，见 services/llm.ts 的 moonshotEffort。
     models: [
       { label: "Kimi K3", value: "kimi-k3", thinking: true, thinkingLevels: ["low", "high"] },
       { label: "Kimi K2.6", value: "kimi-k2.6", thinking: true },
@@ -606,44 +651,52 @@ export const PROVIDERS = {
     endpoint: "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
     defaultModel: "doubao-seed-2-1-turbo-260628",
     defaultTemperature: 0.7,
-    // ⚠ 用 docs.volcengine.com 而不是 www.volcengine.com:后者会 301 到前者,
-    // 而且脚本抓取与浏览器扩展在 www 域上都拿不到内容(权限/空页),只有 docs
-    // 域可读。直接指向【模型列表】页,而不是文档站首页 —— 核对 SKU 时少一跳。
-    docs: "https://docs.volcengine.com/docs/82379/1330310",
+    // ⚠ 用 docs.volcengine.com 而不是 www.volcengine.com:后者会 301 到前者，
+    // 而且脚本抓取与浏览器扩展在 www 域上都拿不到内容 (权限/空页),只有 docs
+    // 域可读。直接指向【模型列表】页，而不是文档站首页 —— 核对 SKU 时少一跳。
+    docs: "https://docs.volcengine.com/docs/ark/model-list",
     apiKeyUrl: "https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey",
     defaultUseRelay: false,
-    // ⚠ 【不收录 Coding Plan 端点】(/api/coding/v3,2026-08-20 撤除)。它不是一个
-    // "地域/线路变体",而是另一种计费权益,官方 FAQ 原文:「套餐是否仅可用于 AI
-    // 工具中的调用？是的,在【非 AI 工具】中使用 Coding Plan / Agent Plan 权益
-    // 对应的 Base URL 和 API Key 有可能被识别为滥用/违规,会导致【订阅停用或
+    // ⚠ 【按量线不收 Coding Plan 端点】(/api/coding/v3)。它不是一个
+    // "地域/线路变体",而是另一种计费权益，官方 FAQ 原文:「套餐是否仅可用于 AI
+    // 工具中的调用？是的，在【非 AI 工具】中使用 Coding Plan / Agent Plan 权益
+    // 对应的 Base URL 和 API Key 有可能被识别为滥用/违规，会导致【订阅停用或
     // 账号封禁】」。判据不是"是不是 CLI"(官方支持 Codex CLI / OpenCode /
     // OpenClaw 这类自托管 CLI),而是【是不是 AI 编程工具】—— 本项目是字幕/
-    // Markdown/JSON 批量翻译,不写代码不读代码库,落在"非 AI 工具"一侧。
-    // 收录它对用户【零收益】(非指定工具调用不走套餐额度,照常扣标准余额)
-    // 却把封号风险转嫁过去;而且该端点主推编码向模型,翻译场景本就不该用。
-    // 同理不收录 GLM(/api/coding/paas/v4)、Kimi(api.kimi.com/coding)、
-    // 火山 Agent Plan 等一切"按工作流卖额度"的端点 —— 新增此类时先查这一条。
+    // Markdown/JSON 批量翻译，不写代码不读代码库，落在"非 AI 工具"一侧。
+    // 火山 FAQ【另一条独立问题】还称：套餐额度只在支持的 Coding 工具中生效，
+    // 之外的 API 调用按方舟现有 (按量) 计费规则收费 —— 此说法只代表火山一家，
+    // 阿里的套餐页面没有同类表述，禁止外推;翻译场景也不该用编码向模型。
+    // 2026-09:订阅端点本身以【独立 hidden provider】(volcengine / alibaba，本文件
+    // 末尾) 收了进来 —— 为的是给 legend-talk 下发目录，网页 UI 默认不显示、开关旁
+    // 挂封号警告;GLM(/api/coding/paas/v4)、Kimi(api.kimi.com/coding)、火山
+    // Agent Plan 等其他"按工作流卖额度"的端点仍不收，等有下游消费方时照此办理。
     endpoints: undefined,
-    // 清单以上方 docs 链接(官方模型列表页)的【推荐模型】栏为准,2026-08-20
-    // 用浏览器逐条核对 —— 该站对脚本抓取不返回内容,必须用浏览器打开。
-    // 官方把模型分「推荐 / 往期 / 即将下线」三层,我们只收【推荐】那一层:
-    // 2.0 系列(pro-260215、lite-260428 等)已整体降为往期,同 zhipu 只留 5.x 的
-    // 处置 —— 老型号对翻译没有不可替代价值,留着只是让下拉更长。
+    // 清单以上方 docs 链接 (官方模型列表页) 的【推荐模型】栏为准，2026-08-20 首核、
+    // 2026-09-25 浏览器复核 —— 该站对脚本抓取不返回内容，必须用浏览器打开。
+    // 官方把模型分「推荐 / 往期 / 即将下线」三层，我们只收【推荐】那一层：
+    // 2.0 系列 (pro-260215、lite-260428 等) 已整体降为往期，同 zhipu 只留 5.x 的
+    // 处置 —— 老型号对翻译没有不可替代价值，留着只是让下拉更长。
+    // 2026-09-25 换代：pro 的在售快照从 260628 滚到 【260915】(260628 已降入往期，
+    // 按上面这条规则必须换);推荐层现共四支 (evolving / 2-1-pro-260915 /
+    // 2-1-lite-260915 / 2-1-turbo-260628),turbo 未变、默认不动。lite 见下面限流段。
     //
     // 默认 2.1 turbo 而非推荐榜首的 evolving:逐行翻译是【高频短请求】,
-    // turbo 是轻量高速档,性价比最优;evolving 的 1024k 上下文对逐行/小批量
-    // 翻译用不上(我们的上下文批默认才 3 行 + 窗口 50),多花的钱换不来质量。
+    // turbo 是轻量高速档，性价比最优;evolving 的 1024k 上下文对逐行/小批量
+    // 翻译用不上 (我们的上下文批默认才 3 行 + 窗口 50),多花的钱换不来质量。
     // 要旗舰能力或超长上下文的用户在下拉里一键就能切。
-    // ⚠ evolving 是【滚动别名】,不带日期后缀,官方标注「快速迭代 / 周级迭代」——
-    // 同一个 id 的行为会随周更新变化。已知副作用:逐行缓存按【源文+配置】做键,
-    // 模型悄悄换代后旧缓存仍会命中,同一份文件重跑拿到的是上一代译文(要新结果
+    // ⚠ evolving 是【滚动别名】,不带日期后缀，官方标注「快速迭代 / 周级迭代」——
+    // 同一个 id 的行为会随周更新变化。已知副作用：逐行缓存按【源文 + 配置】做键，
+    // 模型悄悄换代后旧缓存仍会命中，同一份文件重跑拿到的是上一代译文 (要新结果
     // 得清缓存)。这也是它不适合当默认的另一个理由 —— 默认应当行为可预期。
-    // ⚠ 限流:三个推荐型号都是 RPM 500 / TPM 100万(往期 2.0 系列曾是 RPM 30000,
-    // 60 倍)。长文件高并发更容易撞 429 —— 引擎有共享冷却闸兜着
-    // (retry.ts rateLimitGate),表现为变慢而不是失败。
+    // ⚠ 限流（2026-09-25 逐行核推荐表）：evolving/pro/turbo 都是 RPM 500 / TPM 100 万,
+    // 长文件高并发更容易撞 429 —— 引擎有共享冷却闸兜着 (retry.ts rateLimitGate),
+    // 表现为变慢而不是失败。例外是【lite-260915:RPM 30000 / TPM 500 万】(60 倍,
+    // 2.0 往期老线的高配额在 lite 新快照上回来了) —— 被 429 卡的批量任务可一键切它。
     models: [
       { label: "Doubao Seed Evolving", value: "doubao-seed-evolving", thinking: true },
-      { label: "Doubao Seed 2.1 Pro", value: "doubao-seed-2-1-pro-260628", thinking: true },
+      { label: "Doubao Seed 2.1 Pro", value: "doubao-seed-2-1-pro-260915", thinking: true },
+      { label: "Doubao Seed 2.1 Lite", value: "doubao-seed-2-1-lite-260915", thinking: true },
       { label: "Doubao Seed 2.1 Turbo", value: "doubao-seed-2-1-turbo-260628", thinking: true },
     ],
   },
@@ -657,16 +710,22 @@ export const PROVIDERS = {
     //   - Token Plan (订阅包量):     token-plan-cn.xiaomimimo.com, key tp-xxxxx
     // Keys are not interchangeable, so we surface both products as quick-pick
     // endpoints and default to pay-as-you-go.
-    // ⚠ 与已撤除的火山 Coding Plan【性质不同,别混为一谈】:Token Plan 是通用
-    // token 预付包(同一批模型、文档无任何用途限制,预付更便宜),收录它用户真省钱;
-    // 火山 Coding Plan 卖的是 AI 编程工作流额度,官方明写非 AI 工具使用可能封号,
-    // 且不走套餐额度 —— 判据见 doubao 条目。新增"套餐/权益类"端点先对照这两条。 Token Plan has three regional clusters (CN / Singapore /
+    // ⚠ 与本文件末尾两个【用途受限】的订阅套餐端点【性质不同，别按名字站队】:
+    // mimo 的 Token Plan 是通用 token 预付包 (同一批模型、文档无任何用途限制，
+    // 预付更便宜),收录它用户真省钱;火山 Coding Plan 卖的是 AI 编程工作流额度，
+    // 官方 FAQ 明写在非 AI 编程工具中使用其 Base URL/Key 可能被识别为滥用而封停
+    // 订阅或账号 —— 判据见 doubao 条目。阿里的套餐 2026-09 也改名 Token Plan
+    // (token-plan.cn-beijing.maas host，见 PROVIDERS.alibaba),但【限制照旧】:
+    // 官方概述页仍写明仅限 AI 编程工具/Agent 交互式使用 —— "Token Plan"这个名字
+    // 本身不代表无限制，逐家看文档。新增"套餐/权益类"端点先对照这一条
+    // (另：火山 FAQ 还有一句"非工具调用不消耗套餐额度、按按量规则计费",那是
+    // 火山一家的独立条目，阿里无此说法，别外推)。Token Plan has three regional clusters (CN / Singapore /
     // Europe) — all share the same tp-xxxxx key; the url field (universal on
     // openai-compat) also lets users paste any other variant.
     endpoint: "https://api.xiaomimimo.com/v1/chat/completions",
-    defaultModel: "mimo-v2.5",
+    defaultModel: "mimo-v2.6-flash",
     defaultTemperature: 0.7,
-    // 文档站已迁域:platform.xiaomimimo.com → mimo.mi.com(2026-08 核查,两条地址
+    // 文档站已迁域:platform.xiaomimimo.com → mimo.mi.com(2026-08 核查，两条地址
     // 均已人工实测)。控制台仍在旧域，且路径【不带 `#/`】。
     // ⚠ API 端点 (api.xiaomimimo.com) 未随文档站迁移，别顺手一起改。
     docs: "https://mimo.mi.com/docs/api/chat/openai-api",
@@ -685,10 +744,15 @@ export const PROVIDERS = {
     // the per-model thinking tag below makes each listed SKU send an explicit
     // `{type:"disabled"}` when off (binaryThinkingBody), so the toggle's default-off
     // state never silently burns reasoning tokens.
-    // Doc: platform.xiaomimimo.com/docs/zh-CN/api/chat/openai-api
+    // Doc: mimo.mi.com llms.txt → static/docs/api/chat/openai-api.md（逐参数核对 2026-09-25:
+    // v2.6 全系与 v2.5 同形态、同「default enabled」;thinking 态下 temperature/top_p 被
+    // 强制回默认 —— 与既有「思考态锁定参数」各家先例一致，不改发送逻辑）
+    // ⚠ 2026-09-25 官方 Models 页红字公告：mimo-v2.5 与 mimo-v2.5-pro 将于
+    // 2026-10-21 10:00 (北京) 正式退役 —— 按「默认不许挂着将死模型」整族换 v2.6
+    // (flash/pro;还有 pro-ultraspeed 是商务合作制，不收)。v2.5 手填在退役前仍可用。
     models: [
-      { label: "MiMo V2.5", value: "mimo-v2.5", thinking: true },
-      { label: "MiMo V2.5 Pro", value: "mimo-v2.5-pro", thinking: true },
+      { label: "MiMo V2.6 Flash", value: "mimo-v2.6-flash", thinking: true },
+      { label: "MiMo V2.6 Pro", value: "mimo-v2.6-pro", thinking: true },
     ],
   },
   zhipu: {
@@ -696,7 +760,7 @@ export const PROVIDERS = {
     category: "llm",
     label: "Zhipu GLM",
     endpoint: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
-    defaultModel: "glm-5.2",
+    defaultModel: "glm-5.3",
     defaultTemperature: 0.7,
     docs: "https://docs.bigmodel.cn/cn/guide/start/introduction",
     apiKeyUrl: "https://bigmodel.cn/usercenter/proj-mgmt/apikeys",
@@ -707,29 +771,32 @@ export const PROVIDERS = {
     ],
     // docs.bigmodel.cn/cn/guide/start/model-overview "文本模型" 表格完整列表
     // (排除标记"即将下线"的 glm-4.5-flash),按文档原顺序。GLM-5.3(2026-08-14)
-    // 是当前旗舰,glm-5.2 次之 (1M 无损上下文),glm-5-turbo 为长任务优化档。
+    // 是当前旗舰，glm-5.2 次之 (1M 无损上下文),glm-5-turbo 为长任务优化档。
     //
-    // ⚠ glm-5.3 【故意不打 thinking 标签】,虽然它恰恰是思考模型 —— 官方模型页
+    // ⚠ glm-5.3【故意不打 thinking 标签】,虽然它恰恰是思考模型 —— 官方模型页
     // 原文「会始终启用思考功能……并不再支持禁用思考功能」,`thinking.type` 只收
-    // "enabled"。而 zhipu 在 SERVER_DEFAULT_THINKING_ON 里,打了标签就意味着
+    // "enabled"。而 zhipu 在 SERVER_DEFAULT_THINKING_ON 里，打了标签就意味着
     // 关闭态要发 thinking:{type:"disabled"} —— 对 5.3 是非法值。不打标签 →
     // gated() 走 listed-but-untagged 分支【整个省略】thinking 参数 (llm.ts),
-    // 模型按自己的默认强度思考，请求合法。同 MiniMax M2.x / hunyuan-a13b 先例。
+    // 模型按自己的默认强度思考，请求合法。同 MiniMax M2.x 先例。
     // 代价:UI 上 5.3 没有思考开关 —— 它本来也关不掉，如实反映而已。
     //
-    // 默认仍是 glm-5.2 而非旗舰 5.3:逐行翻译不需要强制推理，5.2 可关思考、
-    // 单位成本更低;要 5.3 的用户在下拉里一键就能切。
+    // 默认 = 旗舰 5.3（2026-09-17 改）。原默认 5.2 与它【同价】($1.4/$4.4，OpenRouter
+    // 公开价目核对)且更旧，旧代唯一的卖点是「能真正关掉思考」—— 而"能关思考"不构成选它
+    // 的理由（思考已是各家的默认形态），故 5.2 删除、默认上移到 5.3。
+    // 5.3-Flash 便宜 15 倍($0.09/$0.30)但官方把它归在【多模态】档（文档路径
+    // /cn/guide/models/vlm/glm-5.3-flash，"原生理解图片视频"）—— 翻译是纯文本任务，
+    // 默认仍取文本旗舰，同 stepfun「3.5-flash 优于 3.7-flash」的判据。
     //
-    // ⚠ 【只收 5.x】(2026-08-20 精简):GLM-4.x 全系 8 个已移除。5.x 四代已覆盖
-    // 旗舰/长上下文/快速各档,4.x 对翻译场景没有不可替代价值;而且官方文档索引
-    // (docs.bigmodel.cn/llms.txt)里 4.5 以下已不再单独建页 —— 那是退役前兆。
-    // 加回任何 4.x 之前先确认它在官方模型页仍在售。
+    // ⚠ 【只收官方「推荐模型」表的文本款】：4.x 全系、5.2 与降进「全部模型」一般条目的
+    // 5.1/5/5-Turbo 都不收（仍在售，要手填照样能填）。2026-09-25 复核时该表新增了
+    // GLM-5.3-FlashX 一款 —— 但官方文档拿不到它的调用侧准确 id（子页 404）,
+    // 没有实拉证据不发死 id，暂不收。
     models: [
+      // ⚠ 不打 thinking：GLM-5.3 系列上游强制思考、不可禁用，打了标签 off 态会发
+      // reasoning:{enabled:false}，对它是非法请求（同 openrouter 那条的判据）。
       { label: "GLM-5.3", value: "glm-5.3" },
-      { label: "GLM-5.2", value: "glm-5.2", thinking: true },
-      { label: "GLM-5.1", value: "glm-5.1", thinking: true },
-      { label: "GLM-5", value: "glm-5", thinking: true },
-      { label: "GLM-5 Turbo", value: "glm-5-turbo", thinking: true },
+      { label: "GLM-5.3 Flash", value: "glm-5.3-flash" },
     ],
   },
   minimax: {
@@ -752,14 +819,10 @@ export const PROVIDERS = {
       // 每次翻译都默默烧推理 token(DeepSeek「10M tokens」同款事故)。
       // M2.x 仍是 intrinsic/unclosable(无 toggle 参数)→ 不打标签。See llm.ts.
       { label: "MiniMax M3", value: "MiniMax-M3", thinking: true },
-      { label: "MiniMax M2.7", value: "MiniMax-M2.7" },
-      { label: "MiniMax M2.7 High-Speed", value: "MiniMax-M2.7-highspeed" },
-      // ⚠ M2.5 已下线收录:TokenHub 的 /v1/models 把 minimax-m2.5 标成
-      // status="pre-offline"(2026-08-20 实拉)。规则是【任一渠道 pre-offline
-      // 即全面下线】—— 老模型不留,免得用户选中一个随时会消失的选项。
-      // 已知代价:手填 "MiniMax-M2.5" 的存量用户会落进 gated() 的 custom 分支,
-      // 默认 Off 态发 thinking:{type:"disabled"},而 M2.x 无此参数 → 可能 4xx。
-      // 按仓库「不做向后兼容」方针接受:逃生口是把思考档切 Auto(省略参数)。
+      // ⚠ 已删 SKU 的通用处置（M2.5 由 TokenHub pre-offline 实证后移除）：
+      // 规则 =【任一渠道 pre-offline 即全面下线】，老模型不留。代价：手填旧 id
+      // 落进 gated() 的 custom 分支，Off 态发的 thinking:{type:"disabled"} 对
+      // M2.x 可能 4xx —— 按「不做向后兼容」接受，逃生口 = 思考档切 Auto。
     ],
   },
   stepfun: {
@@ -769,18 +832,24 @@ export const PROVIDERS = {
     endpoint: "https://api.stepfun.com/v1/chat/completions",
     defaultModel: "step-3.5-flash",
     defaultTemperature: 0.7,
-    docs: "https://platform.stepfun.com/docs/llm/modeloverview",
+    // ⚠ 站点加了 /zh/ 前缀，旧的 /docs/llm/modeloverview 现在 404（2026-09-17 实测）。
+    // 无 locale 与 /en/ 形式都 404 —— StepFun 文档**只有中文**，所以这条链接对所有
+    // 语种的用户都会落到中文页，这是上游的现实，不是我们写错了。
+    docs: "https://platform.stepfun.com/docs/zh/guides/models",
     apiKeyUrl: "https://platform.stepfun.com/interface-key",
     defaultUseRelay: false,
-    // 官方模型总览(platform.stepfun.com/docs/llm/modeloverview,2026-08-20 核对)
-    // 的两个主推旗舰,均 256K 上下文、均标"推荐",无即将下线标记。
-    // 默认 3.5-flash 而非 3.7:3.7 是【多模态】推理旗舰,3.5 是【语言】推理
-    // 旗舰 —— 翻译是纯文本任务,语言向那款更对路且更便宜。
+    // 官方文本模型共三款（总览路径现 307 到最新型号子页，逐款有独立文档页;
+    // 官方 llms.txt 可机读）：3.5-flash / 3.7-flash / step-5-preview。
+    // **step-5-preview 不收**:编程/多模态向旗舰 + preview 滚动命名，翻译是纯文本
+    // 任务 —— 判据同下面"3.5 而非 3.7"那条。07-08 的下线公告只动 step-1/2/3 老线，
+    // 在列两条无下线标注。
+    // 默认 3.5-flash 而非 3.7:3.7 是【多模态】推理旗舰，3.5 是【语言】推理
+    // 旗舰 —— 翻译是纯文本任务，语言向那款更对路且更便宜。
     // ⚠ 【不打 thinking 标签】:官方 OpenAI 兼容文档与模型总览都【没有】记载
     // thinking / reasoning_effort / enable_thinking 任何一个开关。按 gated()
-    // 的既定纪律,未知协议的 SKU 一律不注入推理参数(乱发可能 4xx);哪天官方
+    // 的既定纪律，未知协议的 SKU 一律不注入推理参数 (乱发可能 4xx);哪天官方
     // 成文了再连标签带 builder 一起加。
-    // ⚠ 不收 StepAudio(语音)、Step-1o Turbo Vision(视觉,32K)—— 非文本对话。
+    // ⚠ 不收 StepAudio(语音)、Step-1o Turbo Vision(视觉，32K)—— 非文本对话。
     models: [
       { label: "Step 3.5 Flash", value: "step-3.5-flash" },
       { label: "Step 3.7 Flash", value: "step-3.7-flash" },
@@ -793,23 +862,19 @@ export const PROVIDERS = {
     endpoint: "https://qianfan.baidubce.com/v2/chat/completions",
     defaultModel: "ernie-5.1",
     defaultTemperature: 0.7,
-    docs: "https://cloud.baidu.com/doc/qianfan/s/wmh4sv6ya",
+    // 指向【模型列表】页而不是计费页：model 入参的权威来源在这里（同 doubao 的取舍 ——
+    // 核对 SKU 时少一跳）。价格另见 https://cloud.baidu.com/doc/qianfan/s/wmh4sv6ya
+    docs: "https://cloud.baidu.com/doc/qianfan/s/rmh4stp0j",
     apiKeyUrl: "https://console.bce.baidu.com/iam/#/iam/apikey/list",
     defaultUseRelay: false,
     models: [
       { label: "ERNIE 5.1", value: "ernie-5.1" },
-      { label: "ERNIE 5.0", value: "ernie-5.0" },
       // ERNIE 5.0-Thinking server-defaults enable_thinking=true, but it's a hybrid
       // SKU with a real toggle: `enable_thinking` boolean (binary → qianfan is in
       // BINARY_EFFORT_VENDORS). Tagged so off-state sends explicit enable_thinking:false.
-      { label: "ERNIE 5.0 Thinking", value: "ernie-5.0-thinking-latest", thinking: true },
-      // ERNIE X1.1 是文心深度推理线，reasoning 内生 (不支持 thinking_budget)。
-      // 不打 thinking 标签:qianfan 走二元 enable_thinking，给内生推理模型发
-      // enable_thinking:false 可能被拒;省略即用其默认推理，翻译结果照常返回。
-      { label: "ERNIE X1.1", value: "ernie-x1.1" },
-      // 128k 已转正，去掉 -preview 后缀
-      { label: "ERNIE 4.5 Turbo 128K", value: "ernie-4.5-turbo-128k" },
-      { label: "ERNIE 4.5 Turbo 32K", value: "ernie-4.5-turbo-32k" },
+      // ⚠ ernie-x1.1 双条在官方【模型列表】页都标「即将下线」→ 按「老模型不留」不收。
+      // 教训固化：核 model 入参一律以「模型列表」页为准（docs 已指向它），计费页只
+      // 用来对价格 —— 计费页会漏行，据此判「id 不存在」曾得出过错误结论。
     ],
   },
   mistral: {
@@ -817,7 +882,11 @@ export const PROVIDERS = {
     category: "llm",
     label: "Mistral",
     endpoint: "https://api.mistral.ai/v1/chat/completions",
-    defaultModel: "mistral-medium-3-5",
+    // 默认 Small 4：官方把 Medium 3.5 定位成「frontier-class multimodal model
+    // optimized for **agentic and coding** use cases」—— 翻译不是那个负载；而 Small 4
+    // 是官方那句「unifying instruct, reasoning, and coding in a single **efficient**
+    // model」的便宜档，便宜 10 倍（$0.15/$0.60 vs $1.50/$7.50，OpenRouter 价目核对）。
+    defaultModel: "mistral-small-latest",
     defaultTemperature: 0.7,
     docs: "https://docs.mistral.ai/api/",
     apiKeyUrl: "https://console.mistral.ai/api-keys",
@@ -828,7 +897,7 @@ export const PROVIDERS = {
     // BINARY_EFFORT_VENDORS)。Large 3 / Ministral 非推理模型。
     // 注：除 medium-3-5(有效可调 id) 外，一律用 `-latest` 别名 —— Mistral 可调
     // API id 是日期版 (mistral-small-2603 等),纯版本号写法 (mistral-small-4) 不可调用。
-    // Magistral 线已整体废弃 (magistral-medium-2509 于 2026-07-31 退役),移除。
+    // Magistral 线已退役，不收录。
     models: [
       { label: "Mistral Medium 3.5", value: "mistral-medium-3-5", thinking: true },
       { label: "Mistral Small 4", value: "mistral-small-latest", thinking: true },
@@ -841,41 +910,33 @@ export const PROVIDERS = {
     category: "llm",
     label: "xAI (Grok)",
     endpoint: "https://api.x.ai/v1/chat/completions",
-    defaultModel: "grok-4.6",
+    defaultModel: "grok-4.7",
     defaultTemperature: 0.7,
     docs: "https://docs.x.ai/developers/models",
     apiKeyUrl: "https://console.x.ai/",
     defaultUseRelay: false,
-    // Grok 4.6(2026-08 上线,500k 上下文)是当前 frontier 档，与 4.5 同价，设为默认。
-    // 只收录 4.6 / 4.5 两档在产 SKU;更早的世代不收录。
+    // Grok 4.7 是当前 frontier 档（官方 models 页 2026-09-25 列 4.7/4.6/4.5/4.3;
+    // 4.7 与 4.6 同价 $2/$6 —— Zen 公开价目核对）。4.6(2026-08 上线，500k 上下文)
+    // 降为上一代删出清单，手填仍可调。
     //
-    // thinkingLevels 抄自官方逐模型表(docs.x.ai/docs/guides/reasoning,2026-08-20
-    // 核对):4.6 收 low/medium/high/xhigh,4.5 收 low/medium/high(xhigh 被当 high,
-    // 是静默降级不是报错)。xhigh 不写进表里 —— 我们的 ReasoningEffort 只有三档,
-    // 发不出它;哪天 UI 加了档再补。
-    // ⚠ off 态【不发 "none"】:官方枚举里没有这个值,且原文明写
-    // "Reasoning cannot be disabled" —— 详见 pickThinkingLevel 的注释。
-    // (models.dev 给 grok 列过 none,与官方原文冲突,别照它改。)
+    // thinkingLevels 抄自官方逐模型表 (docs.x.ai/docs/guides/reasoning,2026-08-20
+    // 核对、2026-09-25 复测):4.7 与 4.6 同收 low/medium/high/xhigh,4.5 收
+    // low/medium/high(xhigh 被当 high,是静默降级不是报错)。xhigh 不写进表里 ——
+    // 我们的 ReasoningEffort 只有三档，发不出它;哪天 UI 加了档再补。
+    // ⚠ off 态【不发 "none"】:官方枚举里没有这个值，且原文明写
+    // "Reasoning cannot be disabled"（4.7 复核同样如此）—— 详见 pickThinkingLevel 的注释。
+    // (models.dev 给 grok 列过 none，与官方原文冲突，别照它改。)
     models: [
-      { label: "Grok 4.6", value: "grok-4.6", thinking: true, thinkingLevels: ["low", "medium", "high"] },
-      { label: "Grok 4.5", value: "grok-4.5", thinking: true, thinkingLevels: ["low", "medium", "high"] },
+      // 官方只推荐 4.7（4.6 与它同价、是被支配的旧代）。
+      { label: "Grok 4.7", value: "grok-4.7", thinking: true, thinkingLevels: ["low", "medium", "high"] },
     ],
   },
-  // Perplexity 已【提前下线】(原硬期限 2026-09-27)。整条 Sonar chat/completions
-  // 线转 Agent API,官方横幅原文「Sonar Chat Completions is now Agent API. Sonar
-  // will be supported until September 27, 2026.」
-  //
-  // 选择「删除」而不是「迁移」,两条理由:
-  //   1. 迁移成本高:Agent API 是 OpenAI【Responses】形状,不是 chat/completions。
-  //      URL 变 /v1/agent、`messages`→`input`、`max_tokens`→`max_output_tokens`、
-  //      取文本要遍历 output[] 找 type=="output_text",而且它是严格模式 —— 任何
-  //      残留字段直接 400,连错误都以 HTTP 200 + status:"failed" 返回。等于要从
-  //      openai-compat 降级成手写 kind:"custom" service 并单独做错误判定。
-  //   2. 迁移后没有留下来的理由:Sonar 的差异化本来就是「默认联网搜索」,而 Agent
-  //      API 把联网改成了显式 opt-in 的 tools。不传 tools 它就只是又一个普通 LLM,
-  //      本表里已有十几个。为一个无差异化的 provider 维护全项目唯一一份 Responses
-  //      API 解析分支，不划算。
-  // 来源:docs.perplexity.ai/docs/agent-api/migrate-from-sonar/overview
+  // Perplexity 已于 2026-09-27 前【提前移除】—— 别急着按 Agent API 加回来，两条
+  // 理由当时论证过：① Agent API 是 Responses 形状(/v1/agent、input/output[]、严格
+  // 模式、错误以 HTTP 200+status:"failed" 返回),等于全项目唯一一份手写 Responses
+  // 分支；② Sonar 的差异化只剩「默认联网」,Agent API 改成显式 opt-in tools 后它就
+  // 是又一个普通 LLM，本表已有十几个。若哪天联网价值重新成立，连理由①的代价一起
+  // 重估。来源:docs.perplexity.ai/docs/agent-api/migrate-from-sonar/overview
   cohere: {
     kind: "openai-compat",
     category: "llm",
@@ -893,9 +954,9 @@ export const PROVIDERS = {
     // https://docs.cohere.com/docs/compatibility-api
     models: [
       { label: "Command A Plus", value: "command-a-plus-05-2026" },
-      { label: "Command A", value: "command-a-03-2025" },
       { label: "Command A Reasoning", value: "command-a-reasoning-08-2025", thinking: true },
-      { label: "Command A Translate", value: "command-a-translate-08-2025" },
+      // ⚠ Command A Translate 不收：AI provider 里不放专属翻译模型 —— 规则与落点
+      // 见本文件头部「选品规则」。要 MT 质量请选 machine-translation 类。
     ],
   },
   yandex: {
@@ -921,22 +982,20 @@ export const PROVIDERS = {
     docs: "https://aistudio.yandex.ru/docs/en/ai-studio/concepts/api.html",
     apiKeyUrl: "https://aistudio.yandex.ru/platform/folders/",
     // url 可选：自建中转 (转发到 llm.api.cloud.yandex.net 的自有代理)。
-    // 与中转开关正交:url 决定用哪个 endpoint,useRelay 决定走不走中转,二者互不覆盖。
-    // endpoints[] 单条,理由同 claude:让官方地址被 classifyEndpointUrl 认出来。
+    // 与中转开关正交:url 决定用哪个 endpoint,useRelay 决定走不走中转，二者互不覆盖。
+    // endpoints[] 单条，理由同 claude:让官方地址被 classifyEndpointUrl 认出来。
     endpoints: [{ label: "Yandex Cloud", url: "https://llm.api.cloud.yandex.net/v1/chat/completions" }],
     defaults: { url: "", apiKey: "", folderId: "", model: "yandexgpt-5.1", temperature: 0.7, batchSize: 20, contextBatchSize: 3, contextWindow: 50, useRelay: true },
     // Hosted SKUs per aistudio.yandex.ru/docs/en/ai-studio/concepts/generation/models
-    // (2026-08-20 逐条核对:下方 10 个 SKU 与官方"Common instance models"表【完全一致】,
-    // 既无失效项也无遗漏项,无任何退役标注)。
-    // ⚠ 该站对脚本抓取返回验证码页,只能用浏览器打开核对 —— 别因为 curl/WebFetch
+    // (2026-08-20 逐条核对：下方 9 个 SKU 与官方"Common instance models"表【完全一致】,
+    // 既无失效项也无遗漏项，无任何退役标注)。
+    // ⚠ 该站对脚本抓取返回验证码页，只能用浏览器打开核对 —— 别因为 curl/WebFetch
     // 拿不到内容就以为它下线了。
     // Yandex 的退役模式是【先替换、再给一个月宽限】(Release Notes:V3.2→V4 Flash、
     // Qwen3.5→Qwen3.6 都是这个节奏),所以盯 Release Notes 比盯模型表更早发现变动。
     // No thinking tags — the OpenAI-compat path documents no reasoning toggle
     // (YandexGPT 5.1's Chain-of-Reasoning isn't exposed as a request param);
     // sending reasoning_effort risks a 400 on a gateway that never documented it.
-    // DeepSeek V3.2 已于 2026-06-28 到期 (URI 失效返回 400),由 V4 Flash 取代
-    // (Yandex Release Notes 2026-05-28)。aliceai-llm-flash 为 2026-05-19 新增。
     models: [
       { label: "YandexGPT Pro 5.1", value: "yandexgpt-5.1" },
       { label: "YandexGPT Pro 5", value: "yandexgpt-5-pro" },
@@ -944,7 +1003,6 @@ export const PROVIDERS = {
       { label: "Alice AI LLM", value: "aliceai-llm" },
       { label: "Alice AI LLM Flash", value: "aliceai-llm-flash" },
       { label: "DeepSeek V4 Flash", value: "deepseek-v4-flash" },
-      { label: "Qwen3 235B", value: "qwen3-235b-a22b-fp8" },
       { label: "Qwen3.6 35B", value: "qwen3.6-35b-a3b" },
       { label: "GPT-OSS 120B", value: "gpt-oss-120b" },
       { label: "GPT-OSS 20B", value: "gpt-oss-20b" },
@@ -964,235 +1022,413 @@ export const PROVIDERS = {
     defaultUseRelay: false,
     extraHeaders: { "HTTP-Referer": "https://aishort.top", "X-Title": "AIShort" },
     // 选型依据:openrouter.ai/models?order=top-weekly 的周榜前列 —— 免费档
-    // (:free 后缀)+ 各家主流旗舰各取若干。不写死数量:清单随榜单增删,
-    // 写了必漂(此处曾写"2 个 free+9 个主流",增补后就与实际对不上了)。
+    // (:free 后缀)+ 各家主流旗舰各取若干。不写死数量：清单随榜单增删，
+    // 写了必漂 (此处曾写"2 个 free+9 个主流",增补后就与实际对不上了)。
     // OpenRouter 统一 reasoning_effort 参数会自动转发底层 provider(Claude→budget_tokens,
     // OpenAI→reasoning_effort,Gemini→thinkingLevel,DeepSeek→thinking 等),所以
     // 底层 model 支持 thinking 的 slug 都标 thinking: true 即可。
-    // ⚠ slug 写法不统一，逐个以 /api/v1/models/{slug}/endpoints 实拉为准:
-    // Claude 新代是 `anthropic/claude-opus-5`(无小数点),而旧的 opus 4.8 是
-    // `anthropic/claude-opus-4.8`(有小数点)。别按一个规律推另一个。
+    // ⚠ slug 写法不统一，逐个以 /api/v1/models/{slug}/endpoints 实拉为准：
+    // Claude 新代是 `anthropic/claude-opus-5`(无小数点),而 `claude-opus-5.5` 又带
+    // 小数点、旧的 opus 4.8 也是小数点 —— 别按一个规律推另一个。
     // ⚠ 「model 存在」≠「能调用」:poolside/laguna-m.1:free 的 model 对象仍在，但
     // endpoints 数组为【空】(0 个 provider)= 实际不可调用，已换成 laguna-s-2.1:free
-    // (1 endpoint, prompt $0, 262k 上下文)。核 free SKU 必须打 endpoints 端点,
+    // (1 endpoint, prompt $0, 262k 上下文)。核 free SKU 必须打 endpoints 端点，
     // /api/v1/models 全量 JSON 太大会被截断，据它判「不存在」会误删。
     models: [
       { label: "Nemotron 3 Super 120B (free)", value: "nvidia/nemotron-3-super-120b-a12b:free" },
       { label: "Laguna S 2.1 (free)", value: "poolside/laguna-s-2.1:free" },
       { label: "DeepSeek V4.1 Flash", value: "deepseek/deepseek-v4.1-flash", thinking: true },
-      // preview → 正式版:hy3-preview 在上游标注 2026-08-31 下线，不等它挂。
-      // tencent/hy3 已核实有 4 个 status=0 的健康 provider(含腾讯自营),而
-      // hy3-preview 只剩 GMICloud 单点供应 —— 单点本身就是随时归零的形态。
+      // Hy3 正式版（8-31 到期前就从 hy3-preview 换了过来 —— 教训：单点供应的
+      // preview 就是随时归零的形态，核 free/curated SKU 要数健康 provider）。
       { label: "Hy3", value: "tencent/hy3", thinking: true },
       { label: "Claude Sonnet 5", value: "anthropic/claude-sonnet-5", thinking: true },
-      { label: "Claude Opus 5", value: "anthropic/claude-opus-5", thinking: true },
-      { label: "Gemini 3.7 Flash", value: "google/gemini-3.7-flash", thinking: true },
-      { label: "GPT-5.6 Luna", value: "openai/gpt-5.6-luna", thinking: true },
-      // glm-5.3 不打 thinking:上游强制思考、不可禁用,打了标签 off 态会经 OpenRouter
+      { label: "Claude Opus 5.5", value: "anthropic/claude-opus-5.5", thinking: true },
+      { label: "Gemini 3.8 Flash", value: "google/gemini-3.8-flash", thinking: true },
+      { label: "GPT-6 Astra", value: "openai/gpt-6-astra", thinking: true },
+      { label: "GPT-6 Luna", value: "openai/gpt-6-luna", thinking: true },
+      // glm-5.3 不打 thinking:上游强制思考、不可禁用，打了标签 off 态会经 OpenRouter
       // 统一参数发 reasoning:{enabled:false},对它是非法请求。同原生 zhipu 的处理。
       { label: "GLM-5.3", value: "z-ai/glm-5.3" },
-      { label: "Grok 4.6", value: "x-ai/grok-4.6" },
+      { label: "Grok 4.7", value: "x-ai/grok-4.7" },
       { label: "Kimi K2.6", value: "moonshotai/kimi-k2.6", thinking: true },
+      // Qwen3.8 27B 免费档（top-weekly 免费榜在列，endpoints 实拉 1 个健康）。
+      { label: "Qwen3.8 27B (free)", value: "qwen/qwen3.8-27b:free" },
       // M3 上游默认 adaptive thinking(可关)→ 打标签让 off 态经 OpenRouter
       // 统一参数发 reasoning:{enabled:false},否则默认烧推理 token。
       { label: "MiniMax M3", value: "minimax/minimax-m3", thinking: true },
     ],
   },
-  opencode: {
+  opencodeZen: {
     kind: "openai-compat",
     category: "aggregator",
     label: "OpenCode Zen",
     endpoint: "https://opencode.ai/zen/v1/chat/completions",
-    // ⚠ 需要 apiKey，尽管 zen 的 *-free SKU 匿名直连确实能用 —— 那条路不可依赖:
-    // zen 的免费档本来就很容易 429(实测撞过 Retry-After ≈21.6 小时的冷却)，
-    // 零配置进来的用户第一次点翻译就吃闭门羹。理由详见 NO_CRED_REQUIRED 的注释。
+    // key 带 Zen 后缀是【有意的】:同一个账号下有两条产品线(Zen 余额按量 / Go 订阅),
+    // 光写 `opencode` 读不出是哪条 —— 这正是让人以为两者该合成一个 provider 的原因。
+    // 姊妹条目叫 opencodeGo,这里对称。改名代价已知并接受:旧的存档值会优雅回落
+    // (getDefaultConfig 判不过 → DEFAULT_API,且不写回),Worker 需重新部署
+    // (/api/opencode → /api/opencodeZen),下游三个 app 目录需重跑 yarn sync:providers。
+    // ⚠ 别把它"简化"回 opencode —— 那会把这条产品线重新藏进厂商名里。
+    // ⚠ 也【不要】把 Zen 与 Go 合并成 endpoints[] 变体:变体只共享 provider 级
+    // models[]，而两家在售集合不同(交集从早期 4/31 涨到 26/42 —— 2026-09-25 实拉，
+    // 但 Go 仍有 16 条 Zen 没有的选品，如 muse-spark/longcat/mimo-2.6/免费档)，
+    // 何况计费形态不同 —— 合并后总有一份清单对当前端点是错的(见 opencodeGo 条目)。
+    // ⚠ 需要 apiKey。**匿名这条路已被上游关掉**（2026-09-17 实测、复测稳定）：
+    //   无 key → 403 FreeTierError「OpenCode's free tier can only be used from
+    //   within OpenCode」；带【任意】key（哪怕是假 key）→ 过闸，变成 401 AuthError。
+    // 即门槛是【凭证】而不是客户端 —— 这比"匿名能用但容易 429"的旧说法更硬，
+    // 也因此退出 NO_CRED_REQUIRED。理由详见该集合的注释。
     //
     // 「需要 key」≠「要花钱」,别把这两件事混起来 (否则下一个人会觉得这里
-    // 降级得太狠，又把它挪回 NO_CRED_REQUIRED):官方定价表把 8 个 *-free SKU
-    // 标为 Free/Free/Free,填了 key 用它们【依然免费】,key 的门槛是注册 +
-    // 绑账单信息 (官方原话 "add your billing details"),不是预付费。填 key
-    // 换来的是【额度按账号计】而不是和全站陌生人共享一个 IP。
+    // 降级得太狠，又把它挪回 NO_CRED_REQUIRED):官方定价表把一批 *-free SKU
+    // 标为 Free (2026-09-25 实拉目录共 11 条),填了 key 用它们【依然免费】,key
+    // 的门槛是注册 + 绑账单信息 (官方原话 "add your billing details"),不是预付费。
+    // 填 key 换来的是【额度按账号计】而不是和全站陌生人共享一个 IP。
+    // 免费档的收录/排除判据在下面模型清单的第 ④ 条（一律收，只排实测不通与同族旧代）。
     //
-    // ⚠ CLI【同样需要 key】。技术上那条路本来可行 (Node 无 CORS、useRelay
-    // 默认关 → 直连用户自己的 IP，免费 SKU 匿名可用，实测直连 200),但凭证门
-    // (validateTranslationInputs → getConfigStatus) 是两个壳共用的一套，退出
-    // NO_CRED_REQUIRED 就一起退出了。
+    // ⚠ CLI【同样需要 key】—— 匿名 403 这个凭证门对两个壳共用一套
+    // (validateTranslationInputs → getConfigStatus)，没有 key 哪边都打不通。
     // 【故意不给 CLI 开后门】:开后门要在 registry 里按平台或按 useRelay 分叉
     // 凭证判定，把「这个服务要不要凭证」从一条规则切成两条 —— 代价大于收益，
     // 而 CLI 用户填 key 的成本只是 `--api-key` 或 `-s settings.json`。
-    // (曾在 fe250adca 的 commit message 与本注释里声称 CLI 不受影响，那是
-    //  未经验证就写下的断言，实测 `yarn cli -m opencode` 直接 exit 2。)
     defaultModel: "deepseek-v4-flash-free",
     defaultTemperature: 0.7,
     docs: "https://opencode.ai/docs/zen/",
     apiKeyUrl: "https://opencode.ai/auth",
-    // 上游【完全不发 CORS 头】,且 OPTIONS 预检返回站点 404 HTML(实测 2026-08-06)
+    // 上游【完全不发 CORS 头】,且 OPTIONS 预检返回站点 404 HTML(2026-08-06 首次实测，
+    // 2026-09-17 复测不变:OPTIONS → 404 且零 CORS 头；带 Origin 的 POST → 401 且无 ACAO)
     // —— 浏览器直连必死在预检，这也是 Custom(llm) 填 zen 地址走不通的原因。
     // 故默认开 relay;开关保留，上游补 CORS 后用户可自行切回直连。
+    // ⚠ 别被 `/v1/models` 误导:那个端点【是】开放 CORS 的(OPTIONS 200 +
+    //   Access-Control-Allow-Origin: *),只有 chat/completions 不发 —— 所以
+    //   「models 能拉」推不出「chat 能直连」。CLI(Node)侧则两条路都通,没有 CORS 层。
     defaultUseRelay: true,
-    // 模型 id 取自 GET https://opencode.ai/zen/v1/models(实测)。清单只收翻译
-    // 用得上的档位，60+ 全量不列 —— model 字段可自由输入，要冷门 SKU 自己填。
-    // 不标 thinking:zen 是网关，是否把 reasoning_effort 透传给底层 provider
-    // 未经验证，标了就会发未验证的参数。不标 = 不发，安全。
-    // GPT-5.x 线故意不收：该线在 OpenAI 侧拒 temperature(见 openai spec 省略
-    // defaultTemperature 的理由),而 zen 是否代为剥离无法在匿名下验证 —— 收进
-    // 清单等于把一个未验证的 400 风险摆到默认下拉里。要用自行填 model。
-    // 2026-08 复核:ling-3.0-flash-free 与 longcat-2.0-free 已从 /v1/models 消失
-    // (连不带 -free 的同名 SKU 也搜不到),移除;当前 6 个 -free SKU 已全部收录。
+    // 模型清单：**按输入价升序**（一眼看出成本档位），每个家族只留最新一代。
+    // 全量 81 条不列（2026-09-25 实拉）—— model 字段可自由输入，冷门 SKU 自己填。排除四类：
+    //   ① GPT-5.x / gpt-6 线：该线在 OpenAI 侧拒 temperature（见 openai spec 省略
+    //      defaultTemperature 的理由），而 zen 是否代为剥离无法在无 key 下验证 ——
+    //      收进来等于把一个未验证的 400 风险摆到默认下拉里。
+    //   ② 代码 / 视觉特化：kimi-k2.7-code、gpt-5.x-codex、deepseek-v4-flash-vision-exp。
+    //   ③ 隐身 / preview / 实测不可用：union-alpha（2026-08 实测 500，2026-09-25 复测
+    //      已彻底消失：'is not supported'）、hy3-preview、hy4-preview、omen-alpha。
+    //   ④ 免费档一律收（上游 11 条免费 SKU 收 7 条）。⚠ **数据条款不作为排除理由** ——
+    //      「免费期内收集的数据可能用于改进模型」（Big Pickle / MiMo Free / Ling 3.0
+    //      Flash Fin Free）与「仅限试用、勿提交机密数据」（Nemotron 两条）都照收：
+    //      字幕正文不是个人文档，被信息收集可以接受（用户 2026-09-17 明确确认）。
+    //      不收的 4 条全是【功能】原因，不是条款：jev-1.13-free 与
+    //      muse-spark-1.3-contributor-free **实测 500**（2026-09-25 复测仍 500），
+    //      muse-spark-1.2-contributor-free 与 mimo-v2.5-free 是同族旧代（2.6 已上架）。
+    // 未收的付费新款（在册、探针过）：qwen3.8-max 与在列的 grok/sonnet 档重叠且更贵，
+    // deepseek-v4.1-flash 比在收的 v4-flash 贵一倍而同族已在列 —— 都不改变成本梯度，
+    // 收了只是让下拉变长；要它们照样能手填。
+    // 不标 thinking：zen 是网关，是否把 reasoning_effort 透传给底层 provider 未经验证，
+    // 标了就会发未验证的参数；不标 = 不发，安全。
+    // ⚠ 复核用无 key 探针：AuthError = 模型在（不带 Authorization 头回 "Missing API key."，
+    // 带无效 key 回 "Invalid API key."，两种都算可用）；ModelError "… is not supported"
+    // = 已下架；"… for format X" = 走不了该协议；FreeTierError 403 = 免费档【匿名】被拒。
     models: [
+      // 免费档（7 条；条款见上第 ④ 条。2026-09-25：mimo 换 2.6 代；space-bunny 是
+      // 唯一【匿名也能打通】的免费档 —— 免 key 探针直接返回了 completion，其余都要 key）
       { label: "DeepSeek V4 Flash (free)", value: "deepseek-v4-flash-free" },
       { label: "Big Pickle (free)", value: "big-pickle" },
-      { label: "MiMo V2.5 (free)", value: "mimo-v2.5-free" },
-      { label: "Hy3 (free)", value: "hy3-free" },
+      { label: "MiMo V2.6 Flash (free)", value: "mimo-v2.6-flash-free" },
+      { label: "Space Bunny (free)", value: "space-bunny-free" },
+      { label: "Ling 3.0 Flash Fin (free)", value: "ling-3.0-flash-fin-free" },
       { label: "Nemotron 3 Ultra (free)", value: "nemotron-3-ultra-free" },
       { label: "Nemotron 3.5 Lightning (free)", value: "nemotron-3.5-lightning-free" },
-      { label: "Laguna S 2.1 (free)", value: "laguna-s-2.1-free" },
-      { label: "DeepSeek V4 Pro", value: "deepseek-v4-pro" },
-      { label: "Claude Haiku 4.5", value: "claude-haiku-4-5" },
-      { label: "Claude Sonnet 5", value: "claude-sonnet-5" },
-      { label: "Claude Opus 5", value: "claude-opus-5" },
-      { label: "Gemini 3.6 Flash", value: "gemini-3.6-flash" },
-      { label: "Kimi K2.6", value: "kimi-k2.6" },
-      { label: "GLM 5.2", value: "glm-5.2" },
+      // 付费档，输入价升序（$0.14 → $4.00 / 1M，Zen 价格页 2026-09-25 核对）
+      { label: "DeepSeek V4 Flash", value: "deepseek-v4-flash" },
+      { label: "Qwen3.8 Flash", value: "qwen3.8-flash" },
+      { label: "GLM 5.3 Flash", value: "glm-5.3-flash" },
+      { label: "MiniMax M3", value: "minimax-m3" },
       { label: "Qwen3.6 Plus", value: "qwen3.6-plus" },
+      { label: "Kimi K2.6", value: "kimi-k2.6" },
+      { label: "Claude Haiku 4.5", value: "claude-haiku-4-5" },
+      { label: "GLM 5.3", value: "glm-5.3" },
+      { label: "Gemini 3.8 Flash", value: "gemini-3.8-flash" },
+      { label: "DeepSeek V4 Pro", value: "deepseek-v4-pro" },
+      { label: "Claude Sonnet 5", value: "claude-sonnet-5" },
+      // grok-4.7 与 4.6 同价（$2/$6）更新代 —— 按「同价旧代不留」替换。
+      { label: "Grok 4.7", value: "grok-4.7" },
+      { label: "Kimi K3", value: "kimi-k3" },
+      // opus-5-5 比 opus-5 更新且【更便宜】($4/$20 vs $5/$25)，直接替换。
+      { label: "Claude Opus 5.5", value: "claude-opus-5-5" },
+    ],
+  },
+  opencodeGo: {
+    kind: "openai-compat",
+    category: "aggregator",
+    label: "OpenCode Go",
+    endpoint: "https://opencode.ai/zen/go/v1/chat/completions",
+    // 与上方 opencodeZen(Zen)【同 host、同账号、同一把 key】,只有三处不同:路径
+    // (/zen/go/v1 vs /zen/v1)、在售 SKU 集合、计费形态 —— 所以这里是【独立条目】,
+    // 不是 opencodeZen 的 endpoints[] 变体。变体机制只共享 provider 级 models[],
+    // 而两边在售集合不同(2026-09-25 实拉:交集已涨到 26/42，但 Go 仍有 16 条 Zen
+    // 没有的选品 —— muse-spark/longcat/mimo-2.6 系/免费档),计费形态更不同。
+    // 「填了 key」在两边含义不同:Go 是 $10/月的订阅额度(官方按每模型月限额换算:
+    // 5 小时 = 20%、周 = 50%、月 = 100%),Zen 是充值余额 —— UI 文案里别把 Go
+    // 写成"充值即用"。官方限定一个 workspace 只能有一人订阅 Go。
+    //
+    // ⚠ 官方定位是【编程 agent】:"designed for OpenCode and other coding agents
+    // that produce similar types of requests. Traffic is monitored for abuse that
+    // degrades the experience for other users." 字幕翻译的流量形态与这个预期不符。
+    // 官方没禁止第三方客户端(还专门列了一份 Validated Clients 名单),但上游一旦
+    // 收紧,这家是最先被砍的。用户付的是自己的订阅钱,这句话留在这里让他知情。
+    defaultModel: "mimo-v2.6-flash",
+    defaultTemperature: 0.7,
+    docs: "https://opencode.ai/docs/go/",
+    apiKeyUrl: "https://opencode.ai/auth",
+    // 默认取 mimo-v2.6-flash：它在 Go 的 chat/completions 集合里【三条价格轴同时最低】
+    // (输入 $0.14、输出 $0.28、缓存读 $0.0028 每 1M),月限额又落在最高的 $60 档。
+    // 2026-09-25 由 mimo-v2.5 换代：官方 Go 价格表里 2.6-flash 与 2.5 三条价格轴
+    // 同价、同 $60 限额档 —— 按「同价旧代不留」直接替换，选它的理由一字未变。
+    // 字幕翻译请求多而碎、且依赖提示缓存,缓存读价直接决定总成本。
+    // 质量排序这里无法验证,别把它当结论 —— 要更强的模型在下拉里换即可
+    // (glm-5.3-flash 同为 $60 档、输入 $0.15)。
+    //
+    // 上游与 Zen 同 host,CORS 状况逐字一致:OPTIONS 预检返回站点 404 HTML、
+    // 一个 CORS 头都不发(2026-09-16 实测),浏览器直连必死 —— 故默认开 relay。
+    //
+    // ⚠ 【必须重新部署 Worker,否则网页端仍 400】。路由已在本仓库声明:
+    //   scripts/llm-proxy-worker.js 的 PROVIDER_URLS.opencodeGo。
+    // 但那份文件是【部署源】,不是运行中的实例 —— 改它不会影响
+    // llm-proxy.api2026.workers.dev,必须重新部署才生效。发版前请确认已部署;
+    // 未部署时的症状是 POST /api/opencodeGo → 400 {"error":"Unsupported provider…"}。
+    // 借道已有的 /api/opencodeZen 不行 —— Worker 按 provider 校验 endpoint 白名单,
+    // 回 400「Endpoint not allowed for provider "opencodeZen"」。
+    // 自部署 Worker 的用户:这份文件就是配置,加了键即可(见文件头注释)。
+    // CLI 不受影响:那条路默认直连(Node 无 CORS),填 Go 的 key 即可用。
+    // 尽管部署前打不通,仍按"有中转"声明(不隐藏、不摘掉开关):上游 CORS 确实是死的,
+    // 写 false 等于宣称"直连默认可用",那是假的;缺的是 Worker 侧那一跳,
+    // 不是这里该给出的判断。
+    defaultUseRelay: true,
+    // ⚠ 唯一该发的自定义头。官方原话:"Identify itself with its own user agent,
+    // such as my-coding-agent/1.0, rather than a generic SDK or HTTP-library name."
+    // 浏览器侧 fetch 会【静默丢掉】User-Agent(它是 forbidden header name,且不计入
+    // 预检的 Access-Control-Request-Headers)—— 预检集合因此不变,不需要为它调整
+    // CORS 语义(Authorization / content-type 本来就在白名单里)。
+    // ⚠ 但它【必须】在 Worker 的 FORWARDED_HEADERS 里:那份白名单同时兼作【转发】
+    // 白名单,不在其中的头会被中转【静默剥掉】,于是直连与中转行为悄悄分叉 ——
+    // workerParity.test.ts 第三条断言拦的正是这件事(relay provider 的 extraHeaders
+    // 必须全部在白名单内)。本次已把 "user-agent" 加进去。加它【不会】放宽 CORS:
+    // 浏览器本来就设不了这个头,白名单多一项对预检集合没有任何影响。
+    // Node 侧照发,而 Node 默认 UA 正好是 `undici`,一个通用 HTTP 库名,恰是官方
+    // 点名不要的那类 —— 这个头实际只在 CLI 生效,而 CLI 正是需要它的那侧。
+    // 不写版本号:registry 是静态数据,写死的版本发一次版就失真,而这里没有可用的
+    // 构建期注入(导入 package.json 会把整份依赖清单打进客户端包)。
+    extraHeaders: { "User-Agent": "subtitle-translator" },
+    // 会话 id 的头名（值由流水线每轮生成）。理由与三步改法见下。
+    sessionHeader: "x-opencode-session",
+    // ⚠ `x-opencode-session`：**官方公告说得很清楚，别再只看文档那句 should**。
+    //   官方（@opencode）公告原文：
+    //     "Some tools using OpenCode Go are missing the x-opencode-session header which
+    //      prevents optimization of prompt caching. If impacted you will receive an email
+    //      soon with personalized suggestions on how to fix. **Starting 09/06 requests
+    //      missing this header may error.**"
+    //   上游报错（多来源复现，错误类型是 `MissingSessionID`）：
+    //     `{"type":"error","error":{"type":"MissingSessionID","message":"Error from provider
+    //      (Console Go): Request is missing x-opencode-session and cannot be routed
+    //      efficiently. Please see https://opencode.ai/docs/go/#where-can-i-use-it"}}`
+    //   独立报告：VS Code、DeepSeek Harness、TRAE、CodexPlusPlus#2125、多篇 CSDN 排查文。
+    //   ⇒ 判定：**按实际必需处理**（2026-09-06 起会报错）。
+    //   ⚠ 官方文档那一页的措辞仍是 "should"、且没有 400 的说法 —— 光读文档会得出反的结论；
+    //     但同一页维护着「Validated / Known Problematic Clients」清单，逐个点名哪些客户端
+    //     "会话信息缺失"，其中 DeepSeek Harness 那条写着"某些模型路径上缺失"（= 至少部分
+    //     路径是硬要求）。文档的软措辞不足以当"可以不发"的依据。
+    //   ⚠ 这条我们**复现不了**：会话检查在鉴权之后，无 key 先回 401 AuthError。证据来自
+    //     官方公告 + 多个独立用户的实测（其中一人的可用配置就是硬编码一个 UUID 填这个头，
+    //     说明要求是【存在】而非"每轮稳定"—— 稳定只影响缓存收益，所以我们发每轮 id 是
+    //     它的超集：既满足存在，又拿到 routing / prompt caching）。
+    //   ⚠ Zen 文档**完全没提**任何请求头 —— 这是 Go 线的事。
+    //   ⚠ PR #70 里同时加的 `x-opencode-client`：**两份文档都没有这个头**，别跟着发
+    //     （那份可用的社区配置里也只设了 session 一个头，是这条判断的旁证）。
+    //     客户端标识官方要求的是 User-Agent（上面 extraHeaders 已经发了）。
+    // 已修（2026-09-17）。三处一起改的，缺一处都会「看着修了但没用」：
+    //   ① 本条目声明 `sessionHeader: "x-opencode-session"` —— 只声明【头名】；
+    //   ② 值由流水线给：`RunCtx.sessionId` 在 runTranslateLines 里生成一次，
+    //      经 `TranslateTextParams.sessionId` 传到 services/llm.ts 的请求头里
+    //      （**每轮稳定**，不是常量也不是每请求随机 —— 见 types.ts 的注释）；
+    //   ③ Worker 的 FORWARDED_HEADERS 加了 "x-opencode-session"
+    //      （那份集合兼作 CORS 允许列表，不加就是「浏览器死在预检 + 中转静默剥掉」）。
+    // ⚠ **Worker 必须重新部署**，否则网页端仍会 400（症状同下）。
+    // ⚠ 也别忘了别的壳：CLI 走的是同一条 pipeline，自动带上，无需额外改动。
+    // ⚠ 千万别改成「在 services/shared.ts 的 fetchJSON 里按 url.includes("opencode.ai")
+    //   加头」（PR #70 的做法）：中转 URL 形如
+    //   `https://<worker>/api/opencodeGo?endpoint=https%3A%2F%2Fopencode.ai%2F…`，
+    //   encodeURIComponent 不编码 `.`/字母 → **那段判断在中转时也命中**，而浏览器默认
+    //   就走中转；于是预检带上一个 Worker 不允许的头 → **把本来能用的中转弄坏**，
+    //   且失败被 withNetworkHint 改写成「请开启 API Relay」，用户会去开一个已经开着的
+    //   开关。层次上也不对：provider 专用头属于 registry，不属于通用传输层。
+    // 不标 thinking:与 Zen 同理 —— Go 是否把 reasoning_effort 透传给底层 provider
+    // 未经验证,标了就会发未验证的参数。
+    //
+    // 模型清单：**按输入价升序**（一眼看出成本档位），每个家族只留最新一代。
+    // 官方把目录（2026-09-25 实拉 /v1/models 共 42 条）按"主推协议"分成三张表，但那**不是排他约束**：逐条实测只有
+    // grok-4.6 在 /v1/chat/completions 上被拒（"not supported for format oa-compat"，
+    // 同一条 SKU 在 Zen 上是好的；2026-09-25 复测 grok-4.7 同样被拒，故 grok 家族
+    // 仍只收 4.5）。这条文案就是判据：带 "for format X" = SKU 在但走不了该协议；只写 "is not supported" = SKU 不存在。
+    // 排除：grok-4.6 / grok-4.7（协议不兼容，见上；**同族的 4.5 收**）、gpt-5.6-luna（GPT-5.x 拒
+    // temperature，同 Zen）、代码/视觉/全模态特化（kimi-k2.7-code、
+    // deepseek-v4-flash-vision-exp、mimo-v2-omni）、preview / stealth / 定价表里没有的
+    // （hy3-preview、hy4-preview、omen-alpha、union-alpha、deepseek-flash、glm-5、
+    // kimi-k2.5、mimo-v2-pro、qwen3.5-plus —— 会像 Zen 的 hy3-free 那样无声消失）。
+    // ⚠ `muse-spark-1.3-contributor` 的「条款允许拿输入训练」**不是**排除理由：字幕正文不是
+    // 个人文档，被信息收集可以接受（用户 2026-09-17 明确确认）。所以 1.3 收，1.2 只是
+    // 同族旧代才不收。
+    // ⚠ 它**能用于翻译**（已核：Meta 的多模态**推理**模型，1M 上下文 / 131K 输出，支持
+    // `temperature` —— 不存在 GPT-5.x 那种拒参数的坑；OpenAI 兼容端点）。但两条要知道：
+    //   ① 官方 Go 文档给它的端点是 **`/v1/responses`**，不是 chat/completions。现在网关
+    //      允许我们走 chat/completions（无 key 探针过了格式校验，而 grok-4.6 是被明确
+    //      拒掉的），但上游一旦按协议强制，它会像 grok-4.6 那样突然 400。
+    //   ② 可用性受 **Meta 地理使用政策**限制 —— 部分地区直接不可用。
+    //   ③ 它是推理模型，reasoning token 计入输出，实际成本高于标价；官方定位是
+    //      "experimentation / early-stage"，别当成稳定档。
+    // ⚠ 同价旧代一律不留（glm-5.1/5.2 与 5.3 同价、minimax-m2.5/m2.7 与 m3 同价、
+    // deepseek-v4-flash 与 v4.1-flash 同价、qwen3.7-max 比 3.8-max 还贵）——
+    // 它们对"一眼看出成本档位"没有贡献，只会让下拉变长。
+    models: [
+      // 免费档（官方 Go 价格表标 Free / Unlimited，2026-09-25；免 key 探针过格式校验）
+      { label: "Space Bunny (free)", value: "space-bunny-free" },
+      { label: "Muse Spark 1.3 Contributor", value: "muse-spark-1.3-contributor" },
+      { label: "MiMo V2.6 Flash", value: "mimo-v2.6-flash" },
+      { label: "Hy3", value: "hy3" },
+      { label: "Qwen3.8 Flash", value: "qwen3.8-flash" },
+      { label: "GLM 5.3 Flash", value: "glm-5.3-flash" },
+      { label: "DeepSeek V4.1 Flash", value: "deepseek-v4.1-flash" },
+      { label: "LongCat 2.0", value: "longcat-2.0" },
+      { label: "MiniMax M3", value: "minimax-m3" },
+      { label: "Qwen3.7 Plus", value: "qwen3.7-plus" },
+      { label: "MiMo V2.6 Pro", value: "mimo-v2.6-pro" },
+      { label: "Qwen3.6 Plus", value: "qwen3.6-plus" },
+      { label: "DeepSeek V4 Pro", value: "deepseek-v4-pro" },
+      { label: "Kimi K2.6", value: "kimi-k2.6" },
+      { label: "GLM 5.3", value: "glm-5.3" },
+      { label: "Grok 4.5", value: "grok-4.5" },
+      { label: "Qwen3.8 Max", value: "qwen3.8-max" },
+      { label: "Kimi K3", value: "kimi-k3" },
     ],
   },
   tokenhub: {
     kind: "openai-compat",
     category: "aggregator",
     label: "TokenHub (Tencent)",
-    // 已从原混元平台迁到 TokenHub。决定性依据是 TokenHub 迁移指南
-    // (document/product/1823/131382,更新于 2026-08-05) 的这句:
-    //   「hunyuan-t1-latest、**hunyuan-a13b**、hunyuan-turbos-latest、hunyuan-lite、
-    //     hunyuan-translation、hunyuan-translation-lite、hunyuan-large-role-latest,
-    //     TokenHub 将不再支持,建议您切换到 TokenHub 时改为使用更新的模型」
-    // 即 a13b 【没有迁移路径】—— 它不会出现在新平台上(模型列表 1823/130051 里
-    // 确实没有它)。叠加同一份指南的「原平台……停止新购模型服务」:对一个面向公众
-    // 的工具来说,【新用户已经开通不了 a13b】,留着等于给新人一个开不了的选项。
+    // 已从原混元平台迁到 TokenHub，依据是迁移指南(document/product/1823/131382)：
+    // hunyuan-* 老一代（t1/a13b/turbos/lite/translation 系）在 TokenHub【无迁移路径】
+    // 且原平台停止新购 —— 新用户开不通的模型不留。
+    // ⚠ 别把这条写成"旧 API host 在某日已死"：公告的停服日期指的是【模型广场 web
+    // 控制台】，没点名 API host（实测旧 host 当时仍应答）。迁移结论只靠上面
+    // "无路径+开不通"成立。回滚=改 endpoint/defaultModel/models+重部署 worker,
+    // 但等于把 provider 钉死在新用户拿不到的模型上。
     //
-    // ⚠ 别把这条写成"旧端点 9-30 就死了" —— 曾经这么写过,是【推断不是事实】:
-    // 公告里「9 月 30 日全面停服」那句链接指向的是混元【模型广场 web 控制台】,
-    // 并未点名 API host;实测 2026-08-19 旧端点 api.hunyuan.cloud.tencent.com
-    // 仍正常应答。迁移不靠那个日期成立,靠的是上面「a13b 无迁移路径 + 新用户
-    // 开不了」。
-    //
-    // 回滚的话把 endpoint / defaultModel / models 与 worker 路由一起改回去即可,
-    // 没有其他耦合 —— 但回滚等于把 provider 钉死在一个新用户拿不到的模型上。
-    //
-    // ⚠ 这里托管 9 个模型,只有 hy3 是腾讯自研,其余来自 deepseek/glm/kimi/
-    // minimax/mimo 五家 —— 按多厂商托管归 aggregator,与 opencode/siliconflow 同类。
+    // ⚠ 这里托管 8 个模型，只有 hy3 是腾讯自研，其余来自 deepseek/glm/kimi/
+    // minimax/mimo 五家 —— 按多厂商托管归 aggregator，与 opencodeZen/siliconflow 同类。
     endpoint: "https://tokenhub.tencentmaas.com/v1/chat/completions",
     defaultModel: "hy3",
     defaultTemperature: 0.7,
-    // ⚠ TokenHub 光有 API Key 【调不通】:每个模型要先在控制台「在线推理」页
-    // 开通(开启免费体验 / 启用后付费),否则任何调用返回 400 gateway_error
-    // code 401006「输入的服务 ID 不存在，或模型与服务不匹配」。
-    // 实测 2026-08-19:key 有效(无效 key 报的是 401 而非 400),模型也确实在
-    // /v1/models 目录里且 status=online,hy3 / deepseek-v4-flash / glm-5.2 /
-    // kimi-k2.6 四个全部同样 401006 —— 即账号一个都没开通。
+    // ⚠ TokenHub 光有 API Key【调不通】:每个模型要先在控制台「在线推理」页
+    // 开通 (开启免费体验 / 启用后付费),否则任何调用返回 400 gateway_error
+    // code 401006「输入的服务 ID 不存在，或模型与服务不匹配」。判据：401=坏 key,
+    // 400/401006=key 有效但模型没开通 —— 实测过四个在册 online 模型全是 401006
+    // 即账号一个都没开通。
     // ⚠ 文档之间不一致，别被带偏:《混元调用指南》(1823/132252) 的「前提条件」
     // 只写了「注册账号 + 获取 API Key」,【没提】开通这一步;写了的是《迁移指南》
     // (1823/131382) 的第一步。按实际行为，开通是必须的。
     // 请求形状本身没问题:model 填模型 ID(不是"服务 ID"),与 132252 的官方 curl
-    // 示例逐字段一致 —— 用 OpenAI SDK 走 baseURL 也是发同一个请求,不会有差别。
+    // 示例逐字段一致 —— 用 OpenAI SDK 走 baseURL 也是发同一个请求，不会有差别。
     // 这跟绝大多数 provider「填了 key 就能用」的心智不同 —— 用户配好 key 仍然
-    // 400 时，八成是没开通，不是我们的 bug。docs 指向调用概览,apiKeyUrl 指向
-    // 控制台(开通与建 key 都在那里)。
+    // 400 时，八成是没开通，不是我们的 bug。docs 指向调用概览，apiKeyUrl 指向
+    // 控制台 (开通与建 key 都在那里)。
     docs: "https://cloud.tencent.com/document/product/1823/130079",
     apiKeyUrl: "https://console.cloud.tencent.com/tokenhub/apikey",
-    // 浏览器直连不可用 —— 2026-08-19 在【真实浏览器 + 生产 origin】上实测,
-    // 不是 curl 推断(前两版结论都是靠 curl 猜的，都写错过):
-    //   POST 广州 / POST 新加坡 / GET /v1/models 带 Authorization / 不带任何
-    //   自定义头的简单 GET —— 四种全部 `TypeError: Failed to fetch`。
-    // 对照组同页跑，排除了网络与代理干扰:api.github.com(ACAO:*) 200、
-    // 我方 llm-proxy Worker 200、tokenhub 的 no-cors 请求不抛错(主机可达)。
-    // 即:主机通、浏览器跨域能力正常，就是被 CORS 拦的。
-    //
-    // 机制(别再只拿错误响应去验 CORS,会得出相反结论):
-    //   - TokenHub 【只在应用层成功响应上】发 CORS 头 —— 带有效 key 的
-    //     GET /v1/models 200 确实带 `Access-Control-Allow-Origin: *`。
-    //   - 但所有错误路径(401/400)与 `OPTIONS`(全路径 405)都【不发】CORS 头。
-    //   - 带 Authorization 的请求必然触发预检 → 预检非 2xx → 浏览器当场掐断,
+    // 浏览器直连不可用 —— 2026-08-19 在【真实浏览器 + 生产 origin】上实测（四种
+    // 请求形态全部 Failed to fetch；同页对照组 api.github.com / 我方 Worker 均正常）。
+    // ⚠ 验 CORS 别只看错误响应，会得出相反结论 —— 机制：
+    //   - TokenHub【只在应用层成功响应上】发 CORS 头（带有效 key 的 GET /v1/models
+    //     确实带 ACAO: *）;
+    //   - 但所有错误路径 (401/400) 与 `OPTIONS`(全路径 405) 都【不发】;
+    //   - 带 Authorization 的请求必然触发预检 → 预检非 2xx → 浏览器当场掐断，
     //     永远走不到那个会放行的成功响应。
-    // 故 relay 是必需路径。上游哪天补上 OPTIONS 处理就能直连,开关照旧留给用户。
+    // 故 relay 是必需路径。上游哪天补上 OPTIONS 处理就能直连，开关照旧留给用户。
     defaultUseRelay: true,
-    // 两个地域都经中转:客户端把选中的节点作为 ?endpoint= 传给 Worker,后者从
+    // 两个地域都经中转：客户端把选中的节点作为 ?endpoint= 传给 Worker，后者从
     // 自己声明的集合里校验并转发。这两个 URL 必须与 worker 的 tokenhub 数组一致。
-    // ⚠ 【API Key 是分地域的】,换地域要换 key:2026-08-19 同一把广州 key 经中转
-    // 对两个地域实测(当时经由旧版按地域分路由的 worker;现行契约是
-    // /api/tokenhub?endpoint=<所选地域>,结论不变)——广州节点返回 401006
-    // (key 有效、模型未开通),新加坡节点返回 401002「API Key 不存在或签名校验
-    // 失败」。所以切到国际站后若报 401002,不是中转坏了,是那把 key 不属于该地域。
+    // ⚠ 【API Key 是分地域的】,换地域要换 key —— 症状对照：拿广州 key 打新加坡节点
+    // 报 401002「API Key 不存在或签名校验失败」（不是中转坏了）;打广州自己则报
+    // 401006（key 有效、模型未开通）。
     endpoints: [
       { label: "Mainland (CN)", url: "https://tokenhub.tencentmaas.com/v1/chat/completions" },
       { label: "International", url: "https://tokenhub-intl.tencentmaas.com/v1/chat/completions" },
     ],
     // ⚠⚠ 本条 endpoint 改动【必须同步重新部署 Cloudflare Worker】:
     // scripts/llm-proxy-worker.js 的 PROVIDER_URLS.tokenhub 已在同一 commit 里
-    // 指向 TokenHub,但那是【部署源】,不重新部署的话线上 Worker 仍然把
-    // /api/tokenhub 转发到旧域 —— 而 relay 是本 provider 的默认路径,等于所有
+    // 指向 TokenHub，但那是【部署源】,不重新部署的话线上 Worker 仍然把
+    // /api/tokenhub 转发到旧域 —— 而 relay 是本 provider 的默认路径，等于所有
     // 默认配置的用户拿 hy3 去打老平台，必失败。workerParity.test.ts 只能保证
     // 仓库里两处一致，保证不了线上那份。
     //
-    // model id 以 TokenHub 模型列表 (document/product/1823/130051) 为准:
-    // `hy3` 256k(最大输入 192k / 输出 128k),无下线标注;`hy3-preview` 同规格但
-    // 标注「(2026-08-31 下线)」,不收。
+    // model id 以 TokenHub 模型列表 (document/product/1823/130051) 为准。
+    // `hy3` 256k(最大输入 192k / 输出 128k),无下线标注。
     //
     // ⚠ 混元的【专用翻译模型】(hy-mt2-pro/plus/lite) 【刻意不收】。它们确实在同一个
-    // /v1/chat/completions 端点上、同样的 messages 形状，看起来一行就能加进来,
-    // 但规格上就不适合本项目这条管线 —— 模型列表原文:三者都是 **8k 上下文,
+    // /v1/chat/completions 端点上、同样的 messages 形状，看起来一行就能加进来，
+    // 但规格上就不适合本项目这条管线 —— 模型列表原文：三者都是 **8k 上下文，
     // 最大输入/输出各 4k**。而这里的默认是 contextWindow 50 行 + 系统提示词 +
-    // 术语表,4k 输入上限会直接顶爆。别再"顺手补上"这几个 SKU:端点兼容 ≠ 能塞进
-    // 按通用对话模型设计的管线(提示词/术语表/上下文窗口/双语装配)。
-    // 真要支持专用 MT,应该按 machine-translation 类别另起一个 provider。
+    // 术语表，4k 输入上限会直接顶爆。别再"顺手补上"这几个 SKU:端点兼容 ≠ 能塞进
+    // 按通用对话模型设计的管线 (提示词/术语表/上下文窗口/双语装配)。
+    // 真要支持专用 MT，应该按 machine-translation 类别另起一个 provider。
     //
     // TokenHub 是【聚合网关】,除自研 hy3 外还转售 deepseek / glm / kimi / minimax /
-    // qwen / mimo,所以按本表其他聚合网关(openrouter / opencode / siliconflow /
-    // atlascloud / nvidia)的一贯做法把主流型号列出来 —— 一个 key 一份额度就能用到
+    // qwen / mimo，所以按本表其他聚合网关 (openrouter / opencodeZen / siliconflow /
+    // atlascloud / nvidia) 的一贯做法把主流型号列出来 —— 一个 key 一份额度就能用到
     // 这些模型，正是聚合网关的价值所在;"那几家各自有一手 provider" 不构成不列的
-    // 理由(否则 openrouter 那份清单也不该存在)。
+    // 理由 (否则 openrouter 那份清单也不该存在)。
     // 未收录的:hy3-preview(8-31 下线)、hy-mt2-*(见上)、glm-5v-turbo(视觉)、
     // hunyuan-role-latest / hy-role(角色扮演)、kimi-k2.7-code*(代码向)、
     // 带日期的 deepseek-v4-*-2026xx(裸 id 已在)。
     //
-    // ⚠ 全部【不打 thinking 标签】,同 atlascloud 的处理:这是个混合上游的网关,
+    // ⚠ 全部【不打 thinking 标签】,同 atlascloud 的处理：这是个混合上游的网关，
     // 「能不能关思考」逐个模型不同 —— TokenHub 模型支持表里 hy3 默认 disabled,
     // 而 Kimi-K2.7-Code / MiniMax-M2.7 明确标「enabled(不支持关闭)」。没有逐个
     // 核实之前，统一发 thinking:{type:"disabled"} 会打到不支持关闭的那些型号上。
-    // 代价要说清楚:选 deepseek-v4 / glm-5.3 / kimi-k3 这类服务端默认开推理的型号,
-    // 在这里会按它自己的默认推理(比一手 provider 多烧 token)—— 要精确控制思考,
+    // 代价要说清楚：选 deepseek-v4 / glm-5.3 / kimi-k3 这类服务端默认开推理的型号，
+    // 在这里会按它自己的默认推理 (比一手 provider 多烧 token)—— 要精确控制思考，
     // 用本表里对应的一手 provider。
-    // 将来要在这里做开关的话:网关级字段是 thinking:{type:"enabled"|"disabled"|
+    // 将来要在这里做开关的话：网关级字段是 thinking:{type:"enabled"|"disabled"|
     // "adaptive"}(文档 1823/135872),需要先核出【每个型号】支不支持 disabled。
     //
-    // Not thinking-tagged,但理由跟别处不同 —— 不是"不能关",而是"本来就是关的"。
-    // 官方《OpenAI Chat Completions 协议字段说明》(1823/135872) 对 hy3 原文:
-    // 「默认关闭思考，默认推理强度 `low`」,`thinking.type` 合法取值三个:
+    // Not thinking-tagged，但理由跟别处不同 —— 不是"不能关",而是"本来就是关的"。
+    // 官方《OpenAI Chat Completions 协议字段说明》(1823/135872) 对 hy3 原文：
+    // 「默认关闭思考，默认推理强度 `low`」,`thinking.type` 合法取值三个：
     // `enabled` / `disabled` / `adaptive`。
-    // 既然服务端默认就是关的,省略参数 = 不推理 = 翻译要的行为,不打标签最省事,
+    // 既然服务端默认就是关的，省略参数 = 不推理 = 翻译要的行为，不打标签最省事，
     // 也不会像 SERVER_DEFAULT_THINKING_ON 那几家一样偷烧推理 token。
     //
-    // 要加思考开关是可行的(三个取值都合法),代价是三处:models 里给 hy3 打
+    // 要加思考开关是可行的 (三个取值都合法),代价是三处:models 里给 hy3 打
     // `thinking: true`、THINKING_BUILDERS 加一条 `gated("tokenhub", thinkingType)`、
     // 把 tokenhub 放进 BINARY_EFFORT_VENDORS;另外 thinking.test.ts 里
     // 「tokenhub & minimax M2.x send no thinking body」那条断言要跟着改。
     // ⚠ 别用 `reasoning_effort:"none"` —— TokenHub 只列了 low/medium/high。
-    // 清单以 `GET /v1/models` 实拉为准(带 `status` 字段,比翻文档准):只收
-    // status="online" 的文本对话模型,"pre-offline" 的一律不收 —— 2026-08-19 实测
-    // hy3-preview / kimi-k2.5 / minimax-m2.5 / qwen3.5-plus / qwen3.5-flash /
-    // deepseek-v3.2 都已是 pre-offline。
+    // 清单以 `GET /v1/models` 实拉为准 (带 `status` 字段，比翻文档准):只收
+    // status="online" 的文本对话模型，"pre-offline" 的一律不收 —— 历次删掉的
+    // 同代 id（k2.5 / minimax-m2.5 / qwen3.5 系 / deepseek-v3.2 / hy3-preview）
+    // 当时实测全是 pre-offline，这条判据一直在先杀后将死条目。
     // 另外排除:*-code(代码向)、glm-5v-turbo(视觉)、hy-role/hunyuan-role(角色)、
     // hy-mt2-*(见上)、embedding/video/image/3d/asr/speech 各类非对话模型。
     models: [
+      // 2026-09-25 浏览器复核模型列表文档 (1823/130051，/v1/models 免 key 拉不了)：
+      // deepseek 换代到 v4.1-flash（v4-flash 行仍在列，按「同族旧代不留」不并收）;
+      // mimo 两代并存，v2.6-pro 已上架 → 直接换成 2.6（v2.5 原生 10-21 退役，
+      // 这里没必要收将老的那条）。表里另有 glm-5.3-flash/flashx、kimi-k2.7-code
+      // 系、k2.8-preview、step-5-preview、minimax-m2.7 —— 按既有排除
+      // (细分档不收/*-code 不收/无名 preview 不收/同族旧代不收) 维持不列。
       { label: "Hunyuan hy3", value: "hy3" },
-      { label: "DeepSeek V4 Flash", value: "deepseek-v4-flash" },
+      { label: "DeepSeek V4.1 Flash", value: "deepseek-v4.1-flash" },
       { label: "DeepSeek V4 Pro", value: "deepseek-v4-pro" },
       { label: "GLM-5.3", value: "glm-5.3" },
-      { label: "GLM-5.2", value: "glm-5.2" },
       { label: "Kimi K3", value: "kimi-k3" },
       { label: "Kimi K2.6", value: "kimi-k2.6" },
       { label: "MiniMax M3", value: "minimax-m3" },
-      { label: "MiMo V2.5 Pro", value: "mimo-v2.5-pro" },
+      { label: "MiMo V2.6 Pro", value: "mimo-v2.6-pro" },
     ],
   },
   groq: {
@@ -1205,24 +1441,22 @@ export const PROVIDERS = {
     docs: "https://console.groq.com/docs/text-chat",
     apiKeyUrl: "https://console.groq.com/keys",
     defaultUseRelay: false,
-    // 来自 console.groq.com/docs/models 当前 production 列表。preview 阶段的不收录，
-    // 避免引导用户选随时可能下线的 SKU。
+    // 来自 console.groq.com/docs/models 当前 production 列表（2026-09-25 以
+    // 机器可读的 /docs/models.md 复核）。preview 阶段的不收录（含新出现在
+    // preview 层的 qwen/qwen3.8-27b、minimax-m2.7），避免引导用户选随时可能下线的 SKU；
+    // 带 Enterprise 标的 llama-3.1/3.3 行是企业主专属，普通账号开不了，不收。
     // gpt-oss 系列支持 reasoning_effort(top-level enum),其他 model 不支持。
-    // llama-3.3-70b-versatile / llama-3.1-8b-instant 已于 2026-08-16 退役
-    // (console.groq.com/docs/deprecations),官方替代分别是 gpt-oss-120b / gpt-oss-20b
-    // —— 两者本来就在清单里，所以是纯删除，不需要补位。
-    // 删完 production 文本模型只剩 gpt-oss 两档 + compound 两个 system:Groq 当前
-    // 的 production 层就这么大，其余全在 preview 层，不收。
+    // ⚠ groq/compound 系已于 2026-09-21 停服、llama-3.1/3.3 通用档已于 08-16 退役
+    // (console.groq.com/docs/deprecations)—— 别按旧清单往回加。至此 production
+    // 通用文本层就只剩 gpt-oss 两档：Groq 当前的生产层就这么大。
     models: [
       // thinkingLevels:console.groq.com/docs/reasoning(2026-08-20 核对)——
-      // gpt-oss 只收 low/medium/high,【没有 none】("none" 仅 Qwen 3.6 27B 支持)。
-      // 与 gemini/grok 同族:厂商不提供关闭开关,关闭态发最低档 low。
-      // ⚠ 曾经关闭态【省略】该参数 —— 那是落到服务端默认(未文档化,gpt-oss
-      // 惯例是 medium),用户点了"关"却按中档推理计费,方向正好反了。
+      // gpt-oss 只收 low/medium/high,【没有 none】。与 gemini/grok 同族：厂商不提供
+      // 关闭开关，关闭态发最低档 low。
+      // ⚠ 曾经关闭态【省略】该参数 —— 那是落到服务端默认 (未文档化，gpt-oss
+      // 惯例是 medium),用户点了"关"却按中档推理计费，方向正好反了。
       { label: "GPT-OSS 20B", value: "openai/gpt-oss-20b", thinking: true, thinkingLevels: ["low", "medium", "high"] },
       { label: "GPT-OSS 120B", value: "openai/gpt-oss-120b", thinking: true, thinkingLevels: ["low", "medium", "high"] },
-      { label: "Groq Compound", value: "groq/compound" },
-      { label: "Groq Compound Mini", value: "groq/compound-mini" },
     ],
   },
   cerebras: {
@@ -1235,30 +1469,34 @@ export const PROVIDERS = {
     docs: "https://inference-docs.cerebras.ai/models/overview",
     apiKeyUrl: "https://cloud.cerebras.ai/",
     defaultUseRelay: false,
-    // 收录它【不是为了模型】—— 两个公共模型(gpt-oss-120b / gemma-4-31b)在
-    // groq、nvidia、siliconflow 上都能调到。卖点是【速度】:官方标称
+    // 收录它【不是为了模型】—— 同款开源权重模型在别家 (groq / 一手厂商) 也
+    // 多半能调到。卖点是【速度】:官方标称
     // ~3000 tokens/s(gpt-oss-120b),约为 groq 同款的三倍;逐行翻译是高频短
-    // 请求,吞吐直接变成用户感知的等待时间。另有每日 100 万 free token。
-    // 同一个开源模型在不同厂商下速度/价格不同,本就是并存多个聚合器的理由。
+    // 请求，吞吐直接变成用户感知的等待时间。另有每日 100 万 free token。
+    // 同一个开源模型在不同厂商下速度/价格不同，本就是并存多个聚合器的理由。
     //
-    // 清单以官方 Model Catalog 为准(inference-docs.cerebras.ai/models/overview,
-    // 2026-08-20 核对):public endpoints 就这两个,其余在 Dedicated Endpoints
-    // (需预留产能,不是个人自助能用的),不收。
-    // ⚠ /v1/models 需鉴权,无法免 key 实拉;复查请读上面的 Model Catalog 页
+    // 清单以官方 Model Catalog 为准 (inference-docs.cerebras.ai/models/overview,
+    // 2026-08-20 核对):public endpoints 就这两个，其余在 Dedicated Endpoints
+    // (需预留产能，不是个人自助能用的),不收。
+    // ⚠ /v1/models 需鉴权，无法免 key 实拉;复查请读上面的 Model Catalog 页
     // (它有 llms.txt 机器可读索引)。
     models: [
       // thinkingLevels 抄自官方 API 参考的逐模型 reasoning_effort 取值
       // (2026-08-20):gpt-oss-120b 收 low/medium(默认)/high —— 【没有 none】,
-      // 与 groq 上的同款一致,故关闭态发最低档 low(canDisableThinking→false,
-      // 界面标 Min)。gemma-4-31b 则【有 none】且是默认值,属于能真正关掉的一档,
-      // 所以它不声明 thinkingLevels、走 reasoningEffortOrNone 那条路。
+      // 与 groq 上的同款一致，故关闭态发最低档 low(canDisableThinking→false,
+      // 界面标 Min)。qwen-3.8-27b 则【有 none】(官方原文 "Reasoning is enabled by
+      // default at high. Set reasoning_effort to none to disable it.")，
+      // 属于能真正关掉的一档，所以它不声明 thinkingLevels、走 reasoningEffortOrNone
+      // 那条路 (见 llm.ts 的 cerebras builder)。
+      //
+      // ⚠ gemma-4-31b 曾收录、已删：Cerebras 的**公开端点**如今只剩下面两条
+      // （其余家族只走 Dedicated Endpoints）,留着就是选中必 404 的死条目。
       { label: "GPT-OSS 120B", value: "gpt-oss-120b", thinking: true, thinkingLevels: ["low", "medium", "high"] },
-      // 打 thinking 标签:它【支持】reasoning_effort(none 默认/low/medium/high)。
-      // 不打的话 gated() 会把它当"已知非思考模型"直接省略参数 —— 而 none 是
-      // 它的服务端默认,省略与发 none 恰好等效,所以漏打不会出错、只会让用户
-      // 无法开启思考(下拉里没有档位控件)。不声明 thinkingLevels:它有真正的
-      // 关闭值,走 reasoningEffortOrNone 那条路(见 llm.ts 的 cerebras builder)。
-      { label: "Gemma 4 31B", value: "gemma-4-31b", thinking: true },
+      // 打 thinking 标签：它【支持】reasoning_effort(none/low/medium/high，默认 high)。
+      // 不打的话 gated() 会把它当"已知非思考模型"直接省略参数 —— 省略与发 none 等效，
+      // 所以漏打不会出错、只会让用户无法开启思考(下拉里没有档位控件)。
+      // 不声明 thinkingLevels:它有真正的关闭值 none，走 reasoningEffortOrNone 那条路。
+      { label: "Qwen 3.8 27B", value: "qwen-3.8-27b", thinking: true },
     ],
   },
   siliconflow: {
@@ -1268,26 +1506,32 @@ export const PROVIDERS = {
     endpoint: "https://api.siliconflow.cn/v1/chat/completions",
     defaultModel: "deepseek-ai/DeepSeek-V4.1-Flash",
     defaultTemperature: 0.7,
-    docs: "https://docs.siliconflow.cn/cn/api-reference/chat-completions/chat-completions",
+    docs: "https://docs.siliconflow.cn/docs/api/chat-completions-post",
     apiKeyUrl: "https://cloud.siliconflow.cn/me/account/ak",
     defaultUseRelay: false,
     // 来自 siliconflow.com/pricing 当前文本生成模型表
     // 登录后查看 https://cloud.siliconflow.cn/me/models?types=chat
     // DeepSeek V4 和 Kimi K2.6 通过 SiliconFlow 走 OpenAI-compat 协议
     // (同原生 DeepSeek/Moonshot 的 thinking + reasoning_effort 参数)。
-    // ⚠ SiliconFlow 的 id 大小写与前缀都很挑，写错就是 404,一律以 pricing 页
-    // 实际字串为准:
+    // ⚠ SiliconFlow 的 id 大小写与前缀都很挑，写错就是 404，一律以 pricing 页
+    // 实际字串为准：
     //   - org 前缀是 MiniMaxAI(非 minimax),小写会 404
     //   - 部分模型【只有 `Pro/` 付费档】,不存在裸 id —— 2026-08 复核发现
-    //     GLM-5.1 与 Kimi-K2.6 都属此列,原先写的裸 id 一直是无效的
+    //     GLM-5.1 与 Kimi-K2.6 都属此列，原先写的裸 id 一直是无效的
     //   - GLM-4.7 已从 pricing 页下架，移除
-    // 明确核过【不在】SiliconFlow 上:MiniMax-M3、GLM-5.3、Qwen3.8 —— 别照着别家
-    // 的清单往这里搬。
+    // 明确核过【不在】SiliconFlow 上:MiniMax-M3、Qwen3.8 —— 别照着别家
+    // 的清单往这里搬。（2026-09-25 审计抓到这行曾把 GLM-5.3 也列进"不在" ——
+    // 与在收的 zai-org/GLM-5.3 自相矛盾；公开 models 页如今【有】GLM-5.3，
+    // 那句早于它入列、没人回头删。）
+    // ⚠ 当前默认 deepseek-ai/DeepSeek-V4.1-Flash 不在公开页首屏批次里，而
+    // /v1/models 需鉴权、免 key 核不了 —— 若它报 404，把默认退回 DeepSeek-V4-Flash 再登录复核。
     models: [
       { label: "DeepSeek V4.1 Flash", value: "deepseek-ai/DeepSeek-V4.1-Flash", thinking: true },
       { label: "DeepSeek V4 Pro", value: "deepseek-ai/DeepSeek-V4-Pro", thinking: true },
       { label: "Kimi K2.6 (Pro)", value: "Pro/moonshotai/Kimi-K2.6", thinking: true },
-      { label: "GLM-5.2", value: "zai-org/GLM-5.2" },
+      // ⚠ 不打 thinking：GLM-5.3 上游强制思考、不可禁用(同 zhipu / openrouter 的判据)。
+      // （5.2 已删：同价、被 5.3 支配 —— 它唯一的卖点是能关思考，不足以留住旧代。）
+      { label: "GLM-5.3", value: "zai-org/GLM-5.3" },
       { label: "GLM-5.1 (Pro)", value: "Pro/zai-org/GLM-5.1" },
     ],
   },
@@ -1306,14 +1550,13 @@ export const PROVIDERS = {
     // shape vary by the selected upstream model.
     models: [
       { label: "DeepSeek V4 Flash", value: "deepseek-ai/deepseek-v4-flash" },
-      { label: "GLM-5.2", value: "zai-org/glm-5.2" },
       { label: "Qwen3.8 Max", value: "qwen/qwen3.8-max" },
     ],
   },
-  // GitHub Models(models.github.ai)已整家退役 —— 2026-07-30 官方 changelog
+  // GitHub Models(models.github.ai) 已整家退役 —— 2026-07-30 官方 changelog
   // 「GitHub Models is now retired. The playground, model catalog, inference API,
   // and bring your own key (BYOK) are no longer available to any customer」,
-  // catalog 端点实测 HTTP 410 Gone。整个 provider 已删除，不是删几个模型:
+  // catalog 端点实测 HTTP 410 Gone。整个 provider 已删除，不是删几个模型：
   // 它没有任何可替换的端点，留着等于给用户一个必定失败的选项。
   // 官方迁移指向 Azure AI Foundry(本表里的 azureopenai)。
   nvidia: {
@@ -1322,7 +1565,7 @@ export const PROVIDERS = {
     label: "Nvidia NIM",
     docs: "https://build.nvidia.com/explore/discover",
     apiKeyUrl: "https://build.nvidia.com/",
-    defaults: { url: "", apiKey: "", model: "deepseek-ai/deepseek-v4-flash-0731", temperature: 0.7, batchSize: 20, contextBatchSize: 3, contextWindow: 50 },
+    defaults: { url: "", apiKey: "", model: "deepseek-ai/deepseek-v4.1-flash", temperature: 0.7, thinkingEffort: {}, batchSize: 20, contextBatchSize: 3, contextWindow: 50 },
     // model id 一律以 integrate.api.nvidia.com/v1/models 实拉为准 ——
     // build.nvidia.com 展示页的 slug 跟真实 id 不是一回事，别照着网页抄。
     //
@@ -1330,67 +1573,119 @@ export const PROVIDERS = {
     // 开箱即 404):
     //   - deepseek-ai/deepseek-v4-flash → 现在只有带日期的 `-0731`,裸 id 不存在
     //   - deepseek-ai/deepseek-v4-pro   → NIM 上【完全没有】V4 Pro
-    // 该前缀下如今只剩 deepseek-coder-6.7b-instruct 与 deepseek-v4-flash-0731。
+    // ⚠ 2026-09-17 再核一遍，又抓到两条，且两条都【只有实拉 /v1/models 才看得见】
+    // （build.nvidia.com 的展示页看不出）—— 这个端点不带 key 也返回 200，82 条全量
+    // 目录，所以本清单每一条都能直接核，别等用户报 404：
+    //   - openai/gpt-oss-120b → 页面上 `isDeprecated:true`，且【不在】/v1/models 里
+    //     = 已下架。当初按展示页抄进来的 id 是个死条目，换成同门的 openai/gpt-oss-20b
+    //     （在册、isDeprecated:false）。
+    //   - deepseek-ai/deepseek-v4-flash-0731 → 页面 attributes 挂着
+    //     `DEPRECATION: 09/19/2026`，原文「This API will be deprecated on 09/19/2026.
+    //     It will no longer be supported after 09/21/2026.」。它当时是【默认模型】——
+    //     按本仓「老模型不留，免得用户选中一个随时会消失的选项」的既定规则（见 minimax
+    //     M2.5 那段）一并删掉。
+    //     2026-09-25 复拉：该前缀下重新有了 deepseek-v4.1-flash（在册、无弃用标记），
+    //     外加代码模型 deepseek-coder-6.7b-instruct。
     //
-    // 随 v4-pro 移除，本 provider 已【没有任何】thinking 模型 —— NIM 的 thinking
-    // 注入是 DeepSeek 专属的 chat_template_kwargs.thinking + reasoning_effort 嵌套，
-    // 只对 v4-pro 有意义。故 defaults 里的 thinkingEffort 一并删掉(留着是死配置,
-    // 且会让 UI 以为这个 provider 有思考能力)。要 thinking 走原生 DeepSeek provider;
-    // 将来 NIM 上了可控推理的 SKU 再连标签一起加回。
+    // 2026-09-25 复拉补充：目录另有 nvidia/nemotron-4-340b-instruct（与 reward）——
+    // 那是 3 Ultra/Super 世代之前的旧命名线，不收（当时按「展示页看不出代际」犹豫过，
+    // 立此存照免得下次再问「4 怎么没列」）。
+    //
+    // 默认 2026-09-25 换回 deepseek-ai/deepseek-v4.1-flash：NIM 在本表的存在理由
+    // 就是「DeepSeek 通道」，此前退到 gemma-4-31b-it 纯粹因为 v4-pro/v4-flash 双双
+    // 失效、目录里没活的 DeepSeek（见上）；如今 v4.1-flash 在册无弃用 → 回归本位。
+    // 计费口径：NIM 公共端点【就是免费节点】(限额/限速，不按 token 收费) ——
+    // 2026-09-26 官网复核坐实：developer.nvidia.com 官方博客 2024-07-29
+    // 「Access to NVIDIA NIM Now Available Free to Developer Program Members」
+    // (托管端点发放 free credits)；2026 年开发者论坛官方回复原文
+    // 「Many of you are using free tier API access to NVIDIA NIMs」，默认限速
+    // 40 RPM。OpenRouter 上 NVIDIA 托管节点标 $0 为第三方旁证。
+    // 免费 ⇒ 默认选品只看译文质量不看成本，flash 档是最优解；
+    // 清单里的 Nemotron/Gemma 仍是能力/延迟对照档。
+    //
+    // 2026-09-25 起本 provider 【重新有】thinking 模型：deepseek-v4.1-flash 上架
+    // （此前 v4-pro 移除后一度为零，故 defaults 里的 thinkingEffort 也删过 —— 现已随
+    // 上架恢复）。注入走 service 内联的 buildNvidiaThinkingParams（chat_template_kwargs
+    // 嵌套，那条实现一直留着没删）。NIM 服务端默认【关】思考（opt-in），省略 = 关，
+    // 所以它不进 SERVER_DEFAULT_THINKING_ON、off 态无需显式 disable。
+    // 要 thinking 也可走原生 DeepSeek provider;新 SKU 的实际效果未逐档实测。
     models: [
-      { label: "DeepSeek V4 Flash", value: "deepseek-ai/deepseek-v4-flash-0731" },
       { label: "Nemotron 3 Ultra 550B", value: "nvidia/nemotron-3-ultra-550b-a55b" },
-      { label: "GLM-5.2", value: "z-ai/glm-5.2" },
       // gpt-oss 不打 thinking:nvidia 的注入是 DeepSeek 专属 chat_template_kwargs
       // 嵌套，发给 gpt-oss 是错误形状;其推理本就默认开 (medium),省略即正确。
-      { label: "GPT-OSS 120B", value: "openai/gpt-oss-120b" },
+      { label: "GPT-OSS 20B", value: "openai/gpt-oss-20b" },
       { label: "Gemma 4 31B IT", value: "google/gemma-4-31b-it" },
       { label: "Nemotron Super 120B", value: "nvidia/nemotron-3-super-120b-a12b" },
-      { label: "Llama 3.3 70B Instruct", value: "meta/llama-3.3-70b-instruct" },
-      { label: "Llama 3.1 8B Instruct", value: "meta/llama-3.1-8b-instruct" },
+      // 2026-09-25 实拉 /v1/models 新增：NIM 上唯一在册的 DeepSeek 对话新代，
+      // 打 thinking 标签（NIM 默认关思考，见上面那段）。
+      { label: "DeepSeek V4.1 Flash", value: "deepseek-ai/deepseek-v4.1-flash", thinking: true },
     ],
   },
   azureopenai: {
-    kind: "custom",
+    // 【2026-09-26 并入 openai-compat 工厂】前提事实见下面「悬案结案」段：v1 API
+    // 接受裸 api-key 走 Authorization: Bearer —— 与工厂 wire 完全同型，手写 service
+    // 已删，思考参数走 gated("azureopenai", reasoningEffortOrNone)。
+    // endpoint 全员唯一留空：地址就是每个租户自己的资源根 (用户填，URL_ALSO_REQUIRED
+    // 拦空)，没有官方固定地址可声明；URL 补全在 wireUrlNormalizer 里走
+    // completeAzureUrl（拼 /openai/v1/chat/completions）。中转同理没有固定上游
+    // 可写进 Worker → 无 defaultUseRelay（结构性例外，见 OpenAICompatProviderSpec 注释）。
+    kind: "openai-compat",
     category: "aggregator",
     label: "Azure OpenAI",
     docs: "https://learn.microsoft.com/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure",
-    // 无 temperature 字段：微软官方把 temperature 列入 reasoning 模型 Not
-    // Supported 清单 (GPT-5 全系，learn.microsoft.com/azure/ai-foundry/openai/
-    // how-to/reasoning),运行时证据为 400;统一 provider 级不发。
-    defaults: { url: "", apiKey: "", model: "gpt-5.4-mini", apiVersion: "2025-11-18", batchSize: 20, contextBatchSize: 3, contextWindow: 50, thinkingEffort: {} },
+    endpoint: "",
+    // 无 defaultTemperature = 永不下发 temperature：微软官方把 temperature 列入
+    // reasoning 模型 Not Supported 清单 (GPT-5 全系，learn.microsoft.com/azure/
+    // ai-foundry/openai/how-to/reasoning),运行时证据为 400;统一 provider 级不发。
+    defaultModel: "gpt-5.4-mini",
     // GPT-5 系列全部支持 reasoning(OpenAI 原生 + Azure 镜像同行为)。
-    // gpt-chat-latest 是 5.5 Instant 别名 (per Azure docs),同样支持;2026-08 复核
-    // 别名指向未变，但它现在明确标 Preview 且滚动更新(最新快照 2026-08-06 把上下文
-    // 从 128k 提到 400k)—— 选它要接受行为随时变。
+    // ⚠ 例外是 gpt-chat-latest(5.5 Instant 别名,Preview 且滚动更新 —— 最新快照
+    // 2026-08-06 把上下文从 128k 提到 400k，选它要接受行为随时变)。官方原文:
+    // 「gpt-chat-latest uses a fixed, nonzero reasoning level... Unlike other
+    // reasoning models, **you can't configure this level with the `reasoning_effort`
+    // parameter**」—— 它【收不了 reasoning_effort】，所以下面那条不打 thinking 标签。
     //
-    // GPT-5.6 系列 (sol/terra/luna) 已在 Azure GA(doc 标 NEW,2026-07-09 快照,
+    // GPT-5.6 系列 (sol/terra/luna) 已在 Azure GA(doc 标 NEW,2026-07-09 快照，
     // 1,050,000 上下文)。⚠【故意不设为默认】:官方原文「Some quota tiers require
     // quota requests for gpt-5.6 to deploy this model. Tier 5 and Tier 6
     // subscriptions have quota by default」—— 低配额订阅要先申请才能部署，设成默认
     // 会让一部分用户开箱即失败。默认保持 gpt-5.4-mini。
+    // ⚠ OpenAI 原生侧 2026-09 已主推 GPT-6 家族（本表 openai 条目已换）；Azure 侧
+    // 未见到 6 系在册证据（旁证：Atlas 转售的 Azure 通道只有 5.6 系 `-az` 变体），
+    // 官方模型页确认上架前，本条目清单【不跟着原生换】—— 两家的代际不同步是常态。
     //
-    // ⚠ apiVersion「2025-11-18」已是过时写法:Azure 已切到 v1 GA API,原文
-    // 「api-version is no longer a required parameter with the v1 GA API」,
-    // 新形态是 base 走 /openai/v1/ 且不传 api-version。改这个要动 services 层的
-    // URL 组装，不在本次模型清单更新范围内 —— 单独处理。
+    // 【2026-09-25 已迁移 v1 GA API】：base 走 /openai/v1/ 且不传 api-version
+    // （官方原文「api-version is no longer a required parameter with the v1 GA
+    // API」）。apiVersion 配置字段随之整体删除 —— types/config/pipeline/validation/
+    // UI 各触点一并清掉；migrateConfig 的 defaults-key-only 合并会清掉用户已存的
+    // 旧 apiVersion。
+    // 【2026-09-26 官网复核，悬案结案】此前悬着的「/openai/v1 认不认
+    // Authorization: Bearer <裸 api-key>」——认。官方 v1 API 文档
+    // (learn.microsoft.com/azure/foundry/openai/api-version-lifecycle) 的
+    // key 认证示例就是裸 OpenAI 客户端 `new OpenAI({ baseURL: ".../openai/v1/",
+    // apiKey })`（Python/JS/C#/Go/Java 一致），而该客户端只发 Bearer、不发
+    // api-key 头；REST 页签则另列 api-key 头两条路都通。⇒ 同日本仓并入工厂。
     models: [
       { label: "GPT-5.6 Sol", value: "gpt-5.6-sol", thinking: true },
       { label: "GPT-5.6 Terra", value: "gpt-5.6-terra", thinking: true },
       { label: "GPT-5.6 Luna", value: "gpt-5.6-luna", thinking: true },
-      { label: "GPT-chat-latest", value: "gpt-chat-latest", thinking: true },
-      { label: "GPT-5.5", value: "gpt-5.5", thinking: true },
-      { label: "GPT-5.4", value: "gpt-5.4", thinking: true },
+      // ⚠ 【不打 thinking】(2026-09-17 核 Azure 官方页):它收不了 reasoning_effort,
+      // 打了标签关闭态就会发 reasoning_effort:"none" → 对它是非法参数。不打 → 整个省略,
+      // 模型按自己那个固定档思考,请求合法。同 GLM-5.3 / MiniMax M2.x 的处置。
+      // 代价:UI 上它没有思考开关 —— 它本来也关不掉,如实反映。
+      { label: "GPT-chat-latest", value: "gpt-chat-latest" },
+      // ⚠ 这一条**必须留**，不是"旧代":它是本 provider 的 defaultModel，且理由是官方配额
+      // ——gpt-5.6 在低配额订阅上要先申请配额才能部署，把 5.6 设成默认会让一部分用户开箱
+      // 即失败（见上面那段长注释）。删了它 defaultModel 就指向不存在的模型。
       { label: "GPT-5.4 Mini", value: "gpt-5.4-mini", thinking: true },
-      { label: "GPT-5.4 Nano", value: "gpt-5.4-nano", thinking: true },
     ],
   },
-  // LiteLLM 曾在这里是独立 provider,已并入 llm(Custom)的端点芯片。理由是它
+  // LiteLLM 曾在这里是独立 provider，已并入 llm(Custom) 的端点芯片。理由是它
   // 与 Together AI / Fireworks AI 是同一类东西 —— "一个 OpenAI 兼容地址 + 一份
-  // 文档",而那两家一直就只是芯片。独立槽位换来的只是一份可以并存的存档,代价
-  // 是下拉里多一项、配置要填两遍、还得单独维护一套 provider 级注册(凭据分类、
-  // preflight 名单、UI 顺序)。芯片各自带 docs 之后,独立 provider 的最后一点
-  // 好处(有文档链接)也没有了。
+  // 文档",而那两家一直就只是芯片。独立槽位换来的只是一份可以并存的存档，代价
+  // 是下拉里多一项、配置要填两遍、还得单独维护一套 provider 级注册 (凭据分类、
+  // preflight 名单、UI 顺序)。芯片各自带 docs 之后，独立 provider 的最后一点
+  // 好处 (有文档链接) 也没有了。
   llm: {
     kind: "custom",
     category: "aggregator",
@@ -1403,9 +1698,9 @@ export const PROVIDERS = {
     // models with chat templates that reject `system` role (Gemma family on LM Studio,
     // some codegemma variants) can switch this off so only the user message is sent
     // — avoids jinja "Conversations must start with a user prompt".
-    // (TranslateGemma 与 MiLMMT 各有专用 service,不要走 Custom —— 它们的提示词
-    // 格式是模型卡钉死的,而 Custom 必发 system 消息。MiLMMT 尤其糟:它的 chat
-    // template 是纯拼接,system prompt 不会报错,只会被当正文喂进去。)
+    // (TranslateGemma 与 MiLMMT 各有专用 service，不要走 Custom —— 它们的提示词
+    // 格式是模型卡钉死的，而 Custom 必发 system 消息。MiLMMT 尤其糟：它的 chat
+    // template 是纯拼接，system prompt 不会报错，只会被当正文喂进去。)
     //
     // maxTokens: safety net for local-model repeat-loop. Cross-layer — to expose
     // on another service, also wire it in services/llm.ts (UI + cache key alone
@@ -1417,20 +1712,149 @@ export const PROVIDERS = {
     // Power users with bigger local models can raise it in Advanced Settings.
     defaults: { url: "", apiKey: "", model: "", temperature: 0.7, maxTokens: 0, sendSystemPrompt: true, batchSize: 10, contextBatchSize: 1, contextWindow: 30 },
     // 每个芯片背后是一个独立产品，所以各带各的 docs —— provider 级的一条链接
-    // 在这里没有意义（"Custom" 没有文档），而这条路恰恰最需要文档:用户得先照着
-    // 上游的说明把服务跑起来、把地址和模型名弄对。链接一律写最终落点(2026-08-21
-    // 实测跟随重定向确认,无 locale 段；koboldcpp 于 2026-08-22 补验)。
+    // 在这里没有意义（"Custom" 没有文档），而这条路恰恰最需要文档：用户得先照着
+    // 上游的说明把服务跑起来、把地址和模型名弄对。链接一律写最终落点 (2026-08-21
+    // 实测跟随重定向确认，无 locale 段；koboldcpp 于 2026-08-22 补验)。
     // 前四个本地运行时芯片与 translategemma / milmmt 完全一致（含 docs），
     // 改其中一家就三家一起改 —— 同一个用户会在它们之间来回切。
     endpoints: [
       // Local runtimes first, self-hosted gateway next, cloud aggregators after.
       ...LOCAL_RUNTIME_ENDPOINTS,
-      // LiteLLM 曾是独立 provider,合并进来了:它和 Together / Fireworks 一样,
+      // LiteLLM 曾是独立 provider，合并进来了：它和 Together / Fireworks 一样，
       // 无非是"一个 OpenAI 兼容地址 + 一份文档",而后两者一直就是芯片。
-      // 独立 provider 只多给一个存档槽位,却要多占一个下拉项、多一份重复配置。
+      // 独立 provider 只多给一个存档槽位，却要多占一个下拉项、多一份重复配置。
       { label: "LiteLLM", url: "http://127.0.0.1:4000/v1/chat/completions", docs: "https://docs.litellm.ai/docs/" },
+      // 9Router / OmniRoute：同为自托管网关（OmniRoute 是 9Router 的 TS fork），但**默认端口不同**，
+      // 所以是两枚芯片、各指各的地址（两枚地址必须不同，见 registry.test.ts 的 url 唯一性检查）。
+      // 端口依据（2026-09-22 查源码，别只信 README）：9Router 的 package.json 是 `--port 20127`
+      // （它的 README 示例却写 20128，与源码矛盾，以源码为准）；OmniRoute 是 `${PORT:-20128}`。
+      // 模型名各自填：9Router 形如 `cc/claude-opus-4-6`（前缀/模型），OmniRoute 可用 `auto` 走零配置路由。
+      { label: "9Router", url: "http://127.0.0.1:20127/v1/chat/completions", docs: "https://github.com/decolua/9router" },
+      { label: "OmniRoute", url: "http://127.0.0.1:20128/v1/chat/completions", docs: "https://github.com/diegosouzapw/OmniRoute" },
       { label: "Together AI", url: "https://api.together.xyz/v1/chat/completions", docs: "https://docs.together.ai/docs/inference/openai-compatibility" },
       { label: "Fireworks AI", url: "https://api.fireworks.ai/inference/v1/chat/completions", docs: "https://docs.fireworks.ai/tools-sdks/openai-compatibility" },
+    ],
+  },
+
+  // ── Hidden providers（UI 默认不显示，见 BaseProvider.hidden）──────────────
+  //
+  // 这两条是【订阅套餐】端点 (火山 Coding Plan、阿里 Token Plan),与上方
+  // doubao / qwen 的按量付费端点是同一家厂商的两条产品线 —— 另一个 host、
+  // 另一套套餐专属 SKU，所以是两个独立 provider 而不是 endpoints[] 变体
+  // (变体会共享模型清单，而两边的在售 SKU 集合真的不同:deepseek-v4-pro-0813 /
+  // glm-5.2 在按量线没有对应条目)。
+  // 阿里这条 2026-09 由 Coding Plan(coding.dashscope host) 整体切换为
+  // Token Plan(token-plan.cn-beijing.maas host):旧套餐 SKU 几乎全换，只
+  // qwen3.7-plus 一个重叠;key 保持 alibaba 不变以保住下游存档键。
+  //
+  // 为什么【收】(2026-09 反转 doubao 条目 2026-08-20 的撤除决定):
+  //   它们是 365 系列 legend-talk 的一等公民条目，其厂商事实此前在那个仓库
+  //   手抄维护。收进这里并标记 hidden，模型清单 / 思考 wire / 文档链接就有了
+  //   单一事实源，sync-provider-catalog 会把它们生成进下游目录 (生成器不过滤
+  //   hidden)。本工具自己不主动展示 —— 默认下拉里没有，知道自己在做什么的
+  //   用户可以在 Provider 设置里显式打开开关。
+  //
+  // ⚠ 风险仍然存在，没有因为"隐藏"或"换了套餐名字"而消失。封号条款两家官方
+  // 文档都逐字写了：
+  //   火山 FAQ「在【非 AI 工具】中使用 Coding Plan / Agent Plan 权益对应的
+  //   Base URL 和 API Key 有可能被识别为滥用/违规，会导致【订阅停用或账号
+  //   封禁】」;阿里 Token Plan 概述页「将套餐 API Key 用于允许范围之外的调用
+  //   将被视为违规或滥用，可能会导致订阅被暂停或 API Key 被封禁」(同页还写明
+  //   Token Plan 仅限在 Claude Code/Cursor 等 AI 编程工具与 OpenClaw 类 Agent
+  //   中交互式使用，自动化脚本/应用后端/批量调用均在范围外)。本工具是批量翻译，
+  //   明确落在非 AI 编程工具一侧 —— UI 开关旁挂着这条警告文案
+  //   (showCodingPlansHelp),别删。火山 FAQ【另一条独立问题】还称套餐额度只在
+  //   支持的 Coding 工具内生效、之外的 API 调用按方舟按量规则收费 —— 这是
+  //   火山独有的说法，阿里页面没有任何计费后果表述，UI 文案不得把它当两家
+  //   共有后果。
+  //   GLM(/api/coding/paas/v4)、Kimi(api.kimi.com/coding) 等其他订阅工作流
+  //   端点目前【不收】:没有下游消费方，等有了照此办理。
+  volcengine: {
+    kind: "openai-compat",
+    category: "llm",
+    hidden: true,
+    label: "Volcengine Coding Plan",
+    // 字节方舟 Coding Plan 订阅端点 (/api/coding/v3，区别于 doubao 的按量线
+    // /api/v3)。模型清单以官方「快速开始」(docs/ark/coding-plan-personal-get-started,
+    // 2026-09-25 起数字文档号已迁移为语义路径)的 Model Name
+    // 表为唯一权威 —— 那是套餐别名空间 (全小写、滚动指向当前代),与按量线带
+    // 日期后缀的 id 不同;退役别名在 legend-talk 的 MODEL_ID_MIGRATIONS 登记。
+    endpoint: "https://ark.cn-beijing.volces.com/api/coding/v3/chat/completions",
+    defaultModel: "doubao-seed-evolving",
+    defaultTemperature: 0.7,
+    docs: "https://docs.volcengine.com/docs/ark/coding-plan-personal-get-started",
+    apiKeyUrl: "https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey",
+    // 浏览器直连不通 (legend-talk 侧实测必须走它的 CORS 代理),故默认中转开。
+    // ⚠ 改完需要重新部署 scripts/llm-proxy-worker.js(workerParity 钉着路由)。
+    defaultUseRelay: true,
+    models: [
+      // 2026-09-25 按套餐页 Model Name 表整单复核（该表换血：turbo/2.0-lite 下架，
+      // 新列 pro/lite/2.0-mini/v4.1-flash/k2.8-preview）。thinking 统一走套餐 FAQ 的
+      // {"thinking":{"type":...}} 开关;doubao / deepseek / glm 家族在方舟「深度思考」
+      // 文档的 reasoning_effort 表里逐型号在册，minimax-m3、kimi-k2.7-code、kimi-k3
+      // 依套餐 FAQ 的通用机制标注 —— 若实测某家不收 disabled，把该条的 thinking 撤掉
+      // (撤了 = gated 省略参数 = 用模型默认，安全的另一半)。
+      // k2.8-preview 协议未逐档核过 → 不打标(gated 对未标模型省略参数)。
+      { label: "Doubao Seed Evolving", value: "doubao-seed-evolving", thinking: true },
+      { label: "Doubao Seed 2.1 Pro", value: "doubao-seed-2.1-pro", thinking: true },
+      { label: "Doubao Seed 2.1 Lite", value: "doubao-seed-2.1-lite", thinking: true },
+      { label: "Doubao Seed 2.0 Mini", value: "doubao-seed-2.0-mini", thinking: true },
+      { label: "MiniMax M3", value: "minimax-m3", thinking: true },
+      // glm-5.3 同时接受别名 glm-latest;开通管理页复制出来的是带日期的全名。
+      { label: "GLM-5.3 (glm-latest)", value: "glm-5.3", thinking: true },
+      { label: "GLM-5.3 Flash", value: "glm-5.3-flash", thinking: true },
+      { label: "DeepSeek V4.1 Flash", value: "deepseek-v4.1-flash", thinking: true },
+      { label: "DeepSeek V4 Flash", value: "deepseek-v4-flash", thinking: true },
+      { label: "DeepSeek V4 Pro", value: "deepseek-v4-pro", thinking: true },
+      { label: "Kimi K2.7 Code", value: "kimi-k2.7-code", thinking: true },
+      { label: "Kimi K2.8 Preview", value: "kimi-k2.8-preview" },
+      { label: "Kimi K3", value: "kimi-k3", thinking: true },
+    ],
+  },
+  alibaba: {
+    kind: "openai-compat",
+    category: "llm",
+    hidden: true,
+    label: "Alibaba Bailian Token Plan",
+    // 阿里百炼【Token Plan 个人版】订阅端点 (token-plan.cn-beijing.maas host 的
+    // compatible-mode,2026-09 取代原 Coding Plan;区别于 qwen 的按量线
+    // dashscope.aliyuncs.com/compatible-mode)。API Key 仍是 sk-sp- 开头，
+    // 在 Token Plan 控制台「我的订阅」页生成。
+    // 思考开关：百炼 OpenAI 兼容文档 (qwen-api-via-openai-chat-completions) 载明
+    // 裸 enable_thinking 布尔适用于 Qwen3.7/3.6/3.5 系列、GLM 系列 (阿里直供)、
+    // DeepSeek-V4-Pro/Flash 系列 (阿里直供)。⚠ qwen3.8 系列【不在】该参数支持
+    // 名单内 —— 它走 thinking_budget/reasoning_effort 且文档未给关闭档;
+    // deepseek-v4.1-flash 的 reasoning_effort 是 1~100 整数、enable_thinking 亦未
+    // 载明。这三条一律不打 thinking 标 (gated 对未标模型不发任何思考参数，即用
+    // 模型默认值，默认本就在思考)。若实测某条收 false 会 400，把该条 thinking 撤掉。
+    endpoint: "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1/chat/completions",
+    defaultModel: "qwen3.8-flash",
+    defaultTemperature: 0.7,
+    docs: "https://help.aliyun.com/model-studio/token-plan-personal-overview",
+    apiKeyUrl: "https://bailian.console.aliyun.com/cn-beijing/subscription/token-plan/personal",
+    // 浏览器直连可用性未知 (原 coding host 实测必须走中转),保守默认中转开。
+    // ⚠ 改完需要重新部署 scripts/llm-proxy-worker.js(workerParity 钉着路由)。
+    defaultUseRelay: true,
+    models: [
+      // 2026-09-25 按 token-plan-personal-overview 支持表复核：与下面清单逐条一致
+      // (只收文本模型;万相/HappyHorse/decision-model 等多模态与领域模型不收)。
+      // 官方表另有 `auto` 路由项（按 Credits 折算最省），不收——本表默认档已按
+      // 逐行翻译负载手挑，且 auto 的落点不可预期，缓存语义同 doubao-evolving。
+      // 原 Coding Plan 的专属 id 已随套餐换代整体消失 —— 下游【不做存档迁移】
+      // (存量套餐用户极少，旧 id 报错后重选即可，见条目头段)。
+      // qwen3.8-max-preview 是指向 qwen3.8-max 的弃用别名，不收。顺序即页面顺序。
+      { label: "Qwen 3.8 Max", value: "qwen3.8-max" },
+      { label: "Qwen 3.8 Flash", value: "qwen3.8-flash" },
+      { label: "Qwen 3.7 Max", value: "qwen3.7-max", thinking: true },
+      { label: "Qwen 3.7 Plus", value: "qwen3.7-plus", thinking: true },
+      { label: "Qwen 3.6 Flash", value: "qwen3.6-flash", thinking: true },
+      { label: "DeepSeek V4.1 Flash", value: "deepseek-v4.1-flash" },
+      { label: "DeepSeek V4 Pro", value: "deepseek-v4-pro", thinking: true },
+      { label: "DeepSeek V4 Pro 0813", value: "deepseek-v4-pro-0813", thinking: true },
+      { label: "DeepSeek V4 Flash 0731", value: "deepseek-v4-flash-0731", thinking: true },
+      // glm-5.3 官方模型表（2026-09-16 更新）里有；5.2 已按「同价旧代不留」删掉。
+      // ⚠ 不打 thinking：5.3 系列强制思考、不可禁用。
+      { label: "GLM-5.3", value: "glm-5.3" },
     ],
   },
 } as const satisfies Record<string, ProviderSpec>;
@@ -1493,11 +1917,11 @@ export const supportsGlossary = (method: string): boolean => method in PROVIDERS
  */
 export const URL_IS_PRIMARY_CRED: ReadonlySet<string> = new Set(["llm", "translategemma", "milmmt"]);
 
-// 注:曾短暂给厂商 provider 取消过自由填 URL 的输入框(只留 endpoints 标签),
-// 已【撤销】—— 总有自建代理 / 特殊网络的用户需要指一个别的地址,堵死这个口子
-// 得不偿失。官方变体走 endpoints 标签，自由填的口子同时保留，两者不冲突:
-// 标签选中的地址会被 resolveEndpoint 认出是官方变体(见 services/llm.ts),
-// 与中转开关互不干涉:开着就经中转转发到它,关着就直连过去。
+// 注：曾短暂给厂商 provider 取消过自由填 URL 的输入框 (只留 endpoints 标签),
+// 已【撤销】—— 总有自建代理 / 特殊网络的用户需要指一个别的地址，堵死这个口子
+// 得不偿失。官方变体走 endpoints 标签，自由填的口子同时保留，两者不冲突：
+// 标签选中的地址会被 resolveEndpoint 认出是官方变体 (见 services/llm.ts),
+// 与中转开关互不干涉：开着就经中转转发到它，关着就直连过去。
 
 /**
  * Services that work with zero user configuration because they fall back to a
@@ -1507,7 +1931,7 @@ export const URL_IS_PRIMARY_CRED: ReadonlySet<string> = new Set(["llm", "transla
  *   - deeplx: empty URL falls back to our public THIRD_PARTY_ENDPOINTS.deeplx
  *
  * ⚠ 不是「上游有免费档」就能进来 —— 判据是【浏览器里那条零配置路径真的能跑】，
- * 而且要能稳定地跑。opencode 曾短暂进过这个集合:zen 的 *-free SKU 匿名直连实测
+ * 而且要能稳定地跑。opencodeZen 曾短暂进过这个集合:zen 的 *-free SKU 匿名直连实测
  * 200(2026-08-06),看起来完美符合。但 zen 的免费档本来就很容易 429(实测撞到过
  * FreeUsageLimitError、Retry-After 77681 秒 ≈21.6 小时),而这个集合的语义是
  * 「零配置也能直接用」—— 一次成功的探测不等于这条路可依赖。
@@ -1539,7 +1963,7 @@ export const NO_CRED_REQUIRED: ReadonlySet<string> = new Set(["gtxFreeAPI", "edg
  *   - llm, translategemma, milmmt: self-hosted (LM Studio / llama.cpp / vLLM / LiteLLM
  *     proxy) — "server not running" / wrong URL is a NETWORK error (no
  *     auth-abort), and the probe hits the user's own machine, so it's free.
- *     (指向 LiteLLM 之类网关时,probe 会经它转发到上游，严格说花一次微量补全;
+ *     (指向 LiteLLM 之类网关时，probe 会经它转发到上游，严格说花一次微量补全;
  *     但网关挂掉 / 地址错才是这条路的主导故障，不 probe 就逐行慢失败。)
  *   - deepl: free tier returns 456 (quota) which is non-auth (no abort); the
  *     fast-fail is worth the tiny quota the probe spends.
@@ -1623,16 +2047,15 @@ export const getConfigStatus = (method: string, config: TranslationConfig | unde
 
 // User-facing service list, declaration-order. The cast widens `as const` literal
 // types so optional `docs` / `apiKeyUrl` are uniformly accessible across entries.
-export const TRANSLATION_PROVIDERS: TranslationProvider[] = Object.entries(PROVIDERS)
-  .map(([value, p]) => {
-    const spec = p as ProviderSpec;
-    return {
-      value,
-      label: spec.label,
-      ...(spec.docs && { docs: spec.docs }),
-      ...(spec.apiKeyUrl && { apiKeyUrl: spec.apiKeyUrl }),
-    };
-  });
+export const TRANSLATION_PROVIDERS: TranslationProvider[] = Object.entries(PROVIDERS).map(([value, p]) => {
+  const spec = p as ProviderSpec;
+  return {
+    value,
+    label: spec.label,
+    ...(spec.docs && { docs: spec.docs }),
+    ...(spec.apiKeyUrl && { apiKeyUrl: spec.apiKeyUrl }),
+  };
+});
 
 // Compose the TranslationConfig for each provider.
 const buildOpenAICompatDefault = (spec: OpenAICompatProviderSpec): TranslationConfig => {
@@ -1661,9 +2084,9 @@ const buildOpenAICompatDefault = (spec: OpenAICompatProviderSpec): TranslationCo
   // rejected upstream) — omitting the field hides the UI input and keeps the
   // wire request param-free; migrateConfig strips stale stored values.
   if (spec.defaultTemperature !== undefined) base.temperature = spec.defaultTemperature;
-  // url 对 openai-compat 一律存在(空 = 官方默认端点)。它同时承载三种取值:
-  // 官方变体(endpoints 标签写入)与真自定义地址(逃生口 —— DeepSeek 判例证明
-  // 上游按 origin 拦截无法预判,故人人都有,不再逐条 opt-in)。语义判定统一走
+  // url 对 openai-compat 一律存在 (空 = 官方默认端点)。它同时承载三种取值：
+  // 官方变体 (endpoints 标签写入) 与真自定义地址 (逃生口 —— DeepSeek 判例证明
+  // 上游按 origin 拦截无法预判，故人人都有，不再逐条 opt-in)。语义判定统一走
   // classifyEndpointUrl。
   base.url = "";
   if (spec.defaultUseRelay !== undefined) base.useRelay = spec.defaultUseRelay;
@@ -1724,14 +2147,14 @@ export const isCustomModel = (service: string, model: string): boolean => {
  * and REJECT the legacy manual `budget_tokens` shape with a 400. Substring regex so
  * dated snapshot ids (claude-sonnet-5-20260203) still match.
  * ⚠ 新增 Claude SKU 时【必须】同步这条正则 —— 漏了就会给一个 adaptive 世代的
- * 模型发 budget_tokens,整个 provider 对该 model 恒 400(claude-opus-5 上线时
+ * 模型发 budget_tokens，整个 provider 对该 model 恒 400(claude-opus-5 上线时
  * 就是这么漏的)。
  * Doc: platform.claude.com/docs/en/build-with-claude/adaptive-thinking
  * Consumed by services/llm.ts to pick the thinking wire shape.
  */
-// 正则单独导出:同步给下游的 provider 目录要带上它的 source —— 这条「按模型名
+// 正则单独导出：同步给下游的 provider 目录要带上它的 source —— 这条「按模型名
 // 判代」的规则是【厂商事实】,而且【只能按名字判】(用户手填的 SKU 不在任何清单
-// 里),所以下游各写一份必然漂。已经漂过一次:某次精简把 4.7/4.8 从下游那份删了,
+// 里),所以下游各写一份必然漂。已经漂过一次：某次精简把 4.7/4.8 从下游那份删了，
 // 而官方明写 4.7 及以后【拒收】budget_tokens —— 手填 opus-4-8 直接 400。
 export const ADAPTIVE_THINKING_CLAUDE_RE = /claude-(opus-5|opus-4-[78]|sonnet-5|fable-5|mythos)/;
 export const isAdaptiveThinkingClaude = (model: string): boolean => ADAPTIVE_THINKING_CLAUDE_RE.test(model);
@@ -1739,10 +2162,10 @@ export const isAdaptiveThinkingClaude = (model: string): boolean => ADAPTIVE_THI
 /**
  * adaptive 世代里【关不掉】思考的那一支:Fable 5 与 Mythos 全系。官方逐模型表
  * 把它们标成 "Always on",并明写 `thinking:{type:"disabled"}` 回 400 —— 而同代
- * 的 Opus 5 / Sonnet 5 是接受的("On" 而非 "Always on")。所以「关闭思考」在这
- * 一支上只能是【整个 thinking 字段都不发】,让服务端默认(始终思考)生效。
- * ⚠ 连带影响 max_tokens:这支即便用户选了「关」也仍在思考,思考 token 计入
- * max_tokens,按不思考的额度发会撞 stop_reason:"max_tokens"。
+ * 的 Opus 5 / Sonnet 5 是接受的 ("On" 而非 "Always on")。所以「关闭思考」在这
+ * 一支上只能是【整个 thinking 字段都不发】,让服务端默认 (始终思考) 生效。
+ * ⚠ 连带影响 max_tokens:这支即便用户选了「关」也仍在思考，思考 token 计入
+ * max_tokens，按不思考的额度发会撞 stop_reason:"max_tokens"。
  * Doc: platform.claude.com/docs/en/build-with-claude/thinking-troubleshooting
  *      (Configurations each model rejects 一表)
  */
@@ -1757,16 +2180,16 @@ export const isAlwaysThinkingClaude = (model: string): boolean => ALWAYS_THINKIN
  *   · want 省略 = 用户把思考【关掉】了。这几家官方都【没有】关闭开关
  *     (Gemini 3 的 thinkingBudget 已是遗留参数;xAI 明写 "Reasoning cannot be
  *     disabled"),所以最低档就是能做到的"最关"。⚠ 别退回去发厂商枚举里没有的
- *     值当"关":要么被拒(默认态每请求 400),要么被忽略(那就是按【服务端默认】
+ *     值当"关":要么被拒 (默认态每请求 400),要么被忽略 (那就是按【服务端默认】
  *     的高档位静默计费 —— DeepSeek「10M tokens」事故就是这个形态)。
  *   · want 给了但该 SKU 不收 → 降到它收的、不高于 want 的最高档。
  *
- * ⚠ 未列出的 SKU(用户手填)用调用方给的 fallback,不硬降用户显式选的档位
+ * ⚠ 未列出的 SKU(用户手填) 用调用方给的 fallback，不硬降用户显式选的档位
  * (选了 custom 自己负责)。
- * ⚠ 曾用正则近似这些表(按名字判 -pro / 硬编码 grok-4.3),两个毛病:按名字归并
- * 会把合法档位静默降级(gemini 3.1-pro 的 medium 官方接受,却被降成 low);而且
- * 其中一个词边界转义在搬迁中被写成了不可见控制字符,那个分支从此静默失效。
- * 表就在数据里,别再回到正则。
+ * ⚠ 曾用正则近似这些表 (按名字判 -pro / 硬编码 grok-4.3),两个毛病：按名字归并
+ * 会把合法档位静默降级 (gemini 3.1-pro 的 medium 官方接受，却被降成 low);而且
+ * 其中一个词边界转义在搬迁中被写成了不可见控制字符，那个分支从此静默失效。
+ * 表就在数据里，别再回到正则。
  */
 const THINKING_LEVEL_ORDER = ["minimal", "low", "medium", "high"] as const;
 type ThinkingLevel = (typeof THINKING_LEVEL_ORDER)[number];
@@ -1865,14 +2288,18 @@ export const deriveThinkingParams = (method: string, config: TranslationConfig |
  * dial would silently bill the high tier whatever the user picked AND
  * fragment the cache key three ways for byte-identical requests.
  * grok is NOT here: 官方档位是 low/medium/high/xhigh(docs.x.ai),dial 保持
- * 分级,medium 原样发 —— 见 pickThinkingLevel。
+ * 分级，medium 原样发 —— 见 pickThinkingLevel。
  */
-// ⚠ moonshot 已移出:收录 kimi-k3 后它【同时】有二元 SKU(K2.x 的 thinking:{type})
-// 与真分级 SKU(k3 的 reasoning_effort low/high)。集合是 provider 级的,而 UI 的
-// 档位选择器也是 provider 级 —— 给出三档,对 K2.x 是三档折叠成开/关(无害,
+// ⚠ moonshot 已移出：收录 kimi-k3 后它【同时】有二元 SKU(K2.x 的 thinking:{type})
+// 与真分级 SKU(k3 的 reasoning_effort low/high)。集合是 provider 级的，而 UI 的
+// 档位选择器也是 provider 级 —— 给出三档，对 K2.x 是三档折叠成开/关 (无害，
 // 只是 Medium 与 High 同效),对 k3 是必需。反过来只给 Off/On 则 k3 的 high
 // 永远选不到。thinking.test 的「三档形态 ↔ 声明一致」不变量抓住了这次矛盾。
-export const BINARY_EFFORT_VENDORS: ReadonlySet<string> = new Set(["deepseek", "doubao", "zhipu", "mimo", "siliconflow", "cohere", "qianfan", "mistral", "minimax"]);
+// volcengine(方舟 Coding Plan)= 扁平 thinking:{type},alibaba(百炼 Token Plan)
+// = 裸 enable_thinking，都是二元形态;两家是 hidden provider，登记规则不变。
+// ⚠ alibaba 并非每个在册 SKU 都打 thinking 标:qwen3.8-* 与 deepseek-v4.1-flash
+// 在百炼文档里没有 enable_thinking 开关，见该条目注释。
+export const BINARY_EFFORT_VENDORS: ReadonlySet<string> = new Set(["deepseek", "doubao", "zhipu", "mimo", "siliconflow", "cohere", "qianfan", "mistral", "minimax", "volcengine", "alibaba"]);
 
 /**
  * Quick-pick endpoints for providers that surface multiple URL options (regional
@@ -1886,10 +2313,10 @@ export const getProviderEndpoints = (service: string): Array<{ label: string; ur
 };
 
 /**
- * 该 provider 的中转 allowlist(= 官方端点集合,[0] 为默认):endpoints[] 优先,
+ * 该 provider 的中转 allowlist(= 官方端点集合，[0] 为默认):endpoints[] 优先，
  * 没声明的 openai-compat 回落到 [spec.endpoint]。resolveWireEndpoint 的默认
  * 目标、workerParity 测试都从这里取 —— 此前引擎与测试各写了一份同样的回落
- * 规则,测试等于在校验自己的抄本。
+ * 规则，测试等于在校验自己的抄本。
  */
 export const getRelayAllowlist = (service: string): readonly string[] => {
   const spec = PROVIDERS[service as ProviderKey] as ProviderSpec | undefined;
@@ -1899,17 +2326,20 @@ export const getRelayAllowlist = (service: string): readonly string[] => {
 };
 
 // wire 层对 config.url 的补全器 —— 【与各 service 实际做的完全一致】,这是
-// classifyEndpointUrl(界面文案/芯片)、blur 自动补全、relayHint 判据的共同判据:
-//   - claude:Messages 协议,bare host 补 /v1/messages(completeClaudeUrl)
-//   - openai-compat 全员 + 同协议的手写 service(yandex/llm/nvidia/qwenMt/
+// classifyEndpointUrl(界面文案/芯片)、blur 自动补全、relayHint 判据的共同判据：
+//   - claude:Messages 协议，bare host 补 /v1/messages(completeClaudeUrl)
+//   - azureopenai:v1 GA 协议，资源根补 /openai/v1/chat/completions(completeAzureUrl)
+//     —— 全员唯一 endpoint 留空的 openai-compat，没有官方地址可当默认
+//   - 其余 openai-compat 全员 + 同协议的手写 service(yandex/llm/nvidia/qwenMt/
 //     translategemma/milmmt 都在各自实现里调 completeOpenAICompatUrl)
-//   - 其余(deepl/deeplx/azureopenai/gtxFreeAPI…):私有协议或资源基址,引擎
-//     原样使用,这里也原样返回。
-// ⚠ 改某个 service 的补全行为时必须同步这里 —— 界面所见与线上所打分叉,
-// 就是这个函数存在要防的事故(bare host 判 custom、文案与线上行为相反)。
+//   - 其余 (deepl/deeplx/gtxFreeAPI…):私有协议或资源基址，引擎
+//     原样使用，这里也原样返回。
+// ⚠ 改某个 service 的补全行为时必须同步这里 —— 界面所见与线上所打分叉，
+// 就是这个函数存在要防的事故 (bare host 判 custom、文案与线上行为相反)。
 const OPENAI_WIRE_CUSTOM_SERVICES: ReadonlySet<string> = new Set(["yandex", "llm", "nvidia", "qwenMt", "translategemma", "milmmt"]);
 export const wireUrlNormalizer = (service: string): ((url: string) => string) => {
   if (service === "claude") return completeClaudeUrl;
+  if (service === "azureopenai") return completeAzureUrl;
   const spec = PROVIDERS[service as ProviderKey] as ProviderSpec | undefined;
   if (spec?.kind === "openai-compat" || OPENAI_WIRE_CUSTOM_SERVICES.has(service)) return completeOpenAICompatUrl;
   return (u) => u;
@@ -1926,45 +2356,41 @@ export type EndpointUrlClass = {
  * `config.url` 落在三种语义中的哪一种。**只服务界面**(端点芯片高亮、blur 时
  * 文案区分),并作为 relayWouldServe 的"是不是官方地址"判据。
  *
- * 这里曾带过一个 `relayRoutable` 字段,用来表达"这个 url 会不会把中转关掉"。
- * 随着两轴解耦,那个概念本身消失了:中转开不开【只看开关】。
+ * 这里曾带过一个 `relayRoutable` 字段，用来表达"这个 url 会不会把中转关掉"。
+ * 随着两轴解耦，那个概念本身消失了：中转开不开【只看开关】。
  *
- * 引擎不另算一遍:resolveWireEndpoint(下方)的"能不能走内置中转"直接读这里的
- * kind —— 界面所见与线上所打【由构造保证】一致,不再是两套实现靠测试钉齐。
+ * 引擎不另算一遍:resolveWireEndpoint(下方) 的"能不能走内置中转"直接读这里的
+ * kind —— 界面所见与线上所打【由构造保证】一致，不再是两套实现靠测试钉齐。
  */
 export const classifyEndpointUrl = (service: string, url: string | undefined): EndpointUrlClass => {
   const spec = PROVIDERS[service as ProviderKey] as ProviderSpec | undefined;
   // localStorage/导入文件不是类型安全的:非字符串(消毒前的存量、手改)当 undefined
-  // 处理,不能让设置表单在每次渲染时抛 TypeError 直到手清存储。
+  // 处理，不能让设置表单在每次渲染时抛 TypeError 直到手清存储。
   const trimmed = typeof url === "string" ? url.trim() : undefined;
   // 「留空时实际会打哪个地址」:openai-compat 是 spec.endpoint;手写 kind 则看它
-  // defaults 里预置的 url(gtxFreeAPI/qwenMt 有,llm/translategemma 是空 = 无默认,
+  // defaults 里预置的 url(gtxFreeAPI/qwenMt 有，llm/translategemma 是空 = 无默认，
   // 必须用户自己选)。⚠ 别改用 defaults.url 判 openai-compat —— 它们的 defaults.url
   // 一律是 ""(逃生口字段无条件配发),据此判会得出"没有默认端点"的错误结论。
-  // URL 即凭证的服务(llm/translategemma)【没有】隐式默认:留空 =「还没配」,
+  // URL 即凭证的服务 (llm/translategemma)【没有】隐式默认：留空 =「还没配」,
   // 与 getConfigStatus 的 "needs-config" 是同一句话。若在这里把 spec.endpoint 当成
-  // 它的默认,端点标签会在 url 还空着时就亮起"已启用",而状态块同时写着"待配置"
-  // —— 界面自相矛盾。(引擎侧留空仍会打 endpoints[0],那是另一层的兜底,
+  // 它的默认，端点标签会在 url 还空着时就亮起"已启用",而状态块同时写着"待配置"
+  // —— 界面自相矛盾。(引擎侧留空仍会打 endpoints[0],那是另一层的兜底，
   // 状态块的"待配置"已经把话说清楚了。)
   //
   // 其余:claude/yandex 走最后那档 —— defaults.url 是 ""(逃生口),真正的默认地址
-  // 写在 endpoints[0] 里,服务层的 *_DIRECT_ENDPOINT 也从那儿派生,三处同一来源。
-  const defaultEndpoint = URL_IS_PRIMARY_CRED.has(service)
-    ? undefined
-    : spec?.kind === "openai-compat"
-      ? spec.endpoint
-      : getDefaultConfig(service)?.url?.trim() || spec?.endpoints?.[0]?.url;
-  // ⚠ 按【引擎将要打的地址】比,不是裸字符串比 —— 两层规范化都要过:
-  //  1. 补全(completeXUrl):引擎在 resolveWireEndpoint 里先补全再比
-  //     allowlist,所以 bare host(https://llm.api.cloud.yandex.net)在引擎眼里
-  //     【就是】官方端点、照常走中转;这里若按原文判成 custom,文案会宣称
+  // 写在 endpoints[0] 里，服务层的 *_DIRECT_ENDPOINT 也从那儿派生，三处同一来源。
+  const defaultEndpoint = URL_IS_PRIMARY_CRED.has(service) ? undefined : spec?.kind === "openai-compat" ? spec.endpoint : getDefaultConfig(service)?.url?.trim() || spec?.endpoints?.[0]?.url;
+  // ⚠ 按【引擎将要打的地址】比，不是裸字符串比 —— 两层规范化都要过：
+  //  1. 补全 (completeXUrl):引擎在 resolveWireEndpoint 里先补全再比
+  //     allowlist，所以 bare host(https://llm.api.cloud.yandex.net) 在引擎眼里
+  //     【就是】官方端点、照常走中转;这里若按原文判成 custom，文案会宣称
   //     "该地址不会发往公共中转、请求直连",与线上行为正好相反。
   //     选择器 = wireUrlNormalizer(上方),按 service 与引擎逐一对齐 ——
-  //     曾把 qwenMt/translategemma/llm/nvidia 漏成 identity,而它们的引擎都调
-  //     completeOpenAICompatUrl:导入的 base_url 形态地址引擎打官方变体,界面
+  //     曾把 qwenMt/translategemma/llm/nvidia 漏成 identity，而它们的引擎都调
+  //     completeOpenAICompatUrl:导入的 base_url 形态地址引擎打官方变体，界面
   //     却判 custom、芯片不亮。
-  //  2. 规范形(canonicalEndpoint):尾斜杠、主机大小写这类写法差异本就指向
-  //     同一个官方地址;存量/导入的配置不经过输入框的 blur 补全,渲染时就得判对。
+  //  2. 规范形 (canonicalEndpoint):尾斜杠、主机大小写这类写法差异本就指向
+  //     同一个官方地址;存量/导入的配置不经过输入框的 blur 补全，渲染时就得判对。
   if (!trimmed) return { kind: "default", url: defaultEndpoint };
   const key = canonicalEndpoint(wireUrlNormalizer(service)(trimmed));
   if (defaultEndpoint && key === canonicalEndpoint(defaultEndpoint)) return { kind: "default", url: defaultEndpoint };
@@ -1974,69 +2400,67 @@ export const classifyEndpointUrl = (service: string, url: string | undefined): E
 };
 
 /**
- * 「开中转对这组配置有没有效果」—— resolveWireEndpoint 的放行判据,也是
+ * 「开中转对这组配置有没有效果」—— resolveWireEndpoint 的放行判据，也是
  * services/llm.ts「建议打开中转」提示的前置条件(指人去开一个开了也没用的
- * 开关,比不提示更糟)。
+ * 开关，比不提示更糟)。
  *
- * ⚠ 【不把用户自填的地址发给内置公共中转】。内置中转只转发它声明过的端点,
- * 自填地址必然 400 —— 发过去毫无用处,却会把整条 URL(自建网关常带
- * `?token=SECRET`)留在一台用户没打算牵涉的机器的日志里。这【不是】把
- * 「地址」「开关」两轴绑回去:开关照旧有效,只是这一种组合无处可去。
- * 用户自己的中转(usesBuiltinRelay=false)是另一回事:那台机器归他所有、
- * allowlist 由他声明 —— 这正是解耦要支持的场景,照发。
- * 「是不是官方地址」直接问 classifyEndpointUrl —— 与界面同一个判据,不重算。
+ * ⚠ 【不把用户自填的地址发给内置公共中转】。内置中转只转发它声明过的端点，
+ * 自填地址必然 400 —— 发过去毫无用处，却会把整条 URL(自建网关常带
+ * `?token=SECRET`) 留在一台用户没打算牵涉的机器的日志里。这【不是】把
+ * 「地址」「开关」两轴绑回去：开关照旧有效，只是这一种组合无处可去。
+ * 用户自己的中转 (usesBuiltinRelay=false) 是另一回事：那台机器归他所有、
+ * allowlist 由他声明 —— 这正是解耦要支持的场景，照发。
+ * 「是不是官方地址」直接问 classifyEndpointUrl —— 与界面同一个判据，不重算。
  */
-export const relayWouldServe = (service: string, opts: { url?: string; relayBase?: string }): boolean =>
-  !usesBuiltinRelay(opts.relayBase) || classifyEndpointUrl(service, opts.url).kind !== "custom";
+export const relayWouldServe = (service: string, opts: { url?: string; relayBase?: string }): boolean => !usesBuiltinRelay(opts.relayBase) || classifyEndpointUrl(service, opts.url).kind !== "custom";
 
 /**
- * 这个 provider 界面上有没有中转开关。withNetworkHint(services/index.ts)用它决定
- * 该不该提「请开启中转」—— 指人去拨一个他那个 provider 根本没有的开关,
+ * 这个 provider 界面上有没有中转开关。withNetworkHint(services/index.ts) 用它决定
+ * 该不该提「请开启中转」—— 指人去拨一个他那个 provider 根本没有的开关，
  * 比不提示更糟。
  *
  * ⚠ 判据是【默认配置里有没有 useRelay 字段】,不是 `spec.defaultUseRelay`:
- * 后者只是 openai-compat 工厂的输入(buildOpenAICompatDefault 据此填字段),
+ * 后者只是 openai-compat 工厂的输入 (buildOpenAICompatDefault 据此填字段),
  * 而手写 kind 的 claude / yandex 直接把 useRelay 写在自己的 defaults 里 ——
  * 按 defaultUseRelay 判会把这两家当成「没有中转」。这里与 TranslationSettings
- * 决定该不该渲染那个 Switch 的判据(config?.useRelay !== undefined)同源。
+ * 决定该不该渲染那个 Switch 的判据 (config?.useRelay !== undefined) 同源。
  */
 const isRelayCapable = (service: string): boolean => getDefaultConfig(service)?.useRelay !== undefined;
 
 /**
- * 「指他去开中转」这句话到底有没有用 —— withNetworkHint(services/index.ts)的
- * CORS 改写与 deepseek 的 403 改写(services/llm.ts)共用这一个判据。
- * 三个前置缺一不可:有那个开关、现在没开、开了真会路由到位（relayWouldServe
- * —— 与端点解析、界面文案同一个判据,bare host / 官方变体 / 自建中转的取舍
+ * 「指他去开中转」这句话到底有没有用 —— withNetworkHint(services/index.ts) 的
+ * CORS 改写与 deepseek 的 403 改写 (services/llm.ts) 共用这一个判据。
+ * 三个前置缺一不可：有那个开关、现在没开、开了真会路由到位（relayWouldServe
+ * —— 与端点解析、界面文案同一个判据，bare host / 官方变体 / 自建中转的取舍
  * 不在这里重算）。
  *
- * ⚠ 别退回成 `&& !opts.url`:那是旧的「自定义 endpoint 压过开关」优先级留下的,
+ * ⚠ 别退回成 `&& !opts.url`:那是旧的「自定义 endpoint 压过开关」优先级留下的，
  * 会连"填的就是官方地址"和"自己有中转"这两种真能获益的情况一起吃掉。
  */
 export const relayHintWouldHelp = (service: string, opts: { useRelay?: boolean; url?: string; relayBase?: string }): boolean =>
   isRelayCapable(service) && !opts.useRelay && relayWouldServe(service, opts);
 
 /**
- * 「这个地址是用户自己的」—— withNetworkHint(services/index.ts)据此把网络错误改写成
- * CORS 提示(中转帮不上,补救在对面服务器上)。两种形态缺一不可:
- * URL_IS_PRIMARY_CRED 那几家根本没有官方默认端点(填什么都是他的);其余家
+ * 「这个地址是用户自己的」—— withNetworkHint(services/index.ts) 据此把网络错误改写成
+ * CORS 提示 (中转帮不上，补救在对面服务器上)。两种形态缺一不可：
+ * URL_IS_PRIMARY_CRED 那几家根本没有官方默认端点 (填什么都是他的);其余家
  * 则看他是不是填了个非官方地址。
  * ⚠ 单靠 kind==="custom" 会漏掉最常撞 CORS 的那批:LM Studio / Ollama 等
- * 本地运行时地址在 llm 的 endpoints[] 里有芯片,会被判成 "variant"。
+ * 本地运行时地址在 llm 的 endpoints[] 里有芯片，会被判成 "variant"。
  */
-export const isUserSuppliedEndpoint = (service: string, url: string | undefined): boolean =>
-  URL_IS_PRIMARY_CRED.has(service) || classifyEndpointUrl(service, url).kind === "custom";
+export const isUserSuppliedEndpoint = (service: string, url: string | undefined): boolean => URL_IS_PRIMARY_CRED.has(service) || classifyEndpointUrl(service, url).kind === "custom";
 
 /**
- * THE wire-endpoint resolution —— 所有走中转开关的服务(openai-compat 工厂 +
- * claude/yandex)唯一的出口地址计算。两轴正交:`url` 决定打哪个地址(空 =
+ * THE wire-endpoint resolution —— 所有走中转开关的服务 (openai-compat 工厂 +
+ * claude/yandex)唯一的出口地址计算。两轴正交:`url` 决定打哪个地址 (空 =
  * 官方默认),`useRelay` 决定走不走中转;唯一的组合限制见 relayWouldServe。
  * 中转路由键 = provider key(Worker 的 /api/{key} 就按它命名)。
- * 传输侧与分类侧过同一个 canonicalEndpoint:写法差异若只在一侧抹平,界面判
+ * 传输侧与分类侧过同一个 canonicalEndpoint:写法差异若只在一侧抹平，界面判
  * "官方"、Worker 的 exact-match 却 400。
  */
 export const resolveWireEndpoint = (service: string, opts: { url?: string; useRelay?: boolean; relayBase?: string }): string => {
   const trimmed = opts.url?.trim();
-  // 空 url → allowlist[0](官方默认)。调用方都是中转能力服务,allowlist 非空
+  // 空 url → allowlist[0](官方默认)。调用方都是中转能力服务，allowlist 非空
   // 由构造 + registry.test 的「endpoints[0] 即默认」不变量保证。
   const target = trimmed ? wireUrlNormalizer(service)(trimmed) : getRelayAllowlist(service)[0]!;
   if (!opts.useRelay || !relayWouldServe(service, opts)) return target;
@@ -2069,6 +2493,27 @@ export const categorizedOptions = (["machine-translation", "llm", "aggregator"] 
   label: CATEGORY_LABELS[cat],
   options: TRANSLATION_PROVIDERS.filter((s) => PROVIDERS[s.value as ProviderKey]?.category === cat).map(({ value, label }) => ({ value, label })),
 }));
+
+/**
+ * 带 `hidden: true` 的 provider(目前 volcengine 方舟 Coding Plan、alibaba
+ * 百炼 Token Plan 两个用途受限的订阅套餐端点)。行为层视图 (LLM_MODELS /
+ * defaultConfigs / dispatch / CLI) 全量
+ * 包含，UI 选择器通过本判据过滤 —— 全仓过滤 hidden 的唯一合法判据，别再手抄
+ * key 集合。
+ */
+export const isUiHiddenMethod = (method: string): boolean => (PROVIDERS[method as ProviderKey] as ProviderSpec | undefined)?.hidden === true;
+
+/**
+ * 服务选择器 (TranslationSettings + ApiStatusBlock 两处 Select) 的数据源。
+ * `showHidden` 关闭 (默认) 时滤掉 hidden provider;但【当前选中值】永远保留 ——
+ * 经设置导入选中 hidden 服务的用户必须看到自己在用什么，antd Select 对不在
+ * options 里的 value 只会显示裸 key。
+ */
+export const getVisibleCategorizedOptions = (showHidden: boolean, currentMethod?: string) =>
+  categorizedOptions.map((group) => ({
+    ...group,
+    options: group.options.filter((o) => showHidden || o.value === currentMethod || !isUiHiddenMethod(o.value)),
+  }));
 
 // Lookups
 export const findMethodLabel = (method: string): string => PROVIDERS[method as ProviderKey]?.label ?? method;

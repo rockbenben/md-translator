@@ -37,6 +37,7 @@ const LABELS: Record<string, string> = {
   bn: "বাংলা",
   id: "Indonesia",
   it: "Italiano",
+  hu: "Magyar",
 };
 
 /**

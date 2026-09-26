@@ -20,7 +20,8 @@ import {
   canDisableThinkingForModel,
   classifyEndpointUrl,
   migrateConfig,
-  categorizedOptions,
+  getVisibleCategorizedOptions,
+  isUiHiddenMethod,
   wireUrlNormalizer,
   usesBuiltinRelay,
   LLM_RELAY_BASE,
@@ -37,6 +38,7 @@ import Section from "@/app/components/styled/Section";
 import GlobalPromptsPanel from "@/app/components/GlobalPromptsPanel";
 import GlossaryManager from "@/app/components/glossaryManager/GlossaryManager";
 import { useIsMobile } from "@/app/hooks/useIsMobile";
+import { useShowHiddenProviders } from "@/app/hooks/translation/useShowHiddenProviders";
 
 const { Text, Link } = Typography;
 const { TextArea } = Input;
@@ -355,7 +357,7 @@ const ServiceSettingsForm = ({ service }: { service: string }) => {
       )}
 
       {/* ========== Credentials group ========== */}
-      {(config?.url !== undefined || config?.apiKey !== undefined || config?.region !== undefined || config?.folderId !== undefined || config?.apiVersion !== undefined || config?.useRelay !== undefined) && (
+      {(config?.url !== undefined || config?.apiKey !== undefined || config?.region !== undefined || config?.folderId !== undefined || config?.useRelay !== undefined) && (
         <Section style={{ marginTop: 16 }} noGap>
           <Text strong style={{ display: "block", marginBottom: 8 }}>
             {t("credentialsGroup")}
@@ -386,6 +388,12 @@ const ServiceSettingsForm = ({ service }: { service: string }) => {
                         : t("urlOptionalExtra")
                 }
                 required={URL_IS_PRIMARY_CRED.has(service) || service === "azureopenai"}>
+                {/* Form.Item 默认装单控件,这里要放端点芯片 + URL 输入两块。
+                    用 <Flex vertical> 把两者纵向并列,gap 接管间距、vertical
+                    接管换行 —— 与本文件顶部主区(L897)同一模式。Space wrap
+                    本身仍是 inline-flex,被 Flex 块级化后会自然占满整行,Input
+                    落到下一行。 */}
+                <Flex vertical gap={8} style={{ width: "100%" }}>
                 {(() => {
                   const endpoints = getProviderEndpoints(service);
                   // 判据是「点了能不能改变什么」:
@@ -410,7 +418,7 @@ const ServiceSettingsForm = ({ service }: { service: string }) => {
                   // “怎么把这个服务跑起来”—— 而这正是这条路的第一道坑。
                   const activeDocs = endpoints.find((ep) => ep.url === activeEndpoint)?.docs;
                   return (
-                    <Space wrap size={[4, 8]} style={{ marginBottom: 4 }}>
+                    <Space wrap size={[4, 8]}>
                       {endpoints.map((ep) => {
                         const isActive = activeEndpoint === ep.url;
                         // 默认端点写回 ""(而不是完整 URL):cache.ts 把非空
@@ -490,6 +498,7 @@ const ServiceSettingsForm = ({ service }: { service: string }) => {
                   aria-label={`API ${t("url")}`}
                   spellCheck={false}
                 />
+                </Flex>
               </Form.Item>
             )}
             {config?.apiKey !== undefined && (
@@ -549,11 +558,6 @@ const ServiceSettingsForm = ({ service }: { service: string }) => {
                   aria-label="Yandex Folder ID"
                   spellCheck={false}
                 />
-              </Form.Item>
-            )}
-            {config?.apiVersion !== undefined && (
-              <Form.Item label={`LLM API Version`} extra={`${tCommon("example")}: 2025-11-18`} style={{ marginBottom: config?.useRelay !== undefined ? 24 : 0 }}>
-                <Input value={config.apiVersion as string | undefined} onChange={(e) => handleConfigChange(service, "apiVersion", e.target.value)} aria-label="LLM API Version" spellCheck={false} />
               </Form.Item>
             )}
             {/* 这两个开关的说明文字由 antd Form.Item 渲染，不在我们的 JSX 里，
@@ -849,6 +853,7 @@ const TranslationSettings = () => {
   const isMobile = useIsMobile();
   const { translationMethod, setTranslationMethod, translationConfigs } = useTranslationContext();
   const isLLMModel = LLM_MODELS.includes(translationMethod);
+  const [showHiddenProviders, setShowHiddenProviders] = useShowHiddenProviders();
 
   // Chips row = every service whose getConfigStatus is non-"needs-config",
   // plus the currently-selected one. getConfigStatus is the same predicate the
@@ -864,10 +869,13 @@ const TranslationSettings = () => {
   const activeServices = useMemo(
     () =>
       TRANSLATION_PROVIDERS.filter((s) => {
+        // hidden provider(订阅套餐端点)默认不进 chips;当前已选中时例外,
+        // 否则用户看不到自己在用什么。
+        if (!showHiddenProviders && s.value !== translationMethod && isUiHiddenMethod(s.value)) return false;
         const status = getConfigStatus(s.value, translationConfigs?.[s.value] ?? getDefaultConfig(s.value));
         return status !== "needs-config" || s.value === translationMethod;
       }),
-    [translationConfigs, translationMethod],
+    [translationConfigs, translationMethod, showHiddenProviders],
   );
 
   const providerSelect = (
@@ -876,7 +884,7 @@ const TranslationSettings = () => {
       showSearch={{ optionFilterProp: "label" }}
       value={translationMethod}
       onChange={setTranslationMethod}
-      options={categorizedOptions}
+      options={getVisibleCategorizedOptions(showHiddenProviders, translationMethod)}
       aria-label={t("selectService")}
     />
   );
@@ -936,6 +944,19 @@ const TranslationSettings = () => {
       {supportsGlossary(translationMethod) && <GlossaryManager />}
 
       {isLLMModel && <GlobalPromptsPanel />}
+
+      {/* 订阅套餐端点(火山 Coding Plan、阿里 Token Plan)的唯一入口:默认
+          隐藏,显式 opt-in。警告文案承载官方文档的封号风险,别删 —— 见
+          registry volcengine / alibaba 条目注释。挪到整页最末作为次要操作,
+          避免在顶部跟主服务选择器争夺视觉焦点 —— 这是低频 opt-in,不该
+          抢顶部黄金位置。 */}
+      <Space size="small" wrap>
+        <Switch size="small" checked={showHiddenProviders} onChange={setShowHiddenProviders} aria-label={t("showCodingPlans")} />
+        <Text type="secondary">{t("showCodingPlans")}</Text>
+        <Tooltip title={t("showCodingPlansHelp")}>
+          <InfoCircleOutlined />
+        </Tooltip>
+      </Space>
     </div>
   );
 };

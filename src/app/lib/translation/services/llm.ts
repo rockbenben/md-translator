@@ -46,11 +46,16 @@ type OpenAICompatRequestConfig = {
   /** Absent = provider never sends temperature (locked/rejected upstream — see registry spec). */
   defaultTemperature?: number;
   extraHeaders?: Record<string, string>;
+  /**
+   * 这个 provider 要求把本轮会话 id 放进哪个请求头（registry 声明头名）。
+   * 值取自 `params.sessionId` —— 流水线每轮生成一次，轮内稳定。
+   */
+  sessionHeader?: string;
   extraBody?: Record<string, unknown>;
 };
 
 const openAICompatRequest = async (cfg: OpenAICompatRequestConfig): Promise<string> => {
-  const { params, serviceName, endpoint, defaultModel, defaultTemperature, extraHeaders, extraBody } = cfg;
+  const { params, serviceName, endpoint, defaultModel, defaultTemperature, extraHeaders, sessionHeader, extraBody } = cfg;
   const { apiKey, model, temperature } = params;
   const { effectiveSystemPrompt, prompt } = preparePrompts(params);
   // apiKey 可选的服务跳过 requireApiKey —— 判据查 registry 的 isApiKeyOptional,
@@ -71,6 +76,9 @@ const openAICompatRequest = async (cfg: OpenAICompatRequestConfig): Promise<stri
       "Content-Type": "application/json",
       ...(key ? { Authorization: `Bearer ${key}` } : {}),
       ...extraHeaders,
+      // 会话 id 按 registry 声明的头名发（只在这两者都在时才发）。放在 extraHeaders
+      // 之后，免得被同名的静态头覆盖。
+      ...(sessionHeader && params.sessionId ? { [sessionHeader]: params.sessionId } : {}),
     },
     body: JSON.stringify({
       messages: [
@@ -102,7 +110,7 @@ const resolveEndpoint = (key: OpenAICompatProviderKey, spec: OpenAICompatProvide
 //   - TIER 1 (thinking-aware): registered in THINKING_BUILDERS below. Each
 //     entry is `gated(service, shape)` — the shared gate + one effort→wire shape.
 //   - TIER 2 (base / no builder): providers with no thinking-tagged SKUs in the
-//     registry (stepfun, opencode, tokenhub, atlascloud, litellm). Factory returns
+//     registry (stepfun, opencodeZen, tokenhub, atlascloud, litellm). Factory returns
 //     a pass-through service. isThinkingCapableProvider is false for these, so the
 //     UI offers no thinking control at all — including on custom SKUs.
 // Adding a thinking-capable provider = tag its SKU(s) in the registry + add one
@@ -192,7 +200,8 @@ const thinkingType: EffortShape = (e) => ({ thinking: { type: e ? "enabled" : "d
 const enableThinking: EffortShape = (e) => ({ enable_thinking: !!e });
 
 // `reasoning_effort` enum with explicit "none" off — OpenAI GPT-5.x (omit-default
-// medium on 5.5) + Grok (omit-default "low"). Also reused by Azure (custom service).
+// medium on 5.5) + Grok (omit-default "low"). Azure mirrors openai exactly (its
+// deployments map to the same GPT-5 SKUs) — see its gated() entry below.
 const reasoningEffortOrNone: EffortShape = (e) => ({ reasoning_effort: e ?? "none" });
 // `reasoning_effort` binary high|none — Cohere (command-a-reasoning) + Mistral
 // (adjustable medium/small). Vendor exposes only two effective tiers, so any "on"
@@ -225,8 +234,10 @@ const minimaxThinking: EffortShape = (e) => ({ thinking: { type: e ? "adaptive" 
 // "本来就是关的":TokenHub 文档(1823/135872)给 hy3 的 thinking.type 三个合法
 // 取值 enabled/disabled/adaptive,但明写「默认关闭思考」,省略参数 = 不推理 =
 // 翻译要的行为。加开关的完整步骤见 registry.ts tokenhub models 上方的 playbook
-// (含 ⚠ 别用 reasoning_effort:"none")。NVIDIA NIM 自 v4-pro 移除后已没有任何
-// thinking 模型(registry nvidia 注释是权威),这里没有它的 builder 是对的。
+// (含 ⚠ 别用 reasoning_effort:"none")。NVIDIA NIM 的 thinking 不走本表 —— 它的
+// chat_template_kwargs 注入在 service 里内联 (buildNvidiaThinkingParams)；
+// 2026-09-25 随 deepseek-v4.1-flash 上架重新启用，NIM 默认关思考、省略=关，
+// 所以它既不需要显式 disable、也不进 SERVER_DEFAULT_THINKING_ON。
 
 // (No temperature handling here: providers whose lineup rejects/locks the param
 // simply omit `defaultTemperature` in their registry spec — the factory then
@@ -235,6 +246,11 @@ const minimaxThinking: EffortShape = (e) => ({ thinking: { type: e ? "adaptive" 
 const THINKING_BUILDERS: Partial<Record<OpenAICompatProviderKey, ExtraBodyBuilder>> = {
   // `reasoning_effort` enum, explicit "none" off (server-default-ON)
   openai: gated("openai", reasoningEffortOrNone),
+  // Azure 镜像 openai 同形态（部署名映射同一批 GPT-5 SKU，GPT-5.x omit→medium
+  // 意味着关闭态必须发显式 "none"）。gpt-chat-latest 在 registry 不打标签 →
+  // 走 listed-but-untagged 省略分支。旧版是手写 buildAzureReasoningBody，
+  // 2026-09-26 并入工厂后与 gated() 逐分支同构（tagged 2 态 / custom 3 态 / 省略）。
+  azureopenai: gated("azureopenai", reasoningEffortOrNone),
   // Grok:档位表在 registry 的 grok.models[].thinkingLevels(官方逐模型表)。
   // ⚠ off 态发【最低档 low】而不是 "none":官方枚举只有 low/medium/high/xhigh,
   // 并明写 "Reasoning cannot be disabled"。发 "none" 两种结局都坏 —— 被拒则
@@ -295,6 +311,13 @@ const THINKING_BUILDERS: Partial<Record<OpenAICompatProviderKey, ExtraBodyBuilde
       ? { reasoning_effort: pickThinkingLevel("cerebras", model!, e) }
       : reasoningEffortOrNone(e),
   ),
+  // 订阅套餐端点(registry 里 hidden,UI 默认不显示):火山 Coding Plan 与 doubao
+  // 按量线同为扁平 thinking:{type};阿里百炼线(2026-09 起为 Token Plan 端点)
+  // 与 qianfan 同为裸 enable_thinking —— 不能用 qwenThinking,那个 on 档额外带
+  // thinking_budget,且 qwen3.8 系列等在册 SKU 根本不吃 enable_thinking(registry
+  // 里未打 thinking 标,gated 对它们不发任何思考参数)。按 method key 分流。
+  volcengine: gated("volcengine", thinkingType),
+  alibaba: gated("alibaba", enableThinking),
   // (tokenhub intentionally absent — see note above)
 };
 
@@ -316,6 +339,7 @@ const makeOpenAICompat = (key: OpenAICompatProviderKey, extraBodyBuilder?: Extra
       defaultModel: spec.defaultModel,
       defaultTemperature: spec.defaultTemperature,
       extraHeaders: spec.extraHeaders,
+      sessionHeader: spec.sessionHeader,
       extraBody: extraBodyBuilder?.(params),
     });
 };
@@ -351,10 +375,24 @@ export const deepseek: TranslationService = async (params) => {
   }
 };
 
-// Dispatch map — base services + deepseek override (with CORS error rewrite).
+// Azure —— 工厂服务 + 一层 requireUrl 守卫。2026-09-26 并入 openai-compat 工厂
+// （前提事实：v1 API 接受裸 api-key 走 Authorization: Bearer，官方 key 认证示例
+// 就是裸 OpenAI 客户端 —— 见 registry azureopenai 条目注释）。守卫拦的是
+// 空/纯空白 URL：工厂对 openai-compat 的「留空 = 官方默认」兜底在这里不存在
+// （endpoint 恒空），fetch("") 会打到当前页面、被当可重试错误烧预算（机制见
+// 下方 nvidia 的 !!url?.trim() 注释）。URL_ALSO_REQUIRED 已在验证层拦过，
+// 这是第二道（手改存储/直调路径）。
+export const azureopenai: TranslationService = async (params) => {
+  requireUrl("Azure OpenAI", params.url);
+  return openAICompatServicesBase.azureopenai(params);
+};
+
+// Dispatch map — base services + deepseek override (with CORS error rewrite)
+// + azureopenai override (with requireUrl guard)。
 export const openAICompatServices: Record<OpenAICompatProviderKey, TranslationService> = {
   ...openAICompatServicesBase,
   deepseek,
+  azureopenai,
 };
 
 // --- Special-case services that don't fit the OpenAI-compatible pattern ---
@@ -421,61 +459,9 @@ export const gemini: TranslationService = async (params) => {
   return text.trim();
 };
 
-// Azure mirrors OpenAI's reasoning behavior (deployments map to GPT-5 SKUs), so it
-// reuses the same `reasoningEffortOrNone` shape: gpt-5.5 / gpt-chat-latest omit→
-// "medium" (ON) means a tagged deployment must send explicit "none" when off. A
-// custom (unlisted) deployment instead sends the effort ONLY on opt-in and omits
-// otherwise — same custom-model policy as gated() (off → 400-safe omit, on → user's
-// call). (Azure is a custom service, not in OPENAI_COMPAT_KEYS, so it can't use gated.)
-export const buildAzureReasoningBody = (deployment: string | undefined, reasoningEffort: ThinkingDirective | undefined): Record<string, unknown> => {
-  const model = deployment || (defaultConfigs.azureopenai.model as string);
-  // Tagged: 2-state (undefined → "none" disable, effort → that effort).
-  if (isThinkingModel("azureopenai", model)) return reasoningEffortOrNone(reasoningEffort === "auto" ? undefined : reasoningEffort);
-  // Custom deployment 3-state: "auto" → omit; default Off (undefined) → "none"; effort → that effort.
-  if (isCustomModel("azureopenai", model)) {
-    if (reasoningEffort === "auto") return {};
-    return reasoningEffortOrNone(reasoningEffort);
-  }
-  return {}; // listed-but-untagged → omit
-};
-
-export const azureopenai: TranslationService = async (params) => {
-  const { apiKey, url, model, apiVersion, reasoningEffort } = params;
-  const { effectiveSystemPrompt, prompt } = preparePrompts(params);
-  const endpoint = requireUrl("Azure OpenAI", url);
-  const deployment = model || defaultConfigs.azureopenai.model!;
-  const version = apiVersion || defaultConfigs.azureopenai.apiVersion!;
-  const requestUrl = `${endpoint}/openai/deployments/${deployment}/chat/completions?api-version=${version}`;
-
-  const key = requireApiKey("Azure OpenAI", apiKey);
-
-  // Azure deployment names mirror OpenAI model IDs; GPT-5 family supports
-  // `reasoning_effort` per docs.microsoft.com/azure/.../foundry-models-sold-by-azure.
-  // Orchestrator gates effort on (thinking-tagged ∧ user picked an effort).
-  // No max_tokens passthrough — same rationale as openAICompatRequest above.
-  //
-  // No temperature — Microsoft lists it under "Not Supported" for the whole
-  // GPT-5 reasoning family (runtime evidence: 400, not ignore); provider-level
-  // omit, the config has no temperature field (registry).
-  const requestBody: Record<string, unknown> = {
-    messages: [
-      { role: "system", content: effectiveSystemPrompt },
-      { role: "user", content: prompt },
-    ],
-    ...buildAzureReasoningBody(deployment, reasoningEffort),
-  };
-
-  const data = await fetchJSON(requestUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "api-key": key,
-    },
-    body: JSON.stringify(requestBody),
-    signal: params.signal,
-  });
-  return getOpenAICompatContent(data, "Azure OpenAI");
-};
+// Azure 的 service 与思考参数已并入 openai-compat 工厂（见上方 THINKING_BUILDERS
+// 的 azureopenai 行 + 带 requireUrl 守卫的 wrapper）—— 旧的 buildAzureReasoningBody
+// 与手写 fetch 整体删除，逐分支语义由 gated() 原样承接。
 
 // Yandex AI Studio — protocol-wise plain OpenAI-compat chat/completions, but a
 // custom service because the factory can't assemble per-tenant model URIs:
@@ -487,7 +473,7 @@ export const azureopenai: TranslationService = async (params) => {
 // Relay: useRelay defaults ON in registry defaults (upstream sends no CORS
 // headers as of 2026-06 — preflight OPTIONS is parsed as a JSON body → 400),
 // but the toggle stays user-controllable like every relay-capable provider.
-// Pure URI assembly, exported for unit tests (same pattern as buildAzureReasoningBody).
+// Pure URI assembly, exported for unit tests (same pattern as buildGeminiThinkingConfig).
 export const buildYandexModelUri = (model: string | undefined, folderId: string | undefined): string => {
   // Trim BEFORE the fallback: a whitespace-only model is truthy, so `model || default`
   // would "fall back" to "" and ship a malformed `gpt://<folder>/` to the wire.
@@ -667,7 +653,7 @@ export const buildGeminiThinkingConfig = (model: string, directive: ThinkingDire
 };
 
 // Pure request-shaping for Claude's two thinking generations — exported for
-// thinking.test.ts (same pattern as buildAzureReasoningBody). Membership
+// thinking.test.ts (same pattern as buildYandexModelUri). Membership
 // predicate lives in the registry (isAdaptiveThinkingClaude).
 //   - Adaptive gen (Opus 4.7/4.8, Sonnet 5, Fable 5, Mythos): effort →
 //     thinking:{type:"adaptive"} + output_config.effort; off → explicit
