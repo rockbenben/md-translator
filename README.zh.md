@@ -161,7 +161,7 @@ yarn cli -i post.md -t de -m deepseek --md-translate-frontmatter --md-no-link-te
 
 ## 自行部署
 
-需要 Node.js >= 20.9.0 与 Yarn（或 npm / pnpm）。
+需要 Node.js >= 24 与 Yarn（或 npm / pnpm）。
 
 ```bash
 git clone https://github.com/rockbenben/md-translator.git
