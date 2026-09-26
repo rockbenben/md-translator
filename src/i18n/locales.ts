@@ -9,7 +9,7 @@
  */
 
 // 应用【支持】的全部语言 —— 类型上的单一事实源。
-export const ALL_LOCALES = ["en", "zh", "zh-hant", "pt", "es", "hi", "ar", "fr", "de", "ja", "ko", "ru", "vi", "th", "tr", "bn", "id", "it"] as const;
+export const ALL_LOCALES = ["en", "zh", "zh-hant", "pt", "es", "hi", "ar", "fr", "de", "ja", "ko", "ru", "vi", "th", "tr", "bn", "id", "it", "hu"] as const;
 export type AppLocale = (typeof ALL_LOCALES)[number];
 
 // 单语言构建开关：scripts/buildWithLang.js 用它把本次【构建产出】收敛到一个 locale，
