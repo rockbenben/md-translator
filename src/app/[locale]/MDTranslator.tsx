@@ -314,7 +314,7 @@ const MDTranslator = () => {
               <Button
                 type="primary"
                 size="large"
-                icon={<GlobalOutlined spin={isTranslating} />}
+                icon={<GlobalOutlined spin={isTranslating} aria-hidden />}
                 className="flex-1"
                 onClick={() => (uploadMode === "single" ? handleSingleTranslate() : runBatchTranslation(performTranslation, multipleFiles, readFile, t("noFileUploaded")))}
                 disabled={isTranslating}
@@ -323,7 +323,7 @@ const MDTranslator = () => {
               </Button>
 
               {uploadMode === "single" && sourceText && (
-                <Button size="large" onClick={handleExtractText} icon={<FormatPainterOutlined />}>
+                <Button size="large" onClick={handleExtractText} icon={<FormatPainterOutlined aria-hidden />}>
                   {t("extractText")}
                 </Button>
               )}
@@ -399,8 +399,8 @@ const MDTranslator = () => {
             {LLM_MODELS.includes(translationMethod) && (
               <>
                 <ContextTranslationBlock enabled={contextAware} onEnabledChange={setContextAware} disabled={isTranslating} />
-                <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, marginTop: -8, marginBottom: 12, paddingLeft: 4 }}>
-                  <InfoCircleOutlined style={{ marginRight: 4 }} />
+                <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, marginTop: -8, marginBottom: 12, paddingInlineStart: 4 }}>
+                  <InfoCircleOutlined style={{ marginInlineEnd: 4 }} />
                   {tMarkdown("contextAwareRawNote")}
                 </Typography.Text>
               </>
@@ -416,7 +416,7 @@ const MDTranslator = () => {
                   key: "markdown",
                   label: (
                     <Space>
-                      <FileMarkdownOutlined />
+                      <FileMarkdownOutlined aria-hidden />
                       <Text strong>{tMarkdown("translationOptions")}</Text>
                     </Space>
                   ),
@@ -481,7 +481,7 @@ const MDTranslator = () => {
                   key: "advanced",
                   label: (
                     <Space>
-                      <ControlOutlined />
+                      <ControlOutlined aria-hidden />
                       <Text strong>{t("advancedSettings")}</Text>
                     </Space>
                   ),
