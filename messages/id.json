@@ -66,12 +66,12 @@
     "noTargetLanguage": "Pilih setidaknya satu bahasa target.",
     "translationError": "Terjemahan gagal",
     "translationCancelled": "Terjemahan dibatalkan",
-    "translationStopped": "Berhenti",
+    "translationStopped": "Dihentikan",
     "resumeFromCache": "Baris yang sudah diterjemahkan tersimpan di cache — terjemahkan lagi untuk melanjutkan dari titik berhenti",
-    "cancelKeepsProgress": "Membatalkan tetap menyimpan hasil yang sudah ada",
+    "cancelKeepsProgress": "Pembatalan tetap menyimpan hasil yang sudah ada",
     "dismiss": "Tutup",
     "translationAPI": "API Terjemahan",
-    "enter": "Masuk",
+    "enter": "Masukkan",
     "getApiKey": "Dapatkan Kunci API",
     "charLabel": "Karakter",
     "lineLabel": "Baris",
@@ -153,14 +153,14 @@
     "customExportFilenameTooltip": "'{'name'}' = nama file asli, '{'lang'}' = bahasa, '{'ext'}' = ekstensi, '{'date'}' = tanggal, '{'time'}' = waktu; dalam mode multibahasa, '{'lang'}' ditambahkan otomatis untuk mencegah bentrokan nama",
     "partialFailureTitle": "{count} baris gagal diterjemahkan",
     "partialFailureDesc": "Baris-baris itu tetap berisi teks asli, jadi struktur berkas utuh. Coba lagi hanya mengirim ulang baris tersebut; sisanya dari cache.",
-    "partialFailureWhy": "Umum pada layanan gratis dan swa-inang — biasanya bukan masalah pengaturan Anda.",
+    "partialFailureWhy": "Umum pada layanan gratis dan self-hosted — biasanya bukan masalah pengaturan Anda.",
     "retryFailedLines": "Coba lagi baris yang gagal",
     "viewFailedLines": "Lihat baris yang gagal",
     "failedLinesModalTitle": "{count} baris yang gagal",
     "copyAllFailed": "Salin semua",
     "closeFailedLinesModal": "Tutup",
     "failedLanguagesTitle": "{count} bahasa target gagal",
-    "failedLanguagesDesc": "Semua batch untuk bahasa-bahasa ini gagal — biasanya karena masalah LLM lokal, batas tingkat API, atau penolakan model terhadap bahasa tertentu. Salin kode dan jalankan ulang hanya untuk mereka (tempelkan di 'Pengaturan Multi-Bahasa'); yang lain akan dilewati dari cache.",
+    "failedLanguagesDesc": "Semua batch untuk bahasa-bahasa ini gagal — biasanya karena masalah LLM lokal, batas laju API, atau penolakan model terhadap bahasa tertentu. Salin kode dan jalankan ulang hanya untuk mereka (tempelkan di 'Pengaturan Multi-Bahasa'); yang lain akan dilewati dari cache.",
     "copyAllFailedLanguages": "Salin kode bahasa",
     "apiStatusFreeApi": "Free API",
     "apiStatusNeedsConfig": "Perlu konfig.",
@@ -217,7 +217,22 @@
     "errorHintRelay403": "API mengembalikan 403 Forbidden — aktifkan \"Relay API\" di \"Pengaturan Provider lain\"",
     "errorHintCors": "Tidak dapat terhubung ke alamat ini — periksa alamatnya dan pastikan layanan mengizinkan permintaan lintas-asal (CORS). Gateway mandiri dan model lokal harus mengaktifkannya sendiri, atau gunakan Relay API milik Anda",
     "errorHintGeminiKey": "Tidak dapat terhubung ke Gemini: periksa jaringan Anda terlebih dahulu (beberapa jaringan tidak dapat mengakses layanan Google secara langsung). Jika jaringan baik-baik saja, sejak 19 Juni 2026 Google menolak kunci API tanpa pembatasan — buat ulang kunci di AI Studio (dibatasi secara default) atau tambahkan pembatasan Gemini API pada kunci lama di Google Cloud Console",
-    "rateLimitCooldown": "Batas permintaan tercapai — jeda sejenak, akan dicoba ulang otomatis"
+    "rateLimitCooldown": "Batas permintaan tercapai — jeda sejenak, akan dicoba ulang otomatis",
+    "faqHeading": "Pertanyaan umum",
+    "homeIndexEyebrow": "Indeks",
+    "homeCategoryEyebrow": "{n} kategori",
+    "openNavigation": "Buka navigasi",
+    "goHome": "Kembali ke beranda",
+    "primaryNav": "Navigasi utama",
+    "toggleTheme": "Ganti tema",
+    "communityLinks": "Tautan komunitas",
+    "viewOnGitHub": "Lihat di GitHub",
+    "toolCategories": "Kategori alat",
+    "searchLanguage": "Cari bahasa",
+    "selectLanguage": "Pilih bahasa",
+    "noMatchFound": "Tidak ada hasil",
+    "backToTop": "Kembali ke atas",
+    "exportOptions": "Opsi ekspor"
   },
   "MDTranslator": {
     "clientDescription": "Unggah file Markdown atau tempel teks. Mempertahankan format, kode, dan rumus dengan cerdas. Terjemahan satu klik ke berbagai bahasa.",
@@ -270,7 +285,7 @@
     "batchSize": "Baris simultan",
     "batchSizeExtra": "Permintaan simultan dalam mode tanpa konteks. Terlalu tinggi memicu batas laju API",
     "contextBatchSize": "Konkurensi Mode Konteks",
-    "contextBatchSizeExtra": "Batch simultan dalam mode konteks. Sesuaikan «baris konteks» dulu —— lebih aman untuk kecepatan. Menambah ini berisiko batas",
+    "contextBatchSizeExtra": "Batch simultan dalam mode konteks. Sesuaikan «baris konteks» dulu —— lebih aman untuk kecepatan. Menambah ini berisiko kena batas laju",
     "maxTokens": "Token Maksimum",
     "maxTokensExtra": "Batas token output model. 0 = tanpa batas (default vendor). Atur 2048-4096 untuk model lokal (Ollama/llama.cpp) yang terjebak loop repetisi. Mencapai batas memicu error yang terlihat (tidak ada terjemahan setengah jadi di cache); jika terjemahan panjang yang sah terpotong, naikkan nilai ini.",
     "contextWindow": "Baris konteks",
@@ -326,11 +341,11 @@
       "title": "Penerjemah Markdown",
       "description": "Terjemahan Markdown batch, pertahankan format dan kode",
       "metaTitle": "Penerjemah Markdown | Kode, LaTeX & Front Matter Terjaga",
-      "metaDescription": "Penerjemah Markdown menjaga blok kode, LaTeX, tautan, Front Matter. 25+ mesin AI: DeepSeek, Claude, GPT. Hugo, Jekyll, Docusaurus.",
+      "metaDescription": "Penerjemah Markdown menjaga blok kode, LaTeX, tautan, Front Matter. 30+ mesin AI: DeepSeek, Claude, GPT. Hugo, Jekyll, Docusaurus.",
       "faq": [
         {
           "q": "Alat terjemahan Markdown gratis mana yang paling baik?",
-          "a": "MDTranslator adalah penerjemah Markdown gratis, open-source, sisi browser: sumber tidak pernah meninggalkan mesin Anda, kunci API tetap di localStorage. Mendukung Google free translate plus DeepSeek, Claude, GPT, Gemini, DeepL — total 25+ mesin, mencakup 120+ bahasa target. Otomatis melewati blok kode, rumus LaTeX, URL, dan Front Matter, Anda dapat menerbitkan langsung ke Hugo, Jekyll, Hexo, VitePress, atau Docusaurus tanpa perbaikan format manual."
+          "a": "MDTranslator adalah penerjemah Markdown gratis, open-source, sisi browser: sumber tidak pernah meninggalkan mesin Anda, kunci API tetap di localStorage. Mendukung Google Translate gratis beserta DeepSeek, Claude, GPT, Gemini, DeepL — total 30+ mesin, mencakup 120+ bahasa target. Otomatis melewati blok kode, rumus LaTeX, URL, dan Front Matter, Anda dapat menerbitkan langsung ke Hugo, Jekyll, Hexo, VitePress, atau Docusaurus tanpa perbaikan format manual."
         },
         {
           "q": "Bagaimana cara mempertahankan blok kode dan rumus saat menerjemahkan Markdown?",
@@ -338,7 +353,7 @@
         },
         {
           "q": "Dokumentasi teknis: mesin terjemahan atau terjemahan AI/LLM? Mana yang paling cocok?",
-          "a": "AI/LLM sangat direkomendasikan untuk konten teknis; mesin terjemahan hanya cocok untuk pratinjau cepat. Model AI/LLM mengenali nama library, fungsi, dan variabel dalam konteks tanpa salah menerjemahkan — Claude Sonnet memimpin pada akurasi terminologi dokumen API, DeepSeek menawarkan nilai sangat baik (standar de-facto untuk blog teknis Mandarin), Gemini 3 Pro cocok untuk dokumentasi sebesar buku (konteks 1M token). Mesin terjemahan (Google gratis, DeepL) hanya cocok untuk pratinjau cepat — dokumen Markdown panjang akan terpotong dan istilah teknis mudah salah diterjemahkan menjadi kata sehari-hari. Konfigurasi mesin dapat dibagikan dengan [Penerjemah Subtitle](../subtitle-translator) dan [Penerjemah JSON](../json-translate)."
+          "a": "AI/LLM sangat direkomendasikan untuk konten teknis; mesin terjemahan hanya cocok untuk pratinjau cepat. Model AI/LLM mengenali nama library, fungsi, dan variabel dalam konteks tanpa salah menerjemahkan — Claude Sonnet memimpin pada akurasi terminologi dokumen API, DeepSeek menawarkan nilai sangat baik (standar de-facto untuk blog teknis Mandarin), Gemini cocok untuk dokumentasi sebesar buku (konteks 1M token). Mesin terjemahan (Google gratis, DeepL) hanya cocok untuk pratinjau cepat — dokumen Markdown panjang akan terpotong dan istilah teknis mudah salah diterjemahkan menjadi kata sehari-hari. Konfigurasi mesin dapat dibagikan dengan [Penerjemah Subtitle](../subtitle-translator) dan [Penerjemah JSON](../json-translate)."
         },
         {
           "q": "Bagaimana menerjemahkan README GitHub atau seluruh situs dokumentasi VitePress / Docusaurus?",
@@ -362,7 +377,7 @@
         }
       ],
       "features": [
-        "Preservasi blok kode, LaTeX, link",
+        "Pertahankan blok kode, LaTeX, tautan",
         "Terjemahan Front Matter opsional",
         "Unggah batch Markdown",
         "Kompatibel Hugo, Jekyll, Hexo",
@@ -382,7 +397,7 @@
       "description": "Pencocokan regex, pengurutan, penyaringan, dan pemrosesan teks batch"
     },
     "dataBatch": {
-      "title": "Pemrosesan Teks Pribadi",
+      "title": "Pemrosesan Data Batch",
       "description": "Pemrosesan data Excel batch — deduplikasi, ekstraksi kolom, gabung teks, aturan berurutan"
     },
     "textJoiner": {
@@ -445,8 +460,8 @@
     "externalTools": {
       "legendtalk": "Meja Bundar Pemikir AI",
       "imgprompt": "Prompt Gambar AI",
-      "lives": "Thousand Lives",
-      "learndata": "LearnData Catatan Sumber Terbuka"
+      "learndata": "LearnData Catatan Sumber Terbuka",
+      "hub365": "365 Sumber Terbuka"
     }
   },
   "Metadata": {
@@ -454,14 +469,14 @@
     "description": "ToolsByAI: 19 alat open source untuk menerjemahkan subtitle, Markdown, dan JSON i18n. Tanpa instalasi, berbasis browser.",
     "homeTitle": "Suite ToolsByAI",
     "homeDescription": "19 alat untuk terjemahan, teks, JSON, dan konversi data. Tingkatkan efisiensi pengembang dan kreator.",
-    "ogTitle": "ToolsByAI - Alat Dev AI Gratis dan Open Source",
+    "ogTitle": "ToolsByAI - Peralatan Data & Terjemahan AI untuk Developer",
     "ogDescription": "ToolsByAI: 19 alat open source untuk menerjemahkan subtitle, Markdown, dan JSON i18n. Tanpa instalasi, berbasis browser."
   },
   "languages": {
     "auto": "Deteksi Otomatis",
     "en": "Inggris",
     "zh": "Mandarin",
-    "zh-hant": "Mandarin Tradisional",
+    "zh-hant": "Tionghoa Tradisional",
     "es": "Spanyol",
     "fr": "Prancis",
     "de": "Jerman",
@@ -598,7 +613,7 @@
     "reaction3": "Apa?",
     "reaction4": "Bingung",
     "placeholder": "Tinggalkan pesan (tidak perlu login, email opsional untuk balasan)",
-    "metaDescription": "Halaman feedback Tools By AI: laporkan bug, sarankan fitur, atau bagikan ide. Berbasis Waline, posting anonim, gratis."
+    "metaDescription": "Halaman Umpan Balik Tools By AI: laporkan bug, sarankan fitur, atau bagikan ide. Berbasis Waline, posting anonim, gratis."
   },
   "AppError": {
     "title": "Halaman gagal dimuat",

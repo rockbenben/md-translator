@@ -71,7 +71,7 @@
     "cancelKeepsProgress": "Annullare mantiene quanto già tradotto",
     "dismiss": "Chiudi",
     "translationAPI": "API di Traduzione",
-    "enter": "Invio",
+    "enter": "Inserisci",
     "getApiKey": "Ottieni Chiave API",
     "charLabel": "Caratteri",
     "lineLabel": "Righe",
@@ -128,10 +128,10 @@
     "result": "Risultato",
     "exportSettingTooltip": "Esporta configurazione su file",
     "importSettingTooltip": "Importa configurazione da file",
-    "exportSettingSuccess": "Impostazioni esportate",
+    "exportSettingSuccess": "Configurazione esportata",
     "exportSettingError": "Esportazione fallita, riprova",
     "dictLoadFailed": "Impossibile caricare il dizionario di conversione: controlla la rete o ricarica la pagina",
-    "importSettingSuccess": "Impostazioni importate",
+    "importSettingSuccess": "Configurazione importata",
     "importSettingError": "Importazione fallita, riprova",
     "removeCharsAfterTranslation": "Rimuovi caratteri dopo traduzione",
     "removeCharsAfterTranslationTooltip": "Rimuovi automaticamente caratteri specificati dopo la traduzione (separare con spazi)",
@@ -152,7 +152,7 @@
     "customExportFilename": "Modello nome file",
     "customExportFilenameTooltip": "'{'name'}' = nome originale, '{'lang'}' = lingua, '{'ext'}' = estensione, '{'date'}' = data, '{'time'}' = ora; in modalità multilingua '{'lang'}' viene aggiunto automaticamente per evitare conflitti di nome",
     "partialFailureTitle": "{count} riga/righe non riuscite",
-    "partialFailureDesc": "Quelle righe conservano il testo originale, quindi la struttura del file è intatta. Riprova reinvia solo quelle; il resto arriva dalla cache.",
+    "partialFailureDesc": "Quelle righe conservano il testo originale, quindi la struttura del file è intatta. Riprova: reinvia solo quelle; il resto arriva dalla cache.",
     "partialFailureWhy": "Frequente con servizi gratuiti e self-hosted — di solito non dipende dalla tua configurazione.",
     "retryFailedLines": "Riprova le righe non riuscite",
     "viewFailedLines": "Visualizza righe non riuscite",
@@ -160,7 +160,7 @@
     "copyAllFailed": "Copia tutto",
     "closeFailedLinesModal": "Chiudi",
     "failedLanguagesTitle": "{count} lingua(e) di destinazione fallite",
-    "failedLanguagesDesc": "Tutti i batch per queste lingue sono falliti — di solito a causa di problemi LLM locali, limiti di velocità API o rifiuto del modello per una lingua specifica. Copia i codici e riavvia solo per esse (incolla in 'Impostazioni multilingue'); le altre utilizzeranno la cache e saranno saltate.",
+    "failedLanguagesDesc": "Tutti i batch per queste lingue sono falliti — di solito a causa di problemi LLM locali, limiti di velocità API o rifiuto del modello per una lingua specifica. Copia i codici e riavvia la traduzione solo per quelle lingue (incolla in 'Impostazioni multilingue'); le altre utilizzeranno la cache e saranno saltate.",
     "copyAllFailedLanguages": "Copia codici lingua",
     "apiStatusFreeApi": "Free API",
     "apiStatusNeedsConfig": "Config. necessaria",
@@ -217,7 +217,22 @@
     "errorHintRelay403": "L'API ha restituito 403 Forbidden: attiva \"Relay API\" in «Altre impostazioni Provider»",
     "errorHintCors": "Impossibile raggiungere questo indirizzo: controlla l'indirizzo e che il servizio consenta richieste cross-origin (CORS). I gateway self-hosted e i modelli locali devono abilitarlo, oppure usa il tuo Relay API",
     "errorHintGeminiKey": "Impossibile raggiungere Gemini: controlla prima la rete (alcune reti non raggiungono direttamente i servizi Google). Se la rete funziona, dal 19 giugno 2026 Google rifiuta le chiavi API senza restrizioni — rigenera la chiave in AI Studio (limitata per impostazione predefinita) o aggiungi una restrizione Gemini API alla vecchia chiave nella console Google Cloud",
-    "rateLimitCooldown": "Limite di richieste raggiunto — breve pausa, nuovo tentativo automatico"
+    "rateLimitCooldown": "Limite di richieste raggiunto — breve pausa, nuovo tentativo automatico",
+    "faqHeading": "Domande frequenti",
+    "homeIndexEyebrow": "Indice",
+    "homeCategoryEyebrow": "{n} categorie",
+    "openNavigation": "Apri navigazione",
+    "goHome": "Vai alla home page",
+    "primaryNav": "Navigazione principale",
+    "toggleTheme": "Cambia tema",
+    "communityLinks": "Link della community",
+    "viewOnGitHub": "Vedi su GitHub",
+    "toolCategories": "Categorie degli strumenti",
+    "searchLanguage": "Cerca lingua",
+    "selectLanguage": "Seleziona lingua",
+    "noMatchFound": "Nessun risultato",
+    "backToTop": "Torna in alto",
+    "exportOptions": "Opzioni di esportazione"
   },
   "MDTranslator": {
     "clientDescription": "Carica file Markdown o incolla testo. Preserva intelligentemente formato, codice e formule. Traduzione in un clic in più lingue.",
@@ -261,7 +276,7 @@
     "systemPrompt": "Prompt Sistema",
     "systemPromptExtra": "Prompt sistema per traduzione LLM, lasciare vuoto per predefinito",
     "userPrompt": "Prompt Utente",
-    "userPromptExtra": "Prompt traduzione personalizzato, lasciare vuoto per predefinito. Variáveis:",
+    "userPromptExtra": "Prompt traduzione personalizzato, lasciare vuoto per predefinito. Variabili:",
     "for": "per",
     "textToTranslate": "testo da tradurre",
     "fullText": "testo completo",
@@ -272,7 +287,7 @@
     "contextBatchSize": "Concorrenza Modalità Contesto",
     "contextBatchSizeExtra": "Batch simultanei in modalità contesto. Regola prima «righe di contesto» — più sicuro per la velocità. Aumentare questo rischia limiti",
     "maxTokens": "Token Massimi",
-    "maxTokensExtra": "Limite di token in uscita del modello. 0 = senza limite (predefinito del fornitore). Impostare 2048-4096 per modelli locali (Ollama/llama.cpp) con loop di ripetizione. Raggiungere il limite genera un errore visibile (nessuna traduzione parziale in cache); se una traduzione lunga legittima viene troncata, aumenta questo valore.",
+    "maxTokensExtra": "Limite di token in uscita del modello. 0 = senza limite (predefinito del fornitore). Impostare 2048-4096 per modelli locali (Ollama/llama.cpp) per evitare i loop di ripetizione. Raggiungere il limite genera un errore visibile (nessuna traduzione parziale in cache); se una traduzione lunga legittima viene troncata, aumenta questo valore.",
     "contextWindow": "Righe di contesto",
     "contextWindowExtra": "Righe per batch. Più alto = meno richieste e più velocità, ma può superare il limite di token del modello",
     "delayTime": "Ritardo",
@@ -298,7 +313,7 @@
     "presetDeleteConfirm": "Eliminare questo preset?",
     "presetEmptyHint": "Nessun preset ancora — modifica e clicca Salva",
     "presetDefault": "Prompt predefinito",
-    "presetDefaultReadonly": "Il prompt predefinito è integrato: non può essere modificato né eliminato. Usa \"Salva come nuova preimpostazione\" per personalizzare.",
+    "presetDefaultReadonly": "Il prompt predefinito è integrato: non può essere modificato né eliminato. Usa \"Salva come nuovo preset\" per personalizzare.",
     "qwenMtDomains": "Prompt di dominio (solo in inglese)",
     "sendSystemPrompt": "Invia prompt system",
     "sendSystemPromptExtra": "Disattivare solo quando il chat template rifiuta il ruolo system — errore tipico \"Conversations must start with a user prompt\" (es. famiglia Gemma).",
@@ -326,11 +341,11 @@
       "title": "Traduttore Markdown",
       "description": "Traduzione Markdown in batch, preserva formato e codice",
       "metaTitle": "Traduttore Markdown | Preserva codice, LaTeX e Front Matter",
-      "metaDescription": "Traduttore Markdown che preserva blocchi di codice, LaTeX, link, Front Matter. 25+ motori IA: DeepSeek, Claude, GPT. Hugo, Jekyll.",
+      "metaDescription": "Traduttore Markdown che preserva blocchi di codice, LaTeX, link, Front Matter. 30+ motori IA: DeepSeek, Claude, GPT. Hugo, Jekyll.",
       "faq": [
         {
           "q": "Quale strumento gratuito di traduzione Markdown funziona meglio?",
-          "a": "MDTranslator è un traduttore Markdown gratuito, open-source e lato browser: la sorgente non lascia mai la tua macchina, la chiave API rimane in localStorage. Supporta Google free translate più DeepSeek, Claude, GPT, Gemini, DeepL — 25+ motori in totale, coprendo 120+ lingue di destinazione. Salta automaticamente blocchi di codice, formule LaTeX, URL e Front Matter, puoi pubblicare direttamente su Hugo, Jekyll, Hexo, VitePress o Docusaurus senza riparazione manuale."
+          "a": "MDTranslator è un traduttore Markdown gratuito, open-source e lato browser: la sorgente non lascia mai la tua macchina, la chiave API rimane in localStorage. Supporta Google free translate più DeepSeek, Claude, GPT, Gemini, DeepL — 30+ motori in totale, coprendo 120+ lingue di destinazione. Salta automaticamente blocchi di codice, formule LaTeX, URL e Front Matter, puoi pubblicare direttamente su Hugo, Jekyll, Hexo, VitePress o Docusaurus senza riparazione manuale."
         },
         {
           "q": "Come preservare blocchi di codice e formule durante la traduzione Markdown?",
@@ -338,7 +353,7 @@
         },
         {
           "q": "Documentazione tecnica: traduzione automatica o traduzione IA/LLM? Quale è l'opzione migliore?",
-          "a": "IA/LLM è fortemente raccomandata per contenuti tecnici; la traduzione automatica è adatta solo per anteprime rapide. I modelli IA/LLM riconoscono nomi di librerie, funzioni e variabili nel contesto senza tradurli erroneamente — Claude Sonnet guida per precisione terminologica della documentazione API, DeepSeek offre un valore eccellente (standard di fatto per blog tecnici cinesi), Gemini 3 Pro si adatta a documentazione delle dimensioni di un libro (contesto 1M token). La traduzione automatica (Google free, DeepL) è adatta solo per anteprime rapide: i documenti Markdown lunghi vengono troncati e i termini tecnici finiscono spesso tradotti come parole di uso comune. La configurazione del motore può essere condivisa con [Traduttore Sottotitoli](../subtitle-translator) e [Traduttore JSON](../json-translate)."
+          "a": "IA/LLM è fortemente raccomandata per contenuti tecnici; la traduzione automatica è adatta solo per anteprime rapide. I modelli IA/LLM riconoscono nomi di librerie, funzioni e variabili nel contesto senza tradurli erroneamente — Claude Sonnet guida per precisione terminologica della documentazione API, DeepSeek offre un valore eccellente (standard di fatto per blog tecnici cinesi), Gemini si adatta a documentazione delle dimensioni di un libro (contesto 1M token). La traduzione automatica (Google free, DeepL) è adatta solo per anteprime rapide: i documenti Markdown lunghi vengono troncati e i termini tecnici finiscono spesso tradotti come parole di uso comune. La configurazione del motore può essere condivisa con [Traduttore Sottotitoli](../subtitle-translator) e [Traduttore JSON](../json-translate)."
         },
         {
           "q": "Come traduco un README GitHub o un intero sito di documentazione VitePress / Docusaurus?",
@@ -374,7 +389,7 @@
       "description": "Dividi testi lunghi per separatore, lunghezza o frase — e riuniscili"
     },
     "chineseConversion": {
-      "title": "Conversor Semp/Trad",
+      "title": "Convertitore Sempl/Trad",
       "description": "Supporta caricamento file ed elaborazione in batch per convertire semplificato, tradizionale di Taiwan/Hong Kong e shinjitai giapponese"
     },
     "novelProcessor": {
@@ -386,7 +401,7 @@
       "description": "Integra corrispondenza regex, ordinamento, filtraggio e altre funzionalità per elaborazione in batch"
     },
     "dataBatch": {
-      "title": "Elaboratore di Testo",
+      "title": "Elaboratore di dati batch",
       "description": "Elaborazione batch di dati Excel — deduplicazione, estrazione colonne, fusione, regole concatenate"
     },
     "textJoiner": {
@@ -402,7 +417,7 @@
       "description": "Modifica nodi JSON in batch, prefisso/suffisso/sostituisci"
     },
     "jsonValueTransformer": {
-      "title": "Mappatore Valore JSON",
+      "title": "Mappatore Valori JSON",
       "description": "Mappatura e migrazione valori con JSONPath"
     },
     "jsonValueSwapper": {
@@ -445,17 +460,17 @@
     "externalTools": {
       "legendtalk": "Tavola rotonda dei pensatori IA",
       "imgprompt": "Prompt per immagini IA",
-      "lives": "Thousand Lives",
-      "learndata": "LearnData Note Open Source"
+      "learndata": "LearnData Note Open Source",
+      "hub365": "365 Open Source"
     }
   },
   "Metadata": {
     "title": "ToolsByAI - Utility Sviluppatori & Traduzione IA Online",
-    "description": "ToolsByAI: 19 strumenti open source gratuiti per traduzione sottotitoli, Markdown, JSON i18n e elaborazione batch. 25+ motori IA.",
+    "description": "ToolsByAI: 19 strumenti open source gratuiti per traduzione sottotitoli, Markdown, JSON i18n e elaborazione batch. 30+ motori IA.",
     "homeTitle": "Suite ToolsByAI",
     "homeDescription": "19 strumenti per traduzione, testo, JSON e conversione dati. Potenzia l'efficienza di sviluppatori e creatori.",
-    "ogTitle": "ToolsByAI - Strumenti Dev IA Gratuiti e Open Source",
-    "ogDescription": "ToolsByAI: 19 strumenti open source gratuiti per traduzione sottotitoli, Markdown, JSON i18n e elaborazione batch. 25+ motori IA."
+    "ogTitle": "ToolsByAI - Utility Sviluppatori & Traduzione IA Online",
+    "ogDescription": "ToolsByAI: 19 strumenti open source gratuiti per traduzione sottotitoli, Markdown, JSON i18n e elaborazione batch. 30+ motori IA."
   },
   "languages": {
     "auto": "Rilevamento Auto",

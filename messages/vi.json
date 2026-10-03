@@ -217,7 +217,22 @@
     "errorHintRelay403": "API trả về 403 Forbidden — hãy bật \"Chuyển tiếp API\" trong \"Thêm cài đặt Provider\"",
     "errorHintCors": "Không thể kết nối tới địa chỉ này — hãy kiểm tra địa chỉ và xem dịch vụ có cho phép yêu cầu khác nguồn (CORS) hay không. Cổng tự dựng và mô hình cục bộ phải tự bật, hoặc dùng Chuyển tiếp API của riêng bạn",
     "errorHintGeminiKey": "Không thể kết nối Gemini: hãy kiểm tra mạng trước (một số mạng không thể truy cập trực tiếp dịch vụ Google). Nếu mạng bình thường, từ 19/06/2026 Google từ chối các API key không giới hạn — hãy tạo lại key trong AI Studio (mặc định đã giới hạn) hoặc thêm giới hạn Gemini API cho key cũ trong Google Cloud Console",
-    "rateLimitCooldown": "Đạt giới hạn yêu cầu — tạm dừng một lát rồi tự động thử lại"
+    "rateLimitCooldown": "Đạt giới hạn yêu cầu — tạm dừng một lát rồi tự động thử lại",
+    "faqHeading": "Câu hỏi thường gặp",
+    "homeIndexEyebrow": "Mục lục",
+    "homeCategoryEyebrow": "{n} danh mục",
+    "openNavigation": "Mở điều hướng",
+    "goHome": "Về trang chủ",
+    "primaryNav": "Điều hướng chính",
+    "toggleTheme": "Đổi giao diện",
+    "communityLinks": "Liên kết cộng đồng",
+    "viewOnGitHub": "Xem trên GitHub",
+    "toolCategories": "Danh mục công cụ",
+    "searchLanguage": "Tìm ngôn ngữ",
+    "selectLanguage": "Chọn ngôn ngữ",
+    "noMatchFound": "Không có kết quả",
+    "backToTop": "Lên đầu trang",
+    "exportOptions": "Tùy chọn xuất"
   },
   "MDTranslator": {
     "clientDescription": "Tải lên tệp Markdown hoặc dán văn bản. Giữ nguyên định dạng, mã và công thức một cách thông minh. Dịch sang nhiều ngôn ngữ chỉ bằng một cú nhấp chuột.",
@@ -270,7 +285,7 @@
     "batchSize": "Số dòng đồng thời",
     "batchSizeExtra": "Yêu cầu đồng thời trong chế độ không ngữ cảnh. Quá cao sẽ kích hoạt giới hạn API",
     "contextBatchSize": "Đồng thời Chế độ Ngữ cảnh",
-    "contextBatchSizeExtra": "Lô đồng thời trong chế độ ngữ cảnh. Điều chỉnh «dòng ngữ cảnh» trước —— an toàn hơn cho tốc độ. Tăng cái này có rủi ro giới hạn",
+    "contextBatchSizeExtra": "Lô đồng thời trong chế độ ngữ cảnh. Điều chỉnh «dòng ngữ cảnh» trước — cách tăng tốc an toàn hơn. Tăng giá trị này dễ chạm giới hạn",
     "maxTokens": "Số Token Tối Đa",
     "maxTokensExtra": "Giới hạn token đầu ra của model. 0 = không giới hạn (mặc định nhà cung cấp). Đặt 2048-4096 cho model nội bộ (Ollama/llama.cpp) khi gặp vòng lặp lặp lại. Chạm giới hạn sẽ báo lỗi rõ ràng (không có nửa bản dịch trong cache); nếu bản dịch dài hợp lệ bị cắt, hãy tăng giá trị này.",
     "contextWindow": "Số dòng ngữ cảnh",
@@ -289,7 +304,7 @@
     "presetSelect": "Chọn cài đặt sẵn",
     "presetSave": "Lưu như cài đặt sẵn mới",
     "presetDelete": "Xóa cài đặt sẵn hiện tại",
-    "presetNamePlaceholder": "Tên cấu hình (ví dụ: Phụ đề / Tài liệu kỹ thuật)",
+    "presetNamePlaceholder": "Tên cài đặt sẵn (ví dụ: Phụ đề / Tài liệu kỹ thuật)",
     "presetSaved": "Đã lưu như cài đặt sẵn mới",
     "presetDeleted": "Đã xóa cài đặt sẵn hiện tại",
     "presetNameRequired": "Vui lòng nhập tên cài đặt sẵn",
@@ -315,22 +330,22 @@
   },
   "tools": {
     "subtitleTranslator": {
-      "title": "Dịch giả Phụ đề",
+      "title": "Trình Dịch Phụ Đề",
       "description": "Dịch hàng loạt SRT, ASS, VTT, SBV, LRC. 120+ ngôn ngữ."
     },
     "jsonTranslate": {
-      "title": "Dịch giả JSON i18n",
+      "title": "Trình Dịch JSON i18n",
       "description": "Dịch tệp ngôn ngữ i18n hàng loạt, với đối sánh JSONPath và ánh xạ khóa"
     },
     "mdTranslator": {
-      "title": "Dịch giả Markdown",
+      "title": "Trình Dịch Markdown",
       "description": "Dịch Markdown hàng loạt, giữ định dạng và mã",
       "metaTitle": "Dịch Markdown | Giữ Code, LaTeX và Front Matter",
-      "metaDescription": "Trình dịch Markdown giữ code block, LaTeX, link, Front Matter. 25+ engine AI: DeepSeek, Claude, GPT. Hugo, Jekyll, Docusaurus.",
+      "metaDescription": "Trình dịch Markdown giữ code block, LaTeX, link, Front Matter. 30+ engine AI: DeepSeek, Claude, GPT. Hugo, Jekyll, Docusaurus.",
       "faq": [
         {
           "q": "Công cụ dịch Markdown miễn phí nào hoạt động tốt nhất?",
-          "a": "MDTranslator là trình dịch Markdown miễn phí, mã nguồn mở, phía trình duyệt: nguồn không bao giờ rời máy bạn, API key vẫn ở localStorage. Hỗ trợ Google free translate cùng DeepSeek, Claude, GPT, Gemini, DeepL — tổng cộng 25+ engine, bao phủ 120+ ngôn ngữ đích. Tự động bỏ qua khối mã, công thức LaTeX, URL và Front Matter, bạn có thể xuất bản trực tiếp lên Hugo, Jekyll, Hexo, VitePress hoặc Docusaurus mà không cần sửa định dạng thủ công."
+          "a": "MDTranslator là trình dịch Markdown miễn phí, mã nguồn mở, phía trình duyệt: nguồn không bao giờ rời máy bạn, API key vẫn ở localStorage. Hỗ trợ Google free translate cùng DeepSeek, Claude, GPT, Gemini, DeepL — tổng cộng 30+ engine, bao phủ 120+ ngôn ngữ đích. Tự động bỏ qua khối mã, công thức LaTeX, URL và Front Matter, bạn có thể xuất bản trực tiếp lên Hugo, Jekyll, Hexo, VitePress hoặc Docusaurus mà không cần sửa định dạng thủ công."
         },
         {
           "q": "Làm thế nào để giữ nguyên khối mã và công thức khi dịch Markdown?",
@@ -338,7 +353,7 @@
         },
         {
           "q": "Tài liệu kỹ thuật: dùng dịch máy hay dịch AI/LLM? Cái nào phù hợp nhất?",
-          "a": "AI/LLM được khuyến nghị mạnh mẽ cho nội dung kỹ thuật; dịch máy chỉ phù hợp cho xem nhanh. Mô hình AI/LLM nhận diện tên thư viện, hàm và biến trong ngữ cảnh mà không dịch sai — Claude Sonnet dẫn đầu về độ chính xác thuật ngữ tài liệu API, DeepSeek cho giá trị tuyệt vời (tiêu chuẩn thực tế cho blog kỹ thuật tiếng Trung), Gemini 3 Pro phù hợp với tài liệu cỡ một cuốn sách (ngữ cảnh 1M token). Dịch máy (Google miễn phí, DeepL) chỉ phù hợp xem nhanh — tài liệu Markdown dài bị cắt, thuật ngữ kỹ thuật dễ bị dịch nhầm thành từ thường ngày."
+          "a": "AI/LLM được khuyến nghị mạnh mẽ cho nội dung kỹ thuật; dịch máy chỉ phù hợp cho xem nhanh. Mô hình AI/LLM nhận diện tên thư viện, hàm và biến trong ngữ cảnh mà không dịch sai — Claude Sonnet dẫn đầu về độ chính xác thuật ngữ tài liệu API, DeepSeek cho giá trị tuyệt vời (tiêu chuẩn thực tế cho blog kỹ thuật tiếng Trung), Gemini phù hợp với tài liệu cỡ một cuốn sách (ngữ cảnh 1M token). Dịch máy (Google miễn phí, DeepL) chỉ phù hợp xem nhanh — tài liệu Markdown dài bị cắt, thuật ngữ kỹ thuật dễ bị dịch nhầm thành từ thường ngày."
         },
         {
           "q": "Cách dịch README trên GitHub hoặc cả một trang tài liệu VitePress / Docusaurus?",
@@ -354,7 +369,7 @@
         },
         {
           "q": "Nếu cần dịch phụ đề hoặc tệp cấu hình JSON thay vì Markdown thì sao?",
-          "a": "Với tệp phụ đề (SRT/ASS/VTT/SBV/LRC), dùng [Dịch giả Phụ đề](../subtitle-translator) — giữ timecode và thẻ kiểu ASS. Với tệp i18n JSON (cấu trúc key-value như i18next, next-intl, vue-i18n), dùng [Dịch JSON](../json-translate) — dịch chọn lọc theo đường dẫn Key, bảo vệ placeholder {name}, {count}, v.v. Cả ba công cụ dịch dùng chung cùng cấu hình engine và API Key, nên chuyển qua lại giữa chúng không cần cài đặt lại."
+          "a": "Với tệp phụ đề (SRT/ASS/VTT/SBV/LRC), dùng [Trình Dịch Phụ Đề](../subtitle-translator) — giữ timecode và thẻ kiểu ASS. Với tệp i18n JSON (cấu trúc key-value như i18next, next-intl, vue-i18n), dùng [Dịch JSON](../json-translate) — dịch chọn lọc theo đường dẫn Key, bảo vệ placeholder {name}, {count}, v.v. Cả ba công cụ dịch dùng chung cùng cấu hình engine và API Key, nên chuyển qua lại giữa chúng không cần cài đặt lại."
         },
         {
           "q": "Markdown đã dịch có được tải lên máy chủ không? Có mã nguồn mở không?",
@@ -386,7 +401,7 @@
       "description": "Tích hợp regex, sắp xếp, lọc và nhiều tính năng xử lý văn bản hàng loạt"
     },
     "dataBatch": {
-      "title": "Xử lý văn bản",
+      "title": "Xử lý dữ liệu hàng loạt",
       "description": "Xử lý dữ liệu Excel hàng loạt — loại bỏ trùng, trích xuất cột, hợp nhất văn bản, quy tắc nối tiếp"
     },
     "textJoiner": {
@@ -418,7 +433,7 @@
       "description": "Sắp xếp và nhóm mảng, quy tắc tùy chỉnh"
     },
     "jsonMatchUpdate": {
-      "title": "Cập nhật JSON Match",
+      "title": "Khớp & Cập Nhật JSON",
       "description": "Cập nhật hàng loạt dựa trên khớp trường"
     },
     "dataParserFlare": {
@@ -430,7 +445,7 @@
       "description": "Tạo dữ liệu JSON IMGPrompt hàng loạt"
     },
     "textDiff": {
-      "title": "Text Diff",
+      "title": "So Sánh Văn Bản",
       "description": "So sánh hai văn bản hoặc tệp song song và xác định điểm khác biệt đầu tiên."
     }
   },
@@ -445,17 +460,17 @@
     "externalTools": {
       "legendtalk": "Bàn tròn nhà tư tưởng AI",
       "imgprompt": "Câu lệnh tạo ảnh AI",
-      "lives": "Thousand Lives",
-      "learndata": "LearnData Ghi chú nguồn mở"
+      "learndata": "LearnData Ghi chú nguồn mở",
+      "hub365": "365 Nguồn mở"
     }
   },
   "Metadata": {
     "title": "ToolsByAI - Bộ Công Cụ Dịch Thuật & Dữ Liệu AI Online",
-    "description": "ToolsByAI: 19 công cụ mã nguồn mở miễn phí cho dịch phụ đề, Markdown, JSON i18n và xử lý văn bản/JSON. 25+ engine AI.",
+    "description": "ToolsByAI: 19 công cụ mã nguồn mở miễn phí cho dịch phụ đề, Markdown, JSON i18n và xử lý văn bản/JSON. 30+ engine AI.",
     "homeTitle": "Bộ ToolsByAI",
     "homeDescription": "19 công cụ cho dịch, văn bản, JSON và chuyển đổi dữ liệu. Tăng cường hiệu quả cho nhà phát triển và người sáng tạo.",
-    "ogTitle": "ToolsByAI - Công Cụ Dev AI Miễn Phí & Mã Nguồn Mở",
-    "ogDescription": "ToolsByAI: 19 công cụ mã nguồn mở miễn phí cho dịch phụ đề, Markdown, JSON i18n và xử lý văn bản/JSON. 25+ engine AI."
+    "ogTitle": "ToolsByAI - Bộ Công Cụ Dịch Thuật & Dữ Liệu AI Online",
+    "ogDescription": "ToolsByAI: 19 công cụ mã nguồn mở miễn phí cho dịch phụ đề, Markdown, JSON i18n và xử lý văn bản/JSON. 30+ engine AI."
   },
   "languages": {
     "auto": "Tự động phát hiện",

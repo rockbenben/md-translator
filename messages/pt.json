@@ -112,9 +112,9 @@
     "sameLanguageTarget": "Idiomas de origem e destino iguais; destino ajustado automaticamente para",
     "sameLanguageSource": "Idiomas de origem e destino iguais; origem ajustada automaticamente para",
     "enterApiKey": "Insira a chave API ou mude para API Gratuita.",
-    "enterApiUrl": "Por favor, configure a URL da API em \"Mais configurações do Provider\".",
+    "enterApiUrl": "Por favor, configure a URL da API em \"Mais configurações do provedor\".",
     "serviceUnavailable": "{service} está temporariamente inacessível — verifique a rede e o endereço do serviço, tente novamente mais tarde ou mude para outro serviço de tradução.",
-    "serviceUnavailableSwitched": "{service} está temporariamente inacessível — mudámos automaticamente para {fallback}. Verifique-o e volte a selecioná-lo nas definições se quiser continuar a usá-lo.",
+    "serviceUnavailableSwitched": "{service} está temporariamente inacessível — mudamos automaticamente para {fallback}. Verifique o serviço original e, se estiver tudo certo, selecione-o novamente em Configurações.",
     "noFileUploaded": "Por favor, envie um arquivo primeiro.",
     "translationExported": "Tradução concluída, arquivos exportados",
     "noSourceText": "Por favor, insira ou cole o texto.",
@@ -162,7 +162,7 @@
     "failedLanguagesTitle": "Falha em {count} idioma(s) de destino",
     "failedLanguagesDesc": "Todos os lotes para estes idiomas falharam — geralmente devido a problemas LLM locais, limites de taxa de API ou recusa do modelo a um idioma específico. Copie os códigos e execute novamente apenas com eles (cole em 'Configurações multilíngue'); os outros usarão o cache e serão ignorados.",
     "copyAllFailedLanguages": "Copiar códigos de idioma",
-    "apiStatusFreeApi": "Free API",
+    "apiStatusFreeApi": "API Gratuita",
     "apiStatusNeedsConfig": "Requer config.",
     "apiStatusConfigured": "Configurado",
     "apiStatusTesting": "Testando",
@@ -170,7 +170,7 @@
     "apiStatusFailed": "Falha na conexão",
     "apiStatusTimeout": "Tempo de conexão esgotado",
     "testConnection": "Testar conexão",
-    "moreProviderSettings": "Mais configurações do Provider",
+    "moreProviderSettings": "Mais configurações do provedor",
     "format": "Formatar",
     "formatTooltip": "Formatar: remover linhas vazias e espaços no início/fim",
     "resultToSource": "Resultado ➔ Original",
@@ -185,7 +185,7 @@
     "replaceText": "Substituir texto",
     "generateJson": "Gerar JSON",
     "networkUnavailable": "O serviço de tradução está temporariamente inacessível — pode ser um problema de rede ou o serviço está com algum problema momentâneo. Tente novamente mais tarde ou troque para outro serviço de tradução.",
-    "translationTimeout": "A solicitação de tradução expirou — pode ser uma rede lenta ou o serviço está demorando muito para responder. Tente novamente mais tarde ou troque para outro serviço de tradução.",
+    "translationTimeout": "A requisição de tradução expirou — pode ser uma rede lenta ou o serviço está demorando muito para responder. Tente novamente mais tarde ou troque para outro serviço de tradução.",
     "translationTimeoutLocal": "Tempo esgotado na tradução com o modelo local. Causas comuns: a concorrência excede os slots paralelos do seu servidor local e os pedidos ficam em fila até expirar; ou o modelo entra num ciclo de repetição (normalmente idioma de origem errado). Reduza «Parâmetros de chamada → Linhas simultâneas» neste serviço ou aumente «Configurações Avançadas → Tempo limite», e confirme que o idioma de origem corresponde ao texto.",
     "langGroupCommon": "Comuns",
     "langGroupEurope": "Europa",
@@ -198,7 +198,7 @@
     "langPresetEurope": "Europeias principais",
     "langPresetEastAsian": "Ásia Oriental",
     "langPresetIndian": "Subcontinente Indiano",
-    "selectedCount": "{count} selecionadas",
+    "selectedCount": "{count} selecionados",
     "recentLanguages": "Recentes",
     "langGroupAmericasOceania": "Américas e Oceânia",
     "relatedTools": "Ferramentas relacionadas",
@@ -213,11 +213,26 @@
     "errorHint429": "Limite de requisições excedido, tente novamente mais tarde",
     "errorHint456": "Cota de tradução esgotada neste período",
     "errorHint5xx": "Erro do servidor, tente novamente mais tarde",
-    "errorHintRelay": "Erro de rede (possivelmente CORS) — ative o \"Relay da API\" em \"Mais configurações do Provider\"",
-    "errorHintRelay403": "A API retornou 403 Forbidden — ative o \"Relay da API\" em \"Mais configurações do Provider\"",
+    "errorHintRelay": "Erro de rede (possivelmente CORS) — ative o \"Relay da API\" em \"Mais configurações do provedor\"",
+    "errorHintRelay403": "A API retornou 403 Forbidden — ative o \"Relay da API\" em \"Mais configurações do provedor\"",
     "errorHintCors": "Não foi possível acessar este endereço — verifique o endereço e se o serviço permite requisições de origem cruzada (CORS). Gateways auto-hospedados e modelos locais precisam habilitar isso, ou use o seu próprio Relay da API",
     "errorHintGeminiKey": "Não foi possível conectar ao Gemini: verifique primeiro sua rede (algumas redes não alcançam diretamente os serviços do Google). Se a rede estiver bem, desde 19/06/2026 o Google rejeita chaves de API sem restrições — gere novamente sua chave no AI Studio (restrita por padrão) ou adicione uma restrição de Gemini API à chave antiga no Console do Google Cloud",
-    "rateLimitCooldown": "Limite de requisições atingido — pausando brevemente, repetiremos automaticamente"
+    "rateLimitCooldown": "Limite de requisições atingido — pausando brevemente, repetiremos automaticamente",
+    "faqHeading": "Perguntas frequentes",
+    "homeIndexEyebrow": "Índice",
+    "homeCategoryEyebrow": "{n} categorias",
+    "openNavigation": "Abrir navegação",
+    "goHome": "Ir para a página inicial",
+    "primaryNav": "Navegação principal",
+    "toggleTheme": "Alternar tema",
+    "communityLinks": "Links da comunidade",
+    "viewOnGitHub": "Ver no GitHub",
+    "toolCategories": "Categorias de ferramentas",
+    "searchLanguage": "Pesquisar idioma",
+    "selectLanguage": "Selecionar idioma",
+    "noMatchFound": "Nenhum resultado",
+    "backToTop": "Voltar ao topo",
+    "exportOptions": "Opções de exportação"
   },
   "MDTranslator": {
     "clientDescription": "Envie arquivos Markdown ou cole texto. Preserva inteligentemente formato, código e fórmulas. Tradução em um clique para vários idiomas.",
@@ -258,9 +273,9 @@
     "urlAutoCompleted": "URL completada automaticamente",
     "modelExtra": "Nome modelo LLM, ver documentação API",
     "temperatureExtra": "Temperatura (0-2): Mais alto = mais aleatório, mais baixo = mais determinístico. Recomendado: 0.2-0.8",
-    "systemPrompt": "Prompt Sistema",
+    "systemPrompt": "Prompt do sistema",
     "systemPromptExtra": "Prompt sistema para tradução LLM, deixar vazio para padrão",
-    "userPrompt": "Prompt Usuário",
+    "userPrompt": "Prompt do usuário",
     "userPromptExtra": "Prompt tradução personalizado, deixar vazio para padrão. Variáveis:",
     "for": "para",
     "textToTranslate": "texto a traduzir",
@@ -326,11 +341,11 @@
       "title": "Tradutor Markdown",
       "description": "Tradução Markdown em lote, preserva formato e código",
       "metaTitle": "Tradutor Markdown | Preserva Código, LaTeX e Front Matter",
-      "metaDescription": "Tradutor Markdown que preserva blocos de código, LaTeX, links e Front Matter. 25+ motores IA: DeepSeek, Claude, GPT. Hugo, Jekyll.",
+      "metaDescription": "Tradutor Markdown que preserva blocos de código, LaTeX, links e Front Matter. 30+ motores IA: DeepSeek, Claude, GPT. Hugo, Jekyll.",
       "faq": [
         {
           "q": "Qual ferramenta gratuita de tradução de Markdown funciona melhor?",
-          "a": "MDTranslator é um tradutor de Markdown gratuito, de código aberto e do lado do navegador: a fonte nunca sai da sua máquina, a chave API permanece em localStorage. Suporta Google free translate mais DeepSeek, Claude, GPT, Gemini, DeepL — 25+ motores no total, cobrindo 120+ idiomas alvo. Pula automaticamente blocos de código, fórmulas LaTeX, URLs e Front Matter, você pode publicar direto para Hugo, Jekyll, Hexo, VitePress ou Docusaurus sem reparo manual."
+          "a": "MDTranslator é um tradutor de Markdown gratuito, de código aberto e do lado do navegador: a fonte nunca sai da sua máquina, a chave API permanece em localStorage. Suporta o Google Translate gratuito, além de DeepSeek, Claude, GPT, Gemini, DeepL — 30+ motores no total, cobrindo 120+ idiomas alvo. Pula automaticamente blocos de código, fórmulas LaTeX, URLs e Front Matter, você pode publicar direto para Hugo, Jekyll, Hexo, VitePress ou Docusaurus sem reparo manual."
         },
         {
           "q": "Como preservar blocos de código e fórmulas ao traduzir Markdown?",
@@ -338,7 +353,7 @@
         },
         {
           "q": "Documentação técnica: tradução automática ou tradução IA/LLM? Qual é a melhor opção?",
-          "a": "IA/LLM é fortemente recomendada para conteúdo técnico; tradução automática só serve para pré-visualizações rápidas. Modelos IA/LLM reconhecem nomes de bibliotecas, funções e variáveis no contexto sem traduzi-los errado — Claude Sonnet lidera em precisão terminológica para documentação de API, DeepSeek oferece excelente custo-benefício (padrão de facto para blogs técnicos chineses), Gemini 3 Pro encaixa em documentação do tamanho de um livro (contexto de 1M tokens). Tradução automática (Google grátis, DeepL) só serve para pré-visualizações rápidas: documentos Markdown longos são truncados e termos técnicos costumam ser traduzidos errado como palavras do dia a dia. As configurações do motor podem ser compartilhadas com [Tradutor de Legendas](../subtitle-translator) e [Tradutor JSON](../json-translate)."
+          "a": "IA/LLM é fortemente recomendada para conteúdo técnico; tradução automática só serve para pré-visualizações rápidas. Modelos IA/LLM reconhecem nomes de bibliotecas, funções e variáveis no contexto sem traduzi-los errado — Claude Sonnet lidera em precisão terminológica para documentação de API, DeepSeek oferece excelente custo-benefício (padrão de facto para blogs técnicos chineses), Gemini encaixa em documentação do tamanho de um livro (contexto de 1M tokens). Tradução automática (Google grátis, DeepL) só serve para pré-visualizações rápidas: documentos Markdown longos são truncados e termos técnicos costumam ser traduzidos errado como palavras do dia a dia. As configurações do motor podem ser compartilhadas com [Tradutor de Legendas](../subtitle-translator) e [Tradutor JSON](../json-translate)."
         },
         {
           "q": "Como traduzir um README do GitHub ou um site inteiro VitePress / Docusaurus?",
@@ -386,7 +401,7 @@
       "description": "Integra correspondência por regex, ordenação, filtragem e outras funcionalidades para processamento em lote"
     },
     "dataBatch": {
-      "title": "Processador de Texto",
+      "title": "Processador de dados em lote",
       "description": "Processamento em lote de dados Excel — deduplicação, extração de colunas, fusão, regras encadeadas"
     },
     "textJoiner": {
@@ -437,25 +452,25 @@
   "navigation": {
     "home": "Início",
     "all": "Todos",
-    "translate": "Ferramentas Tradução",
-    "textParser": "Ferramentas Texto",
+    "translate": "Ferramentas de Tradução",
+    "textParser": "Ferramentas de Texto",
     "jsonParser": "Ferramentas JSON",
-    "dataParser": "Ferramentas Dados",
+    "dataParser": "Ferramentas de Dados",
     "otherTools": "Mais ferramentas",
     "externalTools": {
       "legendtalk": "Mesa-redonda de pensadores de IA",
       "imgprompt": "Prompts de imagem de IA",
-      "lives": "Thousand Lives",
-      "learndata": "LearnData Notas de Código Aberto"
+      "learndata": "LearnData Notas de Código Aberto",
+      "hub365": "365 Código Aberto"
     }
   },
   "Metadata": {
     "title": "ToolsByAI - Ferramentas de IA e Dados para Desenvolvedores",
-    "description": "ToolsByAI: 19 ferramentas open source grátis para tradução de legendas, Markdown, JSON i18n e processamento em lote. 25+ motores IA.",
+    "description": "ToolsByAI: 19 ferramentas open source grátis para tradução de legendas, Markdown, JSON i18n e processamento em lote. 30+ motores IA.",
     "homeTitle": "Suíte ToolsByAI",
     "homeDescription": "19 ferramentas para tradução, texto, JSON e conversão de dados. Impulsione a eficiência de desenvolvedores e criadores.",
-    "ogTitle": "ToolsByAI - Ferramentas Dev IA Gratuitas e Open Source",
-    "ogDescription": "ToolsByAI: 19 ferramentas open source grátis para tradução de legendas, Markdown, JSON i18n e processamento em lote. 25+ motores IA."
+    "ogTitle": "ToolsByAI - Ferramentas de IA e Dados para Desenvolvedores",
+    "ogDescription": "ToolsByAI: 19 ferramentas open source grátis para tradução de legendas, Markdown, JSON i18n e processamento em lote. 30+ motores IA."
   },
   "languages": {
     "auto": "Detecção Auto",

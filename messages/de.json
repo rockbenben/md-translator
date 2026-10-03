@@ -166,7 +166,7 @@
     "customExportFilenameTooltip": "'{'name'}' = Originalname, '{'lang'}' = Sprache, '{'ext'}' = Endung, '{'date'}' = Datum, '{'time'}' = Zeit; im Mehrsprachenmodus wird '{'lang'}' automatisch hinzugefügt, um Namenskonflikte zu vermeiden",
     "partialFailureTitle": "{count} Zeile(n) fehlgeschlagen",
     "partialFailureDesc": "Diese Zeilen behalten den Originaltext, die Dateistruktur bleibt intakt. Der erneute Versuch sendet nur sie, der Rest kommt aus dem Cache.",
-    "partialFailureWhy": "Häufig bei kostenlosen und selbst gehosteten Diensten — meist liegt es nicht an deiner Konfiguration.",
+    "partialFailureWhy": "Häufig bei kostenlosen und selbst gehosteten Diensten — meist liegt es nicht an Ihrer Konfiguration.",
     "retryFailedLines": "Fehlgeschlagene Zeilen wiederholen",
     "viewFailedLines": "Fehlgeschlagene Zeilen anzeigen",
     "failedLinesModalTitle": "{count} fehlgeschlagene Zeile(n)",
@@ -176,7 +176,7 @@
     "failedLanguagesDesc": "Alle Batches für diese Sprachen sind fehlgeschlagen — meist durch lokale LLM-Störungen, API-Ratenbegrenzungen oder Modellverweigerung einer bestimmten Sprache. Codes kopieren und nur damit erneut ausführen (in 'Mehrsprachige Einstellungen' einfügen); die anderen werden aus dem Cache übersprungen.",
     "copyAllFailedLanguages": "Sprachcodes kopieren",
     "apiStatusFreeApi": "Free API",
-    "apiStatusNeedsConfig": "Konfig. erforderlich",
+    "apiStatusNeedsConfig": "Konfiguration erforderlich",
     "apiStatusConfigured": "Konfiguriert",
     "apiStatusTesting": "Teste",
     "apiStatusConnected": "✓ Verbunden",
@@ -184,7 +184,7 @@
     "apiStatusTimeout": "Zeitüberschreitung der Verbindung",
     "testConnection": "Verbindung testen",
     "moreProviderSettings": "Weitere Provider-Einstellungen",
-    "networkUnavailable": "Der Übersetzungsdienst ist vorübergehend nicht erreichbar — möglicherweise ein Netzwerkproblem oder der Dienst hat einen kurzen Aussetzer. Versuche es später erneut oder wechsle zu einem anderen Übersetzungsdienst.",
+    "networkUnavailable": "Der Übersetzungsdienst ist vorübergehend nicht erreichbar — möglicherweise ein Netzwerkproblem oder der Dienst hat einen kurzen Aussetzer. Versuchen Sie es später erneut oder wechseln Sie zu einem anderen Übersetzungsdienst.",
     "translationTimeout": "Die Übersetzungsanfrage hat das Zeitlimit überschritten — möglicherweise ein langsames Netzwerk oder der Dienst braucht zu lange zum Antworten. Versuche es später erneut oder wechsle zu einem anderen Übersetzungsdienst.",
     "translationTimeoutLocal": "Zeitüberschreitung bei der Übersetzung mit dem lokalen Modell. Häufige Ursachen: Die Parallelität übersteigt die parallelen Slots deines lokalen Servers, sodass Anfragen dort bis zur Zeitüberschreitung warten; oder das Modell hängt in einer Wiederholungsschleife (meist falsche Ausgangssprache). Verringere bei diesem Dienst „Aufrufparameter → Parallele Zeilen“ oder erhöhe „Erweiterte Einstellungen → Zeitüberschreitung“, und prüfe, ob die gewählte Ausgangssprache zum Text passt.",
     "langGroupCommon": "Häufig",
@@ -217,7 +217,22 @@
     "errorHintRelay403": "Die API hat 403 Forbidden zurückgegeben — aktivieren Sie „API-Relay“ unter „Weitere Provider-Einstellungen“",
     "errorHintCors": "Diese Adresse ist nicht erreichbar — prüfen Sie die Adresse und ob der Dienst Cross-Origin-Anfragen (CORS) erlaubt. Eigene Gateways und lokale Modelle müssen das selbst aktivieren, oder nutzen Sie Ihr eigenes API-Relay",
     "errorHintGeminiKey": "Gemini nicht erreichbar: Prüfen Sie zuerst Ihr Netzwerk (manche Netzwerke erreichen Google-Dienste nicht direkt). Ist das Netzwerk in Ordnung, lehnt Google seit dem 19.06.2026 uneingeschränkte API-Schlüssel ab — erstellen Sie Ihren Schlüssel in AI Studio neu (standardmäßig eingeschränkt) oder fügen Sie dem alten Schlüssel in der Google Cloud Console eine Gemini-API-Einschränkung hinzu",
-    "rateLimitCooldown": "Anfragelimit erreicht — kurze Pause, automatischer neuer Versuch"
+    "rateLimitCooldown": "Anfragelimit erreicht — kurze Pause, automatischer neuer Versuch",
+    "faqHeading": "Häufige Fragen",
+    "homeIndexEyebrow": "Index",
+    "homeCategoryEyebrow": "{n} Kategorien",
+    "openNavigation": "Navigation öffnen",
+    "goHome": "Zur Startseite",
+    "primaryNav": "Hauptnavigation",
+    "toggleTheme": "Design wechseln",
+    "communityLinks": "Community-Links",
+    "viewOnGitHub": "Auf GitHub ansehen",
+    "toolCategories": "Werkzeugkategorien",
+    "searchLanguage": "Sprache suchen",
+    "selectLanguage": "Sprache auswählen",
+    "noMatchFound": "Kein Treffer",
+    "backToTop": "Zurück nach oben",
+    "exportOptions": "Exportoptionen"
   },
   "MDTranslator": {
     "clientDescription": "Markdown-Dateien hochladen oder Text einfügen. Behält Format, Code und Formeln intelligent bei, Ein-Klick-Übersetzung in mehrere Sprachen.",
@@ -240,9 +255,9 @@
     "resetConfigSuccess": "Konfiguration auf Standardwerte zurückgesetzt",
     "resetCacheConfirm": "Gesamten Übersetzungscache löschen? Dies kann nicht rückgängig gemacht werden.",
     "docs": "Dokumentation",
-    "resetCacheTooltip": "Alle Übersetzungscaches löschen (nicht widerrufbar)",
+    "resetCacheTooltip": "Alle Übersetzungscaches löschen (nicht rückgängig machbar)",
     "resetCache": "Cache löschen",
-    "resetCacheSuccess": "Übersetzungs-Cache geleert",
+    "resetCacheSuccess": "Übersetzungscache gelöscht",
     "resetCacheFail": "Übersetzungs-Cache konnte nicht geleert werden",
     "resetConfig": "Standard wiederherstellen",
     "testConfig": "API testen",
@@ -276,9 +291,9 @@
     "contextWindow": "Kontextzeilen",
     "contextWindowExtra": "Zeilen pro Stapel. Höher = weniger Anfragen und mehr Geschwindigkeit, aber kann das Token-Limit des Modells überschreiten",
     "delayTime": "Verzögerungszeit",
-    "delayTimeExtra": "Wartezeit zwischen aufeinanderfolgenden Anfragen. Erhöhen, wenn du häufig ins Rate-Limit läufst",
+    "delayTimeExtra": "Wartezeit zwischen aufeinanderfolgenden Anfragen. Erhöhen, wenn Sie häufig in die Ratenbegrenzung geraten",
     "useRelay": "API-Relay",
-    "useRelayTooltip": "Aktiviere das API-Relay bei CORS- oder 403-Fehlern. Anfragen laufen dann über das Relay zum Anbieter – es leitet nur weiter und speichert nichts.",
+    "useRelayTooltip": "Aktiviere das API-Relay bei CORS- oder 403-Fehlern. Anfragen laufen dann über das Relay zum Provider – es leitet nur weiter und speichert nichts.",
     "useRelayCustomUrl": "Benutzerdefinierter Endpunkt in Verwendung: Das eingebaute öffentliche Relay leitet nur von ihm deklarierte Adressen weiter, daher wird diese Adresse nie dorthin gesendet — Anfragen gehen direkt. Um über ein Relay zu gehen, aktivieren Sie den Schalter und tragen Sie unten Ihre eigene Relay-Adresse ein.",
     "relayBase": "Relay-Adresse",
     "relayBaseExtra": "Leer lassen, um das integrierte Relay zu nutzen. Diese Adresse gilt für alle Dienste mit aktiviertem Relay und erfordert eine eigene Bereitstellung desselben Relay-Workers.",
@@ -289,7 +304,7 @@
     "presetSelect": "Voreinstellung wählen",
     "presetSave": "Als neue Voreinstellung speichern",
     "presetDelete": "Aktuelle Voreinstellung löschen",
-    "presetNamePlaceholder": "Preset-Name (z. B. Untertitel / Technische Doku)",
+    "presetNamePlaceholder": "Voreinstellungsname (z. B. Untertitel / Technische Doku)",
     "presetSaved": "Als neue Voreinstellung gespeichert",
     "presetDeleted": "Aktuelle Voreinstellung gelöscht",
     "presetNameRequired": "Bitte einen Namen eingeben",
@@ -326,11 +341,11 @@
       "title": "Markdown-Übersetzer",
       "description": "Markdown-Batch-Übersetzung, Format und Code behalten",
       "metaTitle": "Markdown-Übersetzer | Code, LaTeX & Front Matter erhalten",
-      "metaDescription": "Markdown-Übersetzer: Code-Blöcke, LaTeX, Links, Front Matter. 25+ KI-Engines: DeepSeek, Claude, GPT. Hugo, Jekyll, Docusaurus.",
+      "metaDescription": "Markdown-Übersetzer: Code-Blöcke, LaTeX, Links, Front Matter. 30+ KI-Engines: DeepSeek, Claude, GPT. Hugo, Jekyll, Docusaurus.",
       "faq": [
         {
           "q": "Welches kostenlose Markdown-Übersetzungstool funktioniert am besten?",
-          "a": "MDTranslator ist ein kostenloser, Open-Source-, browser-seitiger Markdown-Übersetzer: Quelle verlässt nie Ihren Rechner, API-Key bleibt in localStorage. Unterstützt Google Free Translate plus DeepSeek, Claude, GPT, Gemini, DeepL — insgesamt 25+ Engines, abdeckend 120+ Zielsprachen. Überspringt automatisch Code-Blöcke, LaTeX-Formeln, Link-URLs und Front Matter — Sie können direkt zu Hugo, Jekyll, Hexo, VitePress oder Docusaurus veröffentlichen, ohne manuelle Format-Reparatur."
+          "a": "MDTranslator ist ein kostenloser, Open-Source-, browser-seitiger Markdown-Übersetzer: Quelle verlässt nie Ihren Rechner, API-Key bleibt in localStorage. Unterstützt Google Free Translate plus DeepSeek, Claude, GPT, Gemini, DeepL — insgesamt 30+ Engines, abdeckend 120+ Zielsprachen. Überspringt automatisch Code-Blöcke, LaTeX-Formeln, Link-URLs und Front Matter — Sie können direkt zu Hugo, Jekyll, Hexo, VitePress oder Docusaurus veröffentlichen, ohne manuelle Format-Reparatur."
         },
         {
           "q": "Wie bewahrt man Code-Blöcke und Formeln bei der Markdown-Übersetzung?",
@@ -338,7 +353,7 @@
         },
         {
           "q": "Technische Dokumentation: Maschinelle Übersetzung oder KI/LLM? Was eignet sich am besten?",
-          "a": "KI/LLM wird für technische Inhalte dringend empfohlen; maschinelle Übersetzung eignet sich nur für Schnellvorschauen. KI/LLM-Modelle erkennen Bibliotheksnamen, Funktionsnamen und Variablen im Kontext, ohne sie falsch zu übersetzen — Claude Sonnet führt bei API-Doku-Terminologie-Genauigkeit, DeepSeek bietet hervorragenden Wert (De-facto-Standard für chinesische Tech-Blogs), Gemini 3 Pro passt zu buchlanger Dokumentation (1M-Token-Kontext). Maschinelle Übersetzung (Google free, DeepL) eignet sich nur für Schnellvorschauen — lange Markdown-Docs werden gekürzt, und technische Begriffe rutschen leicht in Alltagswörter ab. Die Engine-Konfiguration kann mit [Untertitel-Übersetzer](../subtitle-translator) und [JSON-Übersetzer](../json-translate) geteilt werden."
+          "a": "KI/LLM wird für technische Inhalte dringend empfohlen; maschinelle Übersetzung eignet sich nur für Schnellvorschauen. KI/LLM-Modelle erkennen Bibliotheksnamen, Funktionsnamen und Variablen im Kontext, ohne sie falsch zu übersetzen — Claude Sonnet führt bei API-Doku-Terminologie-Genauigkeit, DeepSeek bietet hervorragenden Wert (De-facto-Standard für chinesische Tech-Blogs), Gemini passt zu buchlanger Dokumentation (1M-Token-Kontext). Maschinelle Übersetzung (Google free, DeepL) eignet sich nur für Schnellvorschauen — lange Markdown-Docs werden gekürzt, und technische Begriffe rutschen leicht in Alltagswörter ab. Die Engine-Konfiguration kann mit [Untertitel-Übersetzer](../subtitle-translator) und [JSON-Übersetzer](../json-translate) geteilt werden."
         },
         {
           "q": "Wie übersetze ich eine GitHub-README oder eine komplette VitePress-/Docusaurus-Doku-Site?",
@@ -371,7 +386,7 @@
     },
     "textSplitter": {
       "title": "Text-Splitter",
-      "description": "Lange Texte nach Trenner, Länge oder Satz teilen — und wieder zusammenführen"
+      "description": "Lange Texte nach Trennzeichen, Länge oder Satz teilen — und wieder zusammenführen"
     },
     "chineseConversion": {
       "title": "Chinesisch-Konvertierung",
@@ -386,7 +401,7 @@
       "description": "Regex-Matching, Sortierung, Filterung und mehr für die Massentextverarbeitung"
     },
     "dataBatch": {
-      "title": "Textprozessor",
+      "title": "Batch-Datenprozessor",
       "description": "Excel-Stapelverarbeitung — Deduplizierung, Spaltenextraktion, Textverbindung, mehrere Regeln in Reihenfolge"
     },
     "textJoiner": {
@@ -394,7 +409,7 @@
       "description": "Mehrere Textspalten zeilenweise per Vorlage zusammenführen, um im Batch CSV, SQL und JSON zu erzeugen"
     },
     "jsonValueExtractor": {
-      "title": "JSON Wert-Extraktor",
+      "title": "JSON-Wertextraktor",
       "description": "JSON-Werte im Batch extrahieren, formatierte Ausgabe"
     },
     "jsonNodeEdit": {
@@ -402,19 +417,19 @@
       "description": "JSON-Knoten im Batch bearbeiten, Präfix/Suffix/Ersetzen"
     },
     "jsonValueTransformer": {
-      "title": "JSON Wert-Mapper",
+      "title": "JSON-Wertemapper",
       "description": "Feldwert-Mapping und Migration mit JSONPath"
     },
     "jsonValueSwapper": {
-      "title": "JSON Wert-Tauscher",
+      "title": "JSON-Wertetauscher",
       "description": "Werte zweier Felder per Klick tauschen"
     },
     "jsonNodeInserter": {
-      "title": "JSON Knoten-Inserter",
+      "title": "JSON-Knoten-Inserter",
       "description": "Neue Knoten an Position im Batch einfügen"
     },
     "jsonSortClassify": {
-      "title": "JSON Sort & Classify",
+      "title": "JSON-Sortierung & Gruppierung",
       "description": "Arrays sortieren und gruppieren, benutzerdefinierte Regeln"
     },
     "jsonMatchUpdate": {
@@ -445,8 +460,8 @@
     "externalTools": {
       "legendtalk": "KI-Denkerrunde",
       "imgprompt": "KI-Bild-Prompts",
-      "lives": "Thousand Lives",
-      "learndata": "LearnData Open-Source-Notizen"
+      "learndata": "LearnData Open-Source-Notizen",
+      "hub365": "365 Open Source"
     }
   },
   "Metadata": {

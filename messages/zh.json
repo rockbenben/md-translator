@@ -55,7 +55,7 @@
     "configuration": "配置选项",
     "operation": "操作",
     "optional": "可选",
-    "pleaseWait": "请稍等...",
+    "pleaseWait": "请稍等…",
     "pasteUploadContent": "或在此输入、粘贴文本",
     "example": "示例",
     "sourceLanguage": "源语言",
@@ -217,7 +217,22 @@
     "errorHintRelay403": "接口返回 403 禁止访问，请在「更多 Provider 设置」中开启「中转 API」",
     "errorHintCors": "无法连接到该地址：请检查地址是否正确，并确认服务已允许跨域（CORS）。自建网关与本地模型需要自行开启，或改用你自己的中转 API",
     "errorHintGeminiKey": "无法连接 Gemini：请先检查网络（部分网络环境无法直连 Google 服务）。若网络正常，则可能是 Google 自 2026-06-19 起拒绝「无限制 API Key」——请在 AI Studio 重新生成密钥（默认已限制），或在 Google Cloud 控制台为旧密钥添加 Gemini API 限制",
-    "rateLimitCooldown": "请求过于频繁，已自动暂停片刻后重试"
+    "rateLimitCooldown": "请求过于频繁，已自动暂停片刻后重试",
+    "faqHeading": "常见问题",
+    "homeIndexEyebrow": "工具索引",
+    "homeCategoryEyebrow": "{n} 个分类",
+    "openNavigation": "打开导航",
+    "goHome": "返回首页",
+    "primaryNav": "主导航",
+    "toggleTheme": "切换主题",
+    "communityLinks": "社区链接",
+    "viewOnGitHub": "在 GitHub 查看",
+    "toolCategories": "工具分类",
+    "searchLanguage": "搜索语言",
+    "selectLanguage": "选择语言",
+    "noMatchFound": "无匹配结果",
+    "backToTop": "回到顶部",
+    "exportOptions": "导出选项"
   },
   "MDTranslator": {
     "clientDescription": "上传 Markdown 文件或粘贴文本，智能保留格式、代码及公式，一键翻译为多种语言。",
@@ -270,7 +285,7 @@
     "batchSize": "并发行数",
     "batchSizeExtra": "非上下文模式的并发请求数。过高会触发 API 限流",
     "contextBatchSize": "上下文并发数",
-    "contextBatchSizeExtra": "上下文模式的并发批次数。先调「上下文行数」加速更稳，本项易限流",
+    "contextBatchSizeExtra": "上下文模式的并发批次数。先调「上下文行数」加速更稳，本项易触发限流",
     "maxTokens": "最大输出 tokens",
     "maxTokensExtra": "限制模型单次响应的 token 数。0 = 不限制（用厂商默认）。本地模型（Ollama/llama.cpp）建议设 2048-4096，避免死循环占用太久。触顶会显式失败（不会写半截译文），正常翻译被截则调大此值。",
     "contextWindow": "上下文行数",
@@ -330,7 +345,7 @@
       "faq": [
         {
           "q": "免费的 Markdown 翻译工具哪个好用？",
-          "a": "MDTranslator 是免费开源的浏览器端 Markdown 翻译工具：原文不经服务器、API Key 仅存本地 localStorage。支持 Google 免费翻译和 DeepSeek、Claude、GPT、Gemini、DeepL 等 25+ 引擎，覆盖 120+ 种目标语言。自动跳过代码块、LaTeX 公式、链接 URL 和 Front Matter，翻译后无需手动修复格式，可直接发布到 Hugo、Jekyll、Hexo、VitePress、Docusaurus。"
+          "a": "MDTranslator 是免费开源的浏览器端 Markdown 翻译工具：原文不经服务器、API Key 仅存本地 localStorage。支持 Google 免费翻译和 DeepSeek、Claude、GPT、Gemini、DeepL 等 30+ 引擎，覆盖 120+ 种目标语言。自动跳过代码块、LaTeX 公式、链接 URL 和 Front Matter，翻译后无需手动修复格式，可直接发布到 Hugo、Jekyll、Hexo、VitePress、Docusaurus。"
         },
         {
           "q": "翻译 Markdown 文档时如何保留代码块和公式？",
@@ -338,7 +353,7 @@
         },
         {
           "q": "翻译技术文档用机器翻译还是 AI 翻译？哪个最合适？",
-          "a": "技术文档强烈推荐 AI 大模型，机器翻译只适合快速预览。AI 大模型能识别上下文里的库名、函数名、变量名不乱译——首选 Claude Sonnet（API 文档术语精度最高），DeepSeek 性价比极高（中文技术博客标配），Gemini 3 Pro 适合整本书级长文档（1M token 上下文）。机器翻译（Google 免费版、DeepL）只适合快速预览：长 Markdown 文档会被截断、技术术语容易被误译成日常词。引擎配置可与 [字幕翻译](../subtitle-translator)、[JSON 翻译](../json-translate) 共享。"
+          "a": "技术文档强烈推荐 AI 大模型，机器翻译只适合快速预览。AI 大模型能识别上下文里的库名、函数名、变量名不乱译——首选 Claude Sonnet（API 文档术语精度最高），DeepSeek 性价比极高（中文技术博客标配），Gemini 适合整本书级长文档（1M token 上下文）。机器翻译（Google 免费版、DeepL）只适合快速预览：长 Markdown 文档会被截断、技术术语容易被误译成日常词。引擎配置可与 [字幕翻译](../subtitle-translator)、[JSON 翻译](../json-translate) 共享。"
         },
         {
           "q": "怎么翻译 GitHub README 或整个 VitePress、Docusaurus 文档站？",
@@ -445,17 +460,17 @@
     "externalTools": {
       "legendtalk": "AI 思想家圆桌",
       "imgprompt": "AI 绘图提示词",
-      "lives": "千世书 人生模拟",
-      "learndata": "LearnData 开源笔记"
+      "learndata": "LearnData 开源笔记",
+      "hub365": "365 开源计划"
     }
   },
   "Metadata": {
     "title": "ToolsByAI | 免费开源的 AI 翻译与数据处理工具集",
-    "description": "ToolsByAI 集合 19 款免费工具：字幕、Markdown、JSON i18n 翻译，文本/JSON 批处理。25+ AI 引擎，全前端处理。",
+    "description": "ToolsByAI 集合 19 款免费工具：字幕、Markdown、JSON i18n 翻译，文本/JSON 批处理。30+ AI 引擎，全前端处理。",
     "homeTitle": "ToolsByAI 工具集",
     "homeDescription": "19 款实用工具，涵盖多语言翻译、文本处理、JSON 编辑和数据转换，助力开发者和创作者提升效率。",
     "ogTitle": "ToolsByAI | 免费开源的 AI 翻译与数据处理工具集",
-    "ogDescription": "ToolsByAI 集合 19 款免费工具：字幕、Markdown、JSON i18n 翻译，文本/JSON 批处理。25+ AI 引擎，全前端处理。"
+    "ogDescription": "ToolsByAI 集合 19 款免费工具：字幕、Markdown、JSON i18n 翻译，文本/JSON 批处理。30+ AI 引擎，全前端处理。"
   },
   "languages": {
     "auto": "自动检测",

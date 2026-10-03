@@ -20,8 +20,8 @@
     "presetNamePlaceholder": "Szójegyzék neve (pl. egy műsor)",
     "edit": "Kifejezések szerkesztése",
     "drawerTitle": "Szójegyzék szerkesztése",
-    "sourcePlaceholder": "Forrás kifejezés (pl. 斯派克)",
-    "targetPlaceholder": "Fordítás (pl. Spike)",
+    "sourcePlaceholder": "Forrás kifejezés (pl. Spike)",
+    "targetPlaceholder": "Fordítás (pl. 斯派克)",
     "addTerm": "Kifejezés hozzáadása",
     "searchPlaceholder": "Kifejezések keresése",
     "duplicateHint": "Azonos forráskifejezések találhatók — forráskifejezésenként csak egy bejegyzés lesz érvényes",
@@ -37,7 +37,7 @@
   "common": {
     "exportFolder": "Exportálási mappa",
     "exportFolderDefault": "Az exportálások az alapértelmezett letöltési mappába kerülnek.",
-    "exportFolderBlocked": "A böngésző nem fogadja el magát az Asztalt, a Dokumentumokat, a Letöltéseket vagy a felhasználói mappát — válassz egy alappalát vagy bármilyen más mappát.",
+    "exportFolderBlocked": "A böngésző nem fogadja el magát az Asztalt, a Dokumentumokat, a Letöltéseket vagy a felhasználói mappát — válassz egy almappát vagy bármilyen más mappát.",
     "exportFolderCurrent": "Az exportálások ide kerülnek: {dir}",
     "exportFolderReset": "Vissza a letöltési mappához",
     "exportFolderFailed": "Nem sikerült beállítani az exportálási mappát.",
@@ -68,7 +68,7 @@
     "translationCancelled": "A fordítás megszakítva",
     "translationStopped": "Leállítva",
     "resumeFromCache": "A kész sorok gyorsítótárban vannak — fordítsd újra a folytatáshoz",
-    "cancelKeepsProgress": "A megszakítás megőrzi a már lefordítottrészt",
+    "cancelKeepsProgress": "A megszakítás megőrzi a már lefordított részt",
     "dismiss": "Elvetés",
     "translationAPI": "Fordítási API",
     "enter": "Bevitel",
@@ -165,7 +165,7 @@
     "customExportFilename": "Exportálandó fájlnév mintája",
     "customExportFilenameTooltip": "'{'name'}' = eredeti fájlnév, '{'lang'}' = nyelv, '{'ext'}' = kiterjesztés, '{'date'}' = dátum, '{'time'}' = idő; többnyelvű módban a '{'lang'}' automatikusan hozzáadódik a névütközések elkerülése érdekében",
     "partialFailureTitle": "{count} sor sikertelen",
-    "partialFailureDesc": "Ezek a sorok megtartották az eredeti szövegüket, így a fájl szerkezete sértetlen marad. Az újrapróbálkozás csak ezeket küldi újra; a többi a gyorsítótárbóljön.",
+    "partialFailureDesc": "Ezek a sorok megtartották az eredeti szövegüket, így a fájl szerkezete sértetlen marad. Az újrapróbálkozás csak ezeket küldi újra; a többi a gyorsítótárból jön.",
     "partialFailureWhy": "Gyakori az ingyenes és saját üzemeltetésű végpontoknál — általában nem jelent problémát a beállításaidban.",
     "retryFailedLines": "Hibás sorok újrapóbálása",
     "viewFailedLines": "Hibás sorok megtekintése",
@@ -217,7 +217,22 @@
     "errorHintRelay403": "Az API 403-as tiltott hibát adott vissza — engedélyezd az \"API-továbbítást (relay)\" a \"További szolgáltatói beállítások\" alatt",
     "errorHintCors": "Nem érhető el ez a végpont — ellenőrizd a címet, és győződj meg arról, hogy a szolgáltatás engedélyezi a cross-origin (CORS) kéréseket. A saját üzemeltetésű átjáróknak és a helyi modelleknek ezt saját maguknak kell engedélyezniük, vagy használnod kell a saját API-továbbítódat",
     "errorHintGeminiKey": "A Gemini nem érhető el: először ellenőrizd a hálózatot (egyes hálózatok nem érik el közvetlenül a Google szolgáltatásait). Ha a hálózat rendben van, a Google 2026. június 19. óta elutasítja a korlátozás nélküli API-kulcsokat — generálj újra kulcsot az AI Studio-ban (alapértelmezetten korlátozott), vagy adj hozzá Gemini API korlátozást a régi kulcshoz a Google Cloud Console-ban",
-    "rateLimitCooldown": "Sebességhatár elérve — rövid szünet, automatikus újrapróbálkozás következik"
+    "rateLimitCooldown": "Sebességhatár elérve — rövid szünet, automatikus újrapróbálkozás következik",
+    "faqHeading": "Gyakori kérdések",
+    "homeIndexEyebrow": "Mutató",
+    "homeCategoryEyebrow": "{n} kategória",
+    "openNavigation": "Navigáció megnyitása",
+    "goHome": "Ugrás a kezdőlapra",
+    "primaryNav": "Fő navigáció",
+    "toggleTheme": "Téma váltása",
+    "communityLinks": "Közösségi linkek",
+    "viewOnGitHub": "Megtekintés a GitHubon",
+    "toolCategories": "Eszközkategóriák",
+    "searchLanguage": "Nyelv keresése",
+    "selectLanguage": "Nyelv kiválasztása",
+    "noMatchFound": "Nincs találat",
+    "backToTop": "Vissza a tetejére",
+    "exportOptions": "Exportálási beállítások"
   },
   "MDTranslator": {
     "clientDescription": "Tölts fel Markdown fájlokat vagy illessz be szöveget. A formázást, a kódot és a képleteket intelligensen megőrzi, egy kattintással több nyelvre fordítható.",
@@ -228,7 +243,7 @@
     "tFrontmatter": "A frontmatter fordítása",
     "tCodeBlocksTooltip": "A dokumentum kódblokkjainak fordítása (általában nem ajánlott)",
     "tCodeBlocks": "A kódblokkok fordítása",
-    "tLatexTooltip": "LaTeX képletek fordítása (kerüld, ha a pénznemjeleket és hasonlókat félreismerten azonosítja)",
+    "tLatexTooltip": "LaTeX képletek fordítása (a pénznemjelek és hasonló speciális karakterek téves felismerésének elkerülésére)",
     "tLatex": "LaTeX képletek fordítása",
     "rawTranslationModeTooltip": "A Markdown formázás elemzése kimarad; az eredménynek nem kell szigorúan megőriznie az eredeti tördelést",
     "rawTranslationMode": "Formázás figyelmen kívül hagyása",
@@ -296,7 +311,7 @@
     "presetUpdate": "Mentés a jelenlegi előbeállításba",
     "presetUpdated": "Mentve a jelenlegi előbeállításba",
     "presetDeleteConfirm": "Törlöd ezt az előbeállítást?",
-    "presetEmptyHint": "Még nincsenek előbeállítások — szerkesszed, majd kattints a Mentés új előbeállításként gombra",
+    "presetEmptyHint": "Még nincsenek előbeállítások — szerkess, majd kattints a Mentés új előbeállításként gombra",
     "presetDefault": "Alapértelmezett utasítás",
     "presetDefaultReadonly": "Az alapértelmezett utasítás beépített — nem módosítható és nem törölhető. A testreszabáshoz használd a \"Mentés új előbeállításként\" lehetőséget.",
     "qwenMtDomains": "Tartományi utasítások (csak angolul)",
@@ -326,11 +341,11 @@
       "title": "Markdown fordító",
       "description": "Markdown fájlok kötegelt fordítása a formátum és a kód megőrzésével",
       "metaTitle": "Markdown fordító | Kód, LaTeX és Front Matter megőrzése",
-      "metaDescription": "Markdown fordító, amely megőrzi a kódot, a LaTeX-et, a hivatkozásokat és a Front Mattert. 25+ AI motor: DeepSeek, Claude, GPT. Hugo, Jekyll, Docusaurus oldalakhoz.",
+      "metaDescription": "Markdown fordító: megőrzi a kódot, a LaTeX-et, a hivatkozásokat és a Front Mattert. 30+ AI motor: DeepSeek, Claude, GPT. Hugo, Jekyll, Docusaurus.",
       "faq": [
         {
           "q": "Melyik ingyenes Markdown-fordító eszköz a legjobb?",
-          "a": "Az MDTranslator ingyenes, nyílt forráskódú, böngészőben futó Markdown fordító: a forrás soha nem hagyja el a gépedet, az API-kulcs a localStorage-ban marad. Támogatja a Google ingyenes fordítását, valamint a DeepSeek, Claude, GPT, Gemini és DeepL motorokat — összesen 25+ motort, 120+ célnyelven. Automatikusan kihagyja a kódblokkokat, a LaTeX képleteket, a hivatkozás-URL-eket és a Front Mattert, így kézi formázásjavítás nélkül publikálhatsz Hugo, Jekyll, Hexo, VitePress vagy Docusaurus alá."
+          "a": "Az MDTranslator ingyenes, nyílt forráskódú, böngészőben futó Markdown fordító: a forrás soha nem hagyja el a gépedet, az API-kulcs a localStorage-ban marad. Támogatja a Google ingyenes fordítását, valamint a DeepSeek, Claude, GPT, Gemini és DeepL motorokat — összesen 30+ motort, 120+ célnyelven. Automatikusan kihagyja a kódblokkokat, a LaTeX képleteket, a hivatkozás-URL-eket és a Front Mattert, így kézi formázásjavítás nélkül publikálhatsz Hugo, Jekyll, Hexo, VitePress vagy Docusaurus alá."
         },
         {
           "q": "Hogyan őrzöm meg a kódblokkokat és a képleteket Markdown fordításakor?",
@@ -338,18 +353,18 @@
         },
         {
           "q": "Gépi fordítást vagy AI/LLM-et használjak műszaki dokumentációhoz? Melyik a jobb?",
-          "a": "Műszaki tartalomhoz erősen ajánlott az AI/LLM; a gépi fordítás csak gyors előnézethez jó. Az AI/LLM modellek kontextusban ismerik fel a könyvtárneveket, függvényneveket és változókat, és nem fordítják félre őket — a Claude Sonnet vezet az API-dokumentációk terminológiai pontosságában, a DeepSeek kiváló ár-érték arányt ad (a kínai műszaki blogok de facto szabványa), a Gemini 3 Pro könyv hosszúságú dokumentációhoz illik (1M tokenes kontextus). A gépi fordítás (Google ingyenes, DeepL) csak gyors előnézethez alkalmas — a hosszú Markdown dokumentumok csonkolódnak, a szakkifejezések pedig hétköznapi szavakká csúsznak. A motorkonfiguráció közös a [Feliratfordítóval](../subtitle-translator) és a [JSON-fordítóval](../json-translate)."
+          "a": "Műszaki tartalomhoz erősen ajánlott az AI/LLM; a gépi fordítás csak gyors előnézethez jó. Az AI/LLM modellek kontextusban ismerik fel a könyvtárneveket, függvényneveket és változókat, és nem fordítják félre őket — a Claude Sonnet vezet az API-dokumentációk terminológiai pontosságában, a DeepSeek kiváló ár-érték arányt ad (a kínai műszaki blogok de facto szabványa), a Gemini könyv hosszúságú dokumentációhoz illik (1M tokenes kontextus). A gépi fordítás (Google ingyenes, DeepL) csak gyors előnézethez alkalmas — a hosszú Markdown dokumentumok csonkolódnak, a szakkifejezések pedig hétköznapi szavakká csúsznak. A motorkonfiguráció közös a [Feliratfordítóval](../subtitle-translator) és a [JSON-fordítóval](../json-translate)."
         },
         {
           "q": "Hogyan fordítsak le egy GitHub README-t vagy egy teljes VitePress / Docusaurus dokumentációs oldalt?",
-          "a": "Töltsd fel kötegeltem a docs/ könyvtárat. A title és description típusú Front Matter mezők a „Frontmatter fordítása” bekapcsolásával fordíthatók; a slug és permalink mezők megmaradnak. A kódblokkok, a parancssori példák és az API-végpontok automatikusan kimaradnak — csak a megjegyzések és a szöveges rész fordul. A lefordított fájlokat tedd vissza az eredeti könyvtárba, és a keretrendszered az i18n.locales konfigurációja alapján felismeri őket. A VitePress zh/, en/ almappákat használ; a Docusaurus az i18n/{locale}/ szerkezetet."
+          "a": "Töltsd fel kötegelten a docs/ könyvtárat. A title és description típusú Front Matter mezők a „Frontmatter fordítása” bekapcsolásával fordíthatók; a slug és permalink mezők megmaradnak. A kódblokkok, a parancssori példák és az API-végpontok automatikusan kimaradnak — csak a megjegyzések és a szöveges rész fordul. A lefordított fájlokat tedd vissza az eredeti könyvtárba, és a keretrendszered az i18n.locales konfigurációja alapján felismeri őket. A VitePress zh/, en/ almappákat használ; a Docusaurus az i18n/{locale}/ szerkezetet."
         },
         {
           "q": "Támogatja a GFM, MDX vagy Astro Markdown nyelvjárásokat?",
           "a": "Teljes mértékben támogatja a szabványos CommonMarkot és a GFM-et (GitHub Flavored Markdown), beleértve a táblázatokat, a feladatlistákat, az áthúzást és a kódkerítéseket. MDX (JSX komponensekkel kevert Markdown) és Astro komponensek esetén a komponenscímkék átlátszatlan blokként vannak kezelve; az olyan egyszerű szöveges attribútumok, mint a <Alert>ez fordításra kerül</Alert>, fordítódnak, a kifejezés-attribútumok (title={var}) viszont változatlanok maradnak, hogy ne törjön el a kód. Ha egy összetett MDX-nél teljesen ki akarod hagyni a Markdown-elemzést, kapcsold be a „Formázás figyelmen kívül hagyása” opciót, és minden egyszerű szövegként fordul."
         },
         {
-          "q": "Milyen eszközzel lehet műszaki blogbejegyzéseket kötegeltem fordítani?",
+          "q": "Milyen eszközzel lehet műszaki blogbejegyzéseket kötegelten fordítani?",
           "a": "Az MDTranslator több Markdown fájl kötegelt feltöltését és egy kattintásos fordítását támogatja. Megőrzi a Front Matter metaadatokat, így a lefordított bejegyzések közvetlenül telepíthetők Hugo, Jekyll, Hexo és más blogkeretrendszerek alá."
         },
         {
@@ -445,17 +460,17 @@
     "externalTools": {
       "legendtalk": "AI gondolkodók kerekasztala",
       "imgprompt": "AI képpromptok",
-      "lives": "Ezer élet",
-      "learndata": "LearnData nyílt forráskódú jegyzetek"
+      "learndata": "LearnData nyílt forráskódú jegyzetek",
+      "hub365": "365 Nyílt forráskód"
     }
   },
   "Metadata": {
     "title": "ToolsByAI | Ingyenes nyílt forráskódú AI fordító és adateszközök",
-    "description": "ToolsByAI: 19 ingyenes nyílt forráskódú eszköz feliratok, Markdown, JSON i18n fordításhoz, valamint szöveg- és JSON-kötegelt feldolgozáshoz. 25+ AI motor.",
+    "description": "ToolsByAI: 19 ingyenes nyílt forráskódú eszköz feliratok, Markdown, JSON i18n fordításhoz, valamint szöveg- és JSON-kötegelt feldolgozáshoz. 30+ AI motor.",
     "homeTitle": "ToolsByAI eszközkészlet",
     "homeDescription": "19 eszköz fordításhoz, szöveghez, JSON-hoz és adatkonverzióhoz. Növeld a fejlesztők és alkotók hatékonyságát.",
     "ogTitle": "ToolsByAI | Ingyenes nyílt forráskódú AI fordító és adateszközök",
-    "ogDescription": "ToolsByAI: 19 ingyenes nyílt forráskódú eszköz feliratok, Markdown, JSON i18n fordításhoz, valamint szöveg- és JSON-kötegelt feldolgozáshoz. 25+ AI motor."
+    "ogDescription": "ToolsByAI: 19 ingyenes nyílt forráskódú eszköz feliratok, Markdown, JSON i18n fordításhoz, valamint szöveg- és JSON-kötegelt feldolgozáshoz. 30+ AI motor."
   },
   "languages": {
     "auto": "Automatikus felismerés",

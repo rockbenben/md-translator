@@ -71,7 +71,7 @@
     "cancelKeepsProgress": "İptal etmek çevrilenleri korur",
     "dismiss": "Kapat",
     "translationAPI": "Çeviri API'si",
-    "enter": "Giriş",
+    "enter": "Lütfen girin",
     "getApiKey": "API Anahtarı Al",
     "charLabel": "Karakter",
     "lineLabel": "Satır",
@@ -217,7 +217,22 @@
     "errorHintRelay403": "API 403 Forbidden döndürdü — \"Daha fazla Provider ayarı\" bölümünde \"API Aktarıcı\"yı açın",
     "errorHintCors": "Bu adrese bağlanılamıyor — adresi ve servisin çapraz kaynak isteklerine (CORS) izin verip vermediğini kontrol edin. Kendi barındırdığınız ağ geçitleri ve yerel modellerde bunu kendiniz açmalısınız ya da kendi API Aktarıcınızı kullanın",
     "errorHintGeminiKey": "Gemini'ye ulaşılamıyor: önce ağınızı kontrol edin (bazı ağlar Google hizmetlerine doğrudan erişemez). Ağ sorunsuzsa, 19 Haziran 2026'dan itibaren Google kısıtlamasız API anahtarlarını reddediyor — anahtarınızı AI Studio'da yeniden oluşturun (varsayılan olarak kısıtlı) veya Google Cloud Console'da eski anahtara Gemini API kısıtlaması ekleyin",
-    "rateLimitCooldown": "İstek sınırına ulaşıldı — kısa bir duraklamadan sonra otomatik olarak yeniden denenecek"
+    "rateLimitCooldown": "İstek sınırına ulaşıldı — kısa bir duraklamadan sonra otomatik olarak yeniden denenecek",
+    "faqHeading": "Sık sorulan sorular",
+    "homeIndexEyebrow": "Dizin",
+    "homeCategoryEyebrow": "{n} kategori",
+    "openNavigation": "Gezinmeyi aç",
+    "goHome": "Ana sayfaya git",
+    "primaryNav": "Ana gezinme",
+    "toggleTheme": "Temayı değiştir",
+    "communityLinks": "Topluluk bağlantıları",
+    "viewOnGitHub": "GitHub’da görüntüle",
+    "toolCategories": "Araç kategorileri",
+    "searchLanguage": "Dil ara",
+    "selectLanguage": "Dil seç",
+    "noMatchFound": "eşleşme yok",
+    "backToTop": "Yukarı çık",
+    "exportOptions": "Dışa aktarma seçenekleri"
   },
   "MDTranslator": {
     "clientDescription": "Markdown dosyalarını yükleyin veya metni yapıştırın. Formatı, kodu ve formülleri akıllıca korur. Tek tıkla birden fazla dile çeviri.",
@@ -228,7 +243,7 @@
     "tFrontmatter": "Frontmatter'ı çevir",
     "tCodeBlocksTooltip": "Kod bloklarının içeriğini çevir (genellikle önerilmez)",
     "tCodeBlocks": "Kod bloklarını çevir",
-    "tLatexTooltip": "LaTeX formüllerini çevir (özel semboller yanlış tanımlanırsa kaçının)",
+    "tLatexTooltip": "LaTeX formüllerini çevir (özel sembollerin yanlış tanınmasını önler)",
     "tLatex": "LaTeX formüllerini çevir",
     "rawTranslationModeTooltip": "Markdown ayrıştırmasını atla; çıktının orijinal biçimlendirmeyi kesinlikle koruması gerekmez",
     "rawTranslationMode": "Biçimlendirmeyi Yoksay",
@@ -265,7 +280,7 @@
     "for": "için",
     "textToTranslate": "çevrilecek metin",
     "fullText": "tam metin",
-    "chunkSize": "Parça Boyutu",
+    "chunkSize": "Blok Boyutu",
     "chunkSizeExtra": "Çok satırlı metin (Altyazı, Markdown) bu boyuta bölünecektir",
     "batchSize": "Eş zamanlı satırlar",
     "batchSizeExtra": "Bağlam dışı modda eşzamanlı istekler. Çok yüksek değer API hız sınırlarını tetikler",
@@ -326,11 +341,11 @@
       "title": "Markdown Çevirici",
       "description": "Toplu Markdown çevirisi, format ve kodu korur",
       "metaTitle": "Markdown Çevirici | Kodu, LaTeX ve Front Matter'ı Korur",
-      "metaDescription": "Markdown çevirmeni: kod blokları, LaTeX, Front Matter korunur. 25+ AI motoru: DeepSeek, Claude, GPT. Hugo, Jekyll, Docusaurus.",
+      "metaDescription": "Markdown çevirmeni: kod blokları, LaTeX, Front Matter korunur. 30+ AI motoru: DeepSeek, Claude, GPT. Hugo, Jekyll, Docusaurus.",
       "faq": [
         {
           "q": "Hangi ücretsiz Markdown çeviri aracı en iyi çalışır?",
-          "a": "MDTranslator, ücretsiz, açık kaynaklı, tarayıcı tarafı bir Markdown çeviricidir: kaynak makinenizden hiç ayrılmaz, API anahtarı localStorage'da kalır. Google ücretsiz çeviriyi plus DeepSeek, Claude, GPT, Gemini, DeepL destekler — toplam 25+ motor, 120+ hedef dili kapsar. Kod bloklarını, LaTeX formüllerini, URL bağlantılarını ve Front Matter'ı otomatik olarak atlar, manuel format onarımı olmadan doğrudan Hugo, Jekyll, Hexo, VitePress veya Docusaurus'a yayınlayabilirsiniz."
+          "a": "MDTranslator, ücretsiz, açık kaynaklı, tarayıcı tarafı bir Markdown çeviricidir: kaynak makinenizden hiç ayrılmaz, API anahtarı localStorage'da kalır. Google ücretsiz çeviriyi, ayrıca DeepSeek, Claude, GPT, Gemini, DeepL destekler — toplam 30+ motor, 120+ hedef dili kapsar. Kod bloklarını, LaTeX formüllerini, URL bağlantılarını ve Front Matter'ı otomatik olarak atlar, manuel format onarımı olmadan doğrudan Hugo, Jekyll, Hexo, VitePress veya Docusaurus'a yayınlayabilirsiniz."
         },
         {
           "q": "Markdown çevirirken kod blokları ve formüller nasıl korunur?",
@@ -338,7 +353,7 @@
         },
         {
           "q": "Teknik dokümantasyon: makine çevirisi mi AI/LLM çevirisi mi en uygun?",
-          "a": "Teknik içerik için AI/LLM şiddetle önerilir; makine çevirisi yalnızca hızlı önizleme için uygundur. AI/LLM modelleri bağlam içindeki kütüphane adlarını, fonksiyon adlarını ve değişkenleri yanlış çevirmeden tanır — Claude Sonnet API doküman terminoloji doğruluğunda öncüdür, DeepSeek mükemmel fiyat/performans sunar (Çince teknik blog çevirisinin fiili standardı), Gemini 3 Pro kitap boyutundaki dokümantasyon için uygundur (1M token bağlam). Makine çevirisi (Google ücretsiz, DeepL) yalnızca hızlı önizleme içindir — uzun Markdown belgeleri kesilir, teknik terimler kolayca günlük kelimelere çevrilir. Motor yapılandırması [Altyazı Çevirmeni](../subtitle-translator) ve [JSON Çevirmeni](../json-translate) ile paylaşılabilir."
+          "a": "Teknik içerik için AI/LLM şiddetle önerilir; makine çevirisi yalnızca hızlı önizleme için uygundur. AI/LLM modelleri bağlam içindeki kütüphane adlarını, fonksiyon adlarını ve değişkenleri yanlış çevirmeden tanır — Claude Sonnet API doküman terminoloji doğruluğunda öncüdür, DeepSeek mükemmel fiyat/performans sunar (Çince teknik blog çevirisinin fiili standardı), Gemini kitap boyutundaki dokümantasyon için uygundur (1M token bağlam). Makine çevirisi (Google ücretsiz, DeepL) yalnızca hızlı önizleme içindir — uzun Markdown belgeleri kesilir, teknik terimler kolayca günlük kelimelere çevrilir. Motor yapılandırması [Altyazı Çevirmeni](../subtitle-translator) ve [JSON Çevirmeni](../json-translate) ile paylaşılabilir."
         },
         {
           "q": "Bir GitHub README'yi veya tüm bir VitePress / Docusaurus belge sitesini nasıl çeviririm?",
@@ -386,7 +401,7 @@
       "description": "Toplu işlem için regex eşleştirme, sıralama, filtreleme ve diğer işlevleri entegre eder"
     },
     "dataBatch": {
-      "title": "Kişisel Metin İşleyici",
+      "title": "Toplu Veri İşleyici",
       "description": "Excel toplu veri işleme — tekilleştirme, sütun çıkarma, metin birleştirme, zincirli kurallar"
     },
     "textJoiner": {
@@ -445,17 +460,17 @@
     "externalTools": {
       "legendtalk": "AI Düşünürler Yuvarlak Masası",
       "imgprompt": "AI Görsel İstemleri",
-      "lives": "Thousand Lives",
-      "learndata": "LearnData Açık Kaynak Notlar"
+      "learndata": "LearnData Açık Kaynak Notlar",
+      "hub365": "365 Açık Kaynak"
     }
   },
   "Metadata": {
     "title": "ToolsByAI - Geliştiriciler İçin Yapay Zeka ve Veri Araçları",
-    "description": "ToolsByAI: altyazı, Markdown, JSON i18n çevirisi ve metin/JSON toplu işleme için 19 ücretsiz açık kaynak araç. 25+ AI motoru.",
+    "description": "ToolsByAI: altyazı, Markdown, JSON i18n çevirisi ve metin/JSON toplu işleme için 19 ücretsiz açık kaynak araç. 30+ AI motoru.",
     "homeTitle": "ToolsByAI Paketi",
     "homeDescription": "Çeviri, metin, JSON ve veri dönüşümü için 19 araç. Geliştirici ve yaratıcı verimliliğini artırın.",
-    "ogTitle": "ToolsByAI - Ücretsiz ve Açık Kaynak Geliştirici Araçları",
-    "ogDescription": "ToolsByAI: altyazı, Markdown, JSON i18n çevirisi ve metin/JSON toplu işleme için 19 ücretsiz açık kaynak araç. 25+ AI motoru."
+    "ogTitle": "ToolsByAI - Geliştiriciler İçin Yapay Zeka ve Veri Araçları",
+    "ogDescription": "ToolsByAI: altyazı, Markdown, JSON i18n çevirisi ve metin/JSON toplu işleme için 19 ücretsiz açık kaynak araç. 30+ AI motoru."
   },
   "languages": {
     "auto": "Otomatik Algılama",
