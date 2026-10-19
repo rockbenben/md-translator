@@ -295,6 +295,7 @@
     "useRelay": "Relais API",
     "useRelayTooltip": "Activez le relais API en cas d'erreurs CORS ou 403. Les requêtes transitent alors par le relais vers le fournisseur ; il relaie sans rien stocker.",
     "useRelayCustomUrl": "Endpoint personnalisé en cours d'utilisation : le relais public intégré ne transmet que les adresses qu'il déclare, cette adresse ne lui est donc jamais envoyée — les requêtes partent en direct. Pour passer par un relais, activez l'interrupteur et saisissez ci-dessous l'adresse de votre propre relais.",
+    "useRelayLocalOnly": "Adresse locale ou réseau privé : seul cet poste l'atteint, un relais ne peut pas y accéder — l'interrupteur reste sans effet sur ce point de terminaison.",
     "relayBase": "Adresse du relais",
     "relayBaseExtra": "Laissez vide pour utiliser le relais intégré. Cette adresse s'applique à tous les services dont le relais est activé et nécessite votre propre déploiement du même Worker de relais.",
     "relayBaseInvalid": "Adresse invalide — une URL complète commençant par http:// ou https://, sans chaîne de requête ni #fragment, et qui n'est pas un point de terminaison /api, est requise (saisissez uniquement l'hôte ou le préfixe de chemin du relais). La traduction échouera tant qu'elle n'est pas corrigée ; laissez le champ vide pour utiliser le relais intégré.",
@@ -447,6 +448,10 @@
     "textDiff": {
       "title": "Text Diff",
       "description": "Comparez deux textes ou fichiers côte à côte et repérez la première différence."
+    },
+    "braceExpander": {
+      "title": "Expansseur d'accolades",
+      "description": "Développez un modèle en liste complète, syntaxe bash"
     }
   },
   "navigation": {
@@ -466,11 +471,11 @@
   },
   "Metadata": {
     "title": "ToolsByAI | Outils de Traduction & Dev IA Gratuits",
-    "description": "ToolsByAI: 19 outils open source gratuits pour la traduction de sous-titres, Markdown, JSON i18n et le traitement par lots. 30+ moteurs IA.",
+    "description": "ToolsByAI: 20 outils open source gratuits pour la traduction de sous-titres, Markdown, JSON i18n et le traitement par lots. 30+ moteurs IA.",
     "homeTitle": "Suite ToolsByAI",
-    "homeDescription": "19 outils pour traduction, texte, JSON et conversion de données. Boostez l'efficacité des développeurs et créateurs.",
+    "homeDescription": "20 outils pour traduction, texte, JSON et conversion de données. Boostez l'efficacité des développeurs et créateurs.",
     "ogTitle": "ToolsByAI | Outils de Traduction & Dev IA Gratuits",
-    "ogDescription": "ToolsByAI: 19 outils open source gratuits pour la traduction de sous-titres, Markdown, JSON i18n et le traitement par lots. 30+ moteurs IA."
+    "ogDescription": "ToolsByAI: 20 outils open source gratuits pour la traduction de sous-titres, Markdown, JSON i18n et le traitement par lots. 30+ moteurs IA."
   },
   "languages": {
     "auto": "Détection auto",
