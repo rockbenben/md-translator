@@ -332,7 +332,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Subtitle Translator",
-      "description": "Batch translate SRT, ASS, VTT, SBV, LRC subtitles. 120+ languages"
+      "description": "Batch translate SRT, ASS, SSA, VTT, SBV, LRC subtitles. 120+ languages"
     },
     "jsonTranslate": {
       "title": "JSON Multi-Language Translator",
@@ -373,8 +373,8 @@
           "a": "For subtitle files (SRT/ASS/VTT/SBV/LRC), use [Subtitle Translator](../subtitle-translator) — it preserves timecodes and ASS style tags. For JSON i18n files (i18next, next-intl, vue-i18n key-value structure), use [JSON Translator](../json-translate) — selective translation by Key path, with placeholder protection for {name}, {count}, etc. All three translation tools share the same engine configurations and API keys, so switching between them needs no re-setup."
         },
         {
-          "q": "Is the translated Markdown uploaded to your server? Is it open source?",
-          "a": "Fully client-side: Markdown reading, parsing, and translation requests all happen in your browser — original content never touches our servers. LLM engine requests go directly from your browser to your configured API endpoint (OpenAI, DeepSeek, etc.), and API keys are stored only in local browser storage. Translation cache uses browser IndexedDB. Source code is open on GitHub (rockbenben/md-translator) for self-hosting or auditing."
+          "q": "Is the translated Markdown uploaded to your server?",
+          "a": "Fully client-side: Markdown reading, parsing, and translation requests all happen in your browser — original content never touches our servers. LLM engine requests go directly from your browser to your configured API endpoint (OpenAI, DeepSeek, etc.), and API keys are stored only in local browser storage. Translation cache uses browser IndexedDB."
         }
       ],
       "features": [
@@ -439,7 +439,7 @@
     },
     "dataParserFlare": {
       "title": "Flare Bookmark Converter",
-      "description": "Convert bookmarks to/from Flare format"
+      "description": "Convert bookmark HTML to Flare YAML (flattened)"
     },
     "dataParserImgPrompt": {
       "title": "IMGPrompt Data Gen",

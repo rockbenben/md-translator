@@ -11,8 +11,9 @@ import { useResetOnSourceChange } from "@/app/hooks/useResetOnSourceChange";
 import { useLocalStorage } from "@/app/hooks/useLocalStorage";
 import { useTextStats } from "@/app/hooks/useTextStats";
 import { useExportFilename } from "@/app/hooks/useExportFilename";
+import { useRevealResult } from "@/app/hooks/useRevealResult";
 
-import { splitTextIntoLines, downloadFile, getFileTypePresetConfig } from "@/app/utils";
+import { splitTextIntoLines, downloadFile, getFileTypePresetConfig, joinLanguageCount } from "@/app/utils";
 import { MARKDOWN_DEFAULTS, filterMarkdownLines, PLACEHOLDER_REPLACE_REGEX, restorePlaceholders, splitMarkdownSegments, mergeMarkdownSegments, applyRemoveCharsToMarkdown, applyRemoveCharsToSegments } from "@/app/lib/translation/formats/markdown";
 import { LLM_MODELS } from "@/app/lib/translation";
 import { mapSkippingSoftFilled } from "@/app/lib/translation/softFill";
@@ -96,8 +97,6 @@ const MDTranslator = () => {
     noteFileFailure,
   } = useTranslationContext();
 
-  // 运行中锁住页面级「导出目录」入口:写入是每个文件现读句柄,跑到一半改目录
-  // 会把同一批产物劈进两个文件夹。控件在 ToolPage 里,prop 传不上去,故用环境锁。
   useLockExportFolder(isTranslating);
   const { message } = App.useApp();
   const exportFile = useFileExport();
@@ -105,6 +104,11 @@ const MDTranslator = () => {
 
   const sourceStats = useTextStats(sourceText);
   const resultStats = useTextStats(translatedText);
+  const hasVisibleResult = uploadMode === "single" && Boolean(translatedText && !(multiLanguageMode && targetLanguages.length > 1));
+  // 有失败时不自动滚到结果：失败面板在结果上方，滚过去会把「哪几行失败 / 重试」
+  // 挤出视野，让一次部分失败看起来像全成功。
+  // 取消后保留进度条作为续跑凭据，不把用户带到可能存在的半成品结果上。
+  const resultRef = useRevealResult(isTranslating, hasVisibleResult && !(failedCount > 0 || failedLangs.length > 0 || runHadFailures) && !isCancelRequested());
 
   const [taggedText, setTaggedText] = useState("");
 
@@ -125,17 +129,10 @@ const MDTranslator = () => {
   const [multiLangModalOpen, setMultiLangModalOpen] = useState(false);
   // 提取出的纯文本预览 — tool-local,不放在共享 TranslationContext 里。
   const [extractedText, setExtractedText] = useState("");
-  // 记录 translatedText 对应的目标语种,handleExportFile 用它生成文件名;
-  // 多语言模式下 translatedText 是 previewLang(常规跑 = targetLangs[0];scoped
-  // 重试时保持上一次预览的语种)而非主 targetLanguage,不记录的话导出文件名会
-  // 标错语种(主 targetLanguage 跟 translatedText 内容不匹配)
+  // 多语言下 translatedText 是预览语种而非主 targetLanguage，不记的话导出文件名会标错语种
   const [translatedTextLang, setTranslatedTextLang] = useState<string | null>(null);
   const { customFileName, setCustomFileName, generateFileName } = useExportFilename("md-translator");
 
-  // 源文本变化时只复位"源派生"的本地预览(extractedText)。译文结果及其元数据
-  // (translatedText / translatedTextLang)则保留——和 JSON 翻译一致:改源后旧结果不清,
-  // 直到重新翻译。这样既符合"保留旧结果",又不必在 render 阶段去 set 共享 context 的
-  // translatedText(那会更新 TranslationProvider → setState-in-render 警告)。
   useResetOnSourceChange(sourceText, () => setExtractedText(""));
 
   // 作废上一轮翻译产物:Clear All 与换/删上传文件时调用,使译文结果、语种标记、
@@ -159,8 +156,6 @@ const MDTranslator = () => {
   const applyRemoveChars = (text: string): string => applyRemoveCharsToMarkdown(text, removeChars);
 
   const performTranslation = async (sourceText: string, fileNameSet?: string, fileIndex?: number, totalFiles?: number) => {
-    // On a failure-panel retry (runRetry) this is narrowed to the langs still
-    // needing work — successful languages aren't re-walked/re-downloaded.
     const targetLangs = getActiveTargetLangs();
     if (multiLanguageMode && targetLangs.length === 0) {
       message.error(t("noTargetLanguage"));
@@ -316,10 +311,11 @@ const MDTranslator = () => {
                 size="large"
                 icon={<GlobalOutlined spin={isTranslating} aria-hidden />}
                 className="flex-1"
+                style={{ whiteSpace: "normal", height: "auto", minHeight: 40 }}
                 onClick={() => (uploadMode === "single" ? handleSingleTranslate() : runBatchTranslation(performTranslation, multipleFiles, readFile, t("noFileUploaded")))}
                 disabled={isTranslating}
                 loading={isTranslating}>
-                {multiLanguageMode ? `${t("translate")} | ${t("totalLanguages")}${targetLanguages.length || 0}` : t("translate")}
+                {multiLanguageMode ? `${t("translate")} | ${joinLanguageCount(t("totalLanguages"), targetLanguages.length || 0)}` : t("translate")}
               </Button>
 
               {uploadMode === "single" && sourceText && (
@@ -521,7 +517,7 @@ const MDTranslator = () => {
 
       {/* Results Section */}
       {uploadMode === "single" && (translatedText || extractedText) && (
-        <div className="mt-6">
+        <div className="mt-6" ref={resultRef}>
           <Row gutter={[24, 24]}>
             {translatedText && !(multiLanguageMode && targetLanguages.length > 1) && (
               <Col xs={24} lg={extractedText ? 12 : 24}>

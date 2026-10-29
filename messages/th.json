@@ -332,7 +332,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "ตัวแปลซับไตเติล",
-      "description": "แปล SRT, ASS, VTT, SBV, LRC เป็นชุด 120+ ภาษา"
+      "description": "แปล SRT, ASS, SSA, VTT, SBV, LRC เป็นชุด 120+ ภาษา"
     },
     "jsonTranslate": {
       "title": "ตัวแปล JSON i18n",
@@ -373,8 +373,8 @@
           "a": "สำหรับไฟล์ซับ (SRT/ASS/VTT/SBV/LRC) ใช้ [ตัวแปลซับไตเติล](../subtitle-translator) — คงไทม์โค้ดและแท็กสไตล์ ASS สำหรับไฟล์ i18n JSON (โครงสร้าง key-value แบบ i18next, next-intl, vue-i18n) ใช้ [แปล JSON](../json-translate) — แปลเลือกได้ตาม Key path พร้อมป้องกัน placeholder {name}, {count} ฯลฯ เครื่องมือแปลทั้งสามใช้คอนฟิกเอนจินและ API Key ร่วมกัน ไม่ต้องตั้งค่าใหม่เมื่อสลับ"
         },
         {
-          "q": "Markdown ที่แปลแล้วจะอัปโหลดไปเซิร์ฟเวอร์ไหม? เป็นโอเพนซอร์สหรือไม่?",
-          "a": "ทำงานฝั่งไคลเอนต์ทั้งหมด: การอ่าน Markdown การ parse และคำขอแปลทั้งหมดเกิดขึ้นในเบราว์เซอร์ของคุณ — เนื้อหาต้นฉบับไม่เคยแตะเซิร์ฟเวอร์ของเรา คำขอเอนจิน LLM ถูกส่งตรงจากเบราว์เซอร์ของคุณไปยัง API endpoint ที่คุณตั้งค่า (OpenAI, DeepSeek ฯลฯ) และ API Key เก็บไว้ใน local storage ของเบราว์เซอร์เท่านั้น แคชการแปลใช้ IndexedDB ของเบราว์เซอร์ ซอร์สโค้ดเปิดบน GitHub (rockbenben/md-translator) สำหรับ self-hosting หรือตรวจสอบ"
+          "q": "Markdown ที่แปลแล้วจะอัปโหลดไปเซิร์ฟเวอร์ไหม?",
+          "a": "ทำงานฝั่งไคลเอนต์ทั้งหมด: การอ่าน Markdown การ parse และคำขอแปลทั้งหมดเกิดขึ้นในเบราว์เซอร์ของคุณ — เนื้อหาต้นฉบับไม่เคยแตะเซิร์ฟเวอร์ของเรา คำขอเอนจิน LLM ถูกส่งตรงจากเบราว์เซอร์ของคุณไปยัง API endpoint ที่คุณตั้งค่า (OpenAI, DeepSeek ฯลฯ) และ API Key เก็บไว้ใน local storage ของเบราว์เซอร์เท่านั้น แคชการแปลใช้ IndexedDB ของเบราว์เซอร์"
         }
       ],
       "features": [
@@ -439,7 +439,7 @@
     },
     "dataParserFlare": {
       "title": "ตัวแปลง Flare",
-      "description": "แปลงบุ๊กมาร์กเบราว์เซอร์และรูปแบบ Flare"
+      "description": "บุ๊กมาร์ก HTML เป็น Flare YAML (แบน)"
     },
     "dataParserImgPrompt": {
       "title": "ตัวสร้างข้อมูล IMGPrompt",

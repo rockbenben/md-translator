@@ -332,7 +332,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Trình Dịch Phụ Đề",
-      "description": "Dịch hàng loạt SRT, ASS, VTT, SBV, LRC. 120+ ngôn ngữ."
+      "description": "Dịch hàng loạt SRT, ASS, SSA, VTT, SBV, LRC. 120+ ngôn ngữ."
     },
     "jsonTranslate": {
       "title": "Trình Dịch JSON i18n",
@@ -373,8 +373,8 @@
           "a": "Với tệp phụ đề (SRT/ASS/VTT/SBV/LRC), dùng [Trình Dịch Phụ Đề](../subtitle-translator) — giữ timecode và thẻ kiểu ASS. Với tệp i18n JSON (cấu trúc key-value như i18next, next-intl, vue-i18n), dùng [Dịch JSON](../json-translate) — dịch chọn lọc theo đường dẫn Key, bảo vệ placeholder {name}, {count}, v.v. Cả ba công cụ dịch dùng chung cùng cấu hình engine và API Key, nên chuyển qua lại giữa chúng không cần cài đặt lại."
         },
         {
-          "q": "Markdown đã dịch có được tải lên máy chủ không? Có mã nguồn mở không?",
-          "a": "Hoàn toàn phía client: đọc Markdown, phân tích cú pháp và yêu cầu dịch đều diễn ra trong trình duyệt của bạn — nội dung gốc không bao giờ đi qua máy chủ của chúng tôi. Yêu cầu engine LLM đi thẳng từ trình duyệt đến endpoint API bạn đã cấu hình (OpenAI, DeepSeek, v.v.), và API Key chỉ lưu trong localStorage cục bộ. Bộ nhớ đệm dịch dùng IndexedDB của trình duyệt. Mã nguồn mở trên GitHub (rockbenben/md-translator) để tự host hoặc kiểm tra."
+          "q": "Markdown đã dịch có được tải lên máy chủ không?",
+          "a": "Hoàn toàn phía client: đọc Markdown, phân tích cú pháp và yêu cầu dịch đều diễn ra trong trình duyệt của bạn — nội dung gốc không bao giờ đi qua máy chủ của chúng tôi. Yêu cầu engine LLM đi thẳng từ trình duyệt đến endpoint API bạn đã cấu hình (OpenAI, DeepSeek, v.v.), và API Key chỉ lưu trong localStorage cục bộ. Bộ nhớ đệm dịch dùng IndexedDB của trình duyệt."
         }
       ],
       "features": [
@@ -439,7 +439,7 @@
     },
     "dataParserFlare": {
       "title": "Trình chuyển đổi Flare",
-      "description": "Chuyển đổi bookmark trình duyệt và định dạng Flare"
+      "description": "Bookmark HTML sang Flare YAML (làm phẳng)"
     },
     "dataParserImgPrompt": {
       "title": "Trình tạo dữ liệu IMGPrompt",

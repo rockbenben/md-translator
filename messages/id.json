@@ -332,7 +332,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Penerjemah Subtitle",
-      "description": "Terjemahan batch SRT, ASS, VTT, SBV, LRC. 120+ bahasa."
+      "description": "Terjemahan batch SRT, ASS, SSA, VTT, SBV, LRC. 120+ bahasa."
     },
     "jsonTranslate": {
       "title": "Penerjemah JSON i18n",
@@ -373,8 +373,8 @@
           "a": "Untuk file subtitle (SRT/ASS/VTT/SBV/LRC), gunakan [Penerjemah Subtitle](../subtitle-translator) — mempertahankan timecode dan tag gaya ASS. Untuk file i18n JSON (struktur key-value i18next, next-intl, vue-i18n), gunakan [Penerjemah JSON](../json-translate) — terjemahan selektif berdasarkan jalur Key, dengan perlindungan placeholder untuk {name}, {count}, dll. Ketiga alat terjemahan berbagi konfigurasi mesin dan API Key yang sama, jadi beralih di antaranya tidak perlu setup ulang."
         },
         {
-          "q": "Apakah Markdown terjemahan diunggah ke server Anda? Apakah open source?",
-          "a": "Sepenuhnya sisi-klien: pembacaan Markdown, parsing, dan permintaan terjemahan semua terjadi di browser Anda — konten asli tidak pernah menyentuh server kami. Permintaan mesin LLM dikirim langsung dari browser Anda ke endpoint API yang Anda konfigurasi (OpenAI, DeepSeek, dll.), dan API Key disimpan hanya di penyimpanan browser lokal. Cache terjemahan menggunakan IndexedDB browser. Kode sumber terbuka di GitHub (rockbenben/md-translator) untuk self-hosting atau audit."
+          "q": "Apakah Markdown terjemahan diunggah ke server Anda?",
+          "a": "Sepenuhnya sisi-klien: pembacaan Markdown, parsing, dan permintaan terjemahan semua terjadi di browser Anda — konten asli tidak pernah menyentuh server kami. Permintaan mesin LLM dikirim langsung dari browser Anda ke endpoint API yang Anda konfigurasi (OpenAI, DeepSeek, dll.), dan API Key disimpan hanya di penyimpanan browser lokal. Cache terjemahan menggunakan IndexedDB browser."
         }
       ],
       "features": [
@@ -439,7 +439,7 @@
     },
     "dataParserFlare": {
       "title": "Konverter Flare",
-      "description": "Konversi bookmark browser dan format Flare"
+      "description": "Bookmark HTML ke Flare YAML (rata)"
     },
     "dataParserImgPrompt": {
       "title": "Generator Data IMGPrompt",

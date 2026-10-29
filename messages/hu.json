@@ -332,7 +332,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Feliratfordító",
-      "description": "SRT, ASS, VTT, SBV, LRC feliratok kötegelt fordítása. 120+ nyelv."
+      "description": "SRT, ASS, SSA, VTT, SBV, LRC feliratok kötegelt fordítása. 120+ nyelv."
     },
     "jsonTranslate": {
       "title": "JSON többnyelvű fordító",
@@ -373,8 +373,8 @@
           "a": "Feliratfájlokhoz (SRT/ASS/VTT/SBV/LRC) használd a [Feliratfordítót](../subtitle-translator) — megőrzi az időbélyegeket és az ASS stílusjelölőket. JSON i18n fájlokhoz (i18next, next-intl, vue-i18n kulcs-érték szerkezet) a [JSON-fordítót](../json-translate) — kulcsútvonal szerinti szelektív fordítás, {name}, {count} stb. helyőrző-védelemmel. Mindhárom fordítóeszköz ugyanazokat a motorkonfigurációkat és API-kulcsokat használja, így a váltáshoz nem kell újra beállítani semmit."
         },
         {
-          "q": "Feltöltődik a lefordított Markdown a szerveretekre? Nyílt forráskódú?",
-          "a": "Teljesen kliensoldali: a Markdown beolvasása, elemzése és a fordítási kérések mind a böngésződben történnek — az eredeti tartalom soha nem kerül a szervereinkre. Az LLM-kérések közvetlenül a böngésződből mennek az általad beállított API-végpontra (OpenAI, DeepSeek stb.), az API-kulcsok pedig kizárólag a helyi böngészőtárban tárolódnak. A fordítási gyorsítótár a böngésző IndexedDB-jét használja. A forráskód nyílt a GitHubon (rockbenben/md-translator), saját üzemeltetéshez vagy auditáláshoz."
+          "q": "Feltöltődik a lefordított Markdown a szerveretekre?",
+          "a": "Teljesen kliensoldali: a Markdown beolvasása, elemzése és a fordítási kérések mind a böngésződben történnek — az eredeti tartalom soha nem kerül a szervereinkre. Az LLM-kérések közvetlenül a böngésződből mennek az általad beállított API-végpontra (OpenAI, DeepSeek stb.), az API-kulcsok pedig kizárólag a helyi böngészőtárban tárolódnak. A fordítási gyorsítótár a böngésző IndexedDB-jét használja."
         }
       ],
       "features": [
@@ -439,7 +439,7 @@
     },
     "dataParserFlare": {
       "title": "Flare könyvjelző-konverter",
-      "description": "Könyvjelzők konvertálása Flare formátumba és abból vissza"
+      "description": "Könyvjelző HTML-ből Flare YAML (lapos)"
     },
     "dataParserImgPrompt": {
       "title": "IMGPrompt adatgenerátor",

@@ -332,7 +332,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Tradutor Legendas",
-      "description": "Tradução em lote SRT, ASS, VTT, SBV, LRC. 120+ idiomas."
+      "description": "Tradução em lote SRT, ASS, SSA, VTT, SBV, LRC. 120+ idiomas."
     },
     "jsonTranslate": {
       "title": "Tradutor JSON i18n",
@@ -373,8 +373,8 @@
           "a": "Para arquivos de legenda (SRT/ASS/VTT/SBV/LRC), use o [Tradutor de Legendas](../subtitle-translator) — preserva timecodes e tags de estilo ASS. Para arquivos JSON de i18n (estruturas key-value como i18next, next-intl, vue-i18n), use o [Tradutor JSON](../json-translate) — tradução seletiva por caminho de chave, com proteção de placeholders {name}, {count} etc. As três ferramentas compartilham as mesmas configurações de motor e API Keys, então alternar entre elas dispensa nova configuração."
         },
         {
-          "q": "O Markdown traduzido é enviado ao servidor? É open source?",
-          "a": "Totalmente client-side: leitura, parsing e requisições de tradução acontecem no seu navegador — o conteúdo original nunca passa pelos nossos servidores. As requisições aos motores LLM vão direto do seu navegador para o endpoint de API que você configurou (OpenAI, DeepSeek, etc.), e as API Keys ficam apenas no localStorage local. O cache de tradução usa IndexedDB do navegador. Código aberto no GitHub (rockbenben/md-translator) para self-hosting ou auditoria."
+          "q": "O Markdown traduzido é enviado ao servidor?",
+          "a": "Totalmente client-side: leitura, parsing e requisições de tradução acontecem no seu navegador — o conteúdo original nunca passa pelos nossos servidores. As requisições aos motores LLM vão direto do seu navegador para o endpoint de API que você configurou (OpenAI, DeepSeek, etc.), e as API Keys ficam apenas no localStorage local. O cache de tradução usa IndexedDB do navegador."
         }
       ],
       "features": [
@@ -439,7 +439,7 @@
     },
     "dataParserFlare": {
       "title": "Conversor Flare",
-      "description": "Conversão favoritos navegador e formato Flare"
+      "description": "Favoritos HTML para Flare YAML (achatado)"
     },
     "dataParserImgPrompt": {
       "title": "Gerador Dados IMGPrompt",

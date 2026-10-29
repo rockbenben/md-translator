@@ -332,7 +332,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Traducteur Sous-titres",
-      "description": "Traduction par lot SRT, ASS, VTT, SBV, LRC. 120+ langues."
+      "description": "Traduction par lot SRT, ASS, SSA, VTT, SBV, LRC. 120+ langues."
     },
     "jsonTranslate": {
       "title": "Traducteur JSON i18n",
@@ -373,8 +373,8 @@
           "a": "Pour les fichiers de sous-titres (SRT/ASS/VTT/SBV/LRC), utilisez le [Traducteur de Sous-titres](../subtitle-translator) — il préserve les timecodes et les balises de style ASS. Pour les fichiers i18n JSON (structure clé-valeur i18next, next-intl, vue-i18n), utilisez le [Traducteur JSON](../json-translate) — traduction sélective par chemin de Key avec protection des espaces réservés {name}, {count}, etc. Les trois outils de traduction partagent les mêmes configurations de moteurs et API keys, donc passer de l'un à l'autre ne nécessite aucune nouvelle configuration."
         },
         {
-          "q": "Le Markdown traduit est-il envoyé sur votre serveur ? Est-ce open source ?",
-          "a": "Entièrement côté client : la lecture, l'analyse et les requêtes de traduction Markdown se font dans votre navigateur — les contenus originaux ne touchent jamais nos serveurs. Les requêtes des moteurs LLM vont directement de votre navigateur à votre endpoint API configuré (OpenAI, DeepSeek, etc.), et les API keys sont stockées uniquement dans le localStorage local. Le cache de traduction utilise l'IndexedDB du navigateur. Le code source est open source sur GitHub (rockbenben/md-translator), pour l'auto-hébergement ou l'audit de l'implémentation."
+          "q": "Le Markdown traduit est-il envoyé sur votre serveur ?",
+          "a": "Entièrement côté client : la lecture, l'analyse et les requêtes de traduction Markdown se font dans votre navigateur — les contenus originaux ne touchent jamais nos serveurs. Les requêtes des moteurs LLM vont directement de votre navigateur à votre endpoint API configuré (OpenAI, DeepSeek, etc.), et les API keys sont stockées uniquement dans le localStorage local. Le cache de traduction utilise l'IndexedDB du navigateur."
         }
       ],
       "features": [
@@ -439,7 +439,7 @@
     },
     "dataParserFlare": {
       "title": "Convertisseur Flare",
-      "description": "Conversion favoris navigateur et format Flare"
+      "description": "Favoris HTML vers Flare YAML (aplati)"
     },
     "dataParserImgPrompt": {
       "title": "Générateur Données IMGPrompt",

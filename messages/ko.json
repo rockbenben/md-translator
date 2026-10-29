@@ -332,7 +332,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "자막 번역기",
-      "description": "SRT, ASS, VTT, SBV, LRC 자막 일괄 번역, 120개 이상 언어 지원"
+      "description": "SRT, ASS, SSA, VTT, SBV, LRC 자막 일괄 번역, 120개 이상 언어 지원"
     },
     "jsonTranslate": {
       "title": "i18n JSON 번역",
@@ -373,8 +373,8 @@
           "a": "자막 파일(SRT/ASS/VTT/SBV/LRC)은 [자막 번역기](../subtitle-translator)를 사용하세요. 타임라인과 ASS 스타일 태그를 보존합니다. JSON 국제화 파일(i18next, next-intl, vue-i18n과 같은 key-value 구조)은 [JSON 번역](../json-translate)을 사용하세요. Key 경로별로 선택적 번역이 가능하며 {name}, {count} 등의 플레이스홀더를 보호할 수 있습니다. 세 가지 번역 도구는 동일한 엔진 설정과 API Key를 공유하므로 도구 간 전환 시 재설정이 필요 없습니다."
         },
         {
-          "q": "번역된 Markdown이 서버에 업로드되나요? 오픈소스인가요?",
-          "a": "완전 프론트엔드 처리: Markdown 문서 읽기, 파싱, 번역 요청이 모두 브라우저 내에서 완료되며 원문은 당사 서버에 저장되지 않습니다. LLM 엔진 요청은 사용자의 브라우저에서 직접 구성된 API 엔드포인트(OpenAI, DeepSeek 등)로 전송되며 API Key는 로컬 localStorage에만 저장됩니다. 번역 캐시는 브라우저 IndexedDB를 사용합니다. 소스 코드는 GitHub에서 오픈소스로 공개되어 있으며(rockbenben/md-translator) 자체 호스팅이나 구현 감사가 가능합니다."
+          "q": "번역된 Markdown이 서버에 업로드되나요?",
+          "a": "완전 프론트엔드 처리: Markdown 문서 읽기, 파싱, 번역 요청이 모두 브라우저 내에서 완료되며 원문은 당사 서버에 저장되지 않습니다. LLM 엔진 요청은 사용자의 브라우저에서 직접 구성된 API 엔드포인트(OpenAI, DeepSeek 등)로 전송되며 API Key는 로컬 localStorage에만 저장됩니다. 번역 캐시는 브라우저 IndexedDB를 사용합니다."
         }
       ],
       "features": [
@@ -439,7 +439,7 @@
     },
     "dataParserFlare": {
       "title": "Flare 북마크 변환",
-      "description": "브라우저 북마크와 Flare 형식 상호 변환"
+      "description": "북마크 HTML을 Flare YAML로 변환 (평면화)"
     },
     "dataParserImgPrompt": {
       "title": "IMGPrompt 생성기",

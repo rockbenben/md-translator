@@ -332,7 +332,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Traductor Subtítulos",
-      "description": "Traducción por lote SRT, ASS, VTT, SBV, LRC. 120+ idiomas."
+      "description": "Traducción por lote SRT, ASS, SSA, VTT, SBV, LRC. 120+ idiomas."
     },
     "jsonTranslate": {
       "title": "Traductor JSON i18n",
@@ -373,8 +373,8 @@
           "a": "Para archivos de subtítulos (SRT/ASS/VTT/SBV/LRC), use el [Traductor de Subtítulos](../subtitle-translator) — preserva timecodes y etiquetas de estilo ASS. Para archivos JSON i18n (estructura clave-valor de i18next, next-intl, vue-i18n), use el [Traductor JSON](../json-translate) — traducción selectiva por ruta de Key con protección de marcadores {name}, {count}, etc. Las tres herramientas de traducción comparten las mismas configuraciones de motor y API keys, así que cambiar entre ellas no requiere reconfiguración."
         },
         {
-          "q": "¿El Markdown traducido se sube a su servidor? ¿Es de código abierto?",
-          "a": "Totalmente del lado cliente: la lectura, parseo y solicitudes de traducción Markdown ocurren en su navegador — el contenido original nunca toca nuestros servidores. Las solicitudes del motor LLM van directamente desde su navegador a su endpoint API configurado (OpenAI, DeepSeek, etc.), y las API keys se almacenan solo en el localStorage local. La caché de traducción usa IndexedDB del navegador. El código fuente es de código abierto en GitHub (rockbenben/md-translator), para auto-hospedaje o auditar la implementación."
+          "q": "¿El Markdown traducido se sube a su servidor?",
+          "a": "Totalmente del lado cliente: la lectura, parseo y solicitudes de traducción Markdown ocurren en su navegador — el contenido original nunca toca nuestros servidores. Las solicitudes del motor LLM van directamente desde su navegador a su endpoint API configurado (OpenAI, DeepSeek, etc.), y las API keys se almacenan solo en el localStorage local. La caché de traducción usa IndexedDB del navegador."
         }
       ],
       "features": [
@@ -439,7 +439,7 @@
     },
     "dataParserFlare": {
       "title": "Convertidor Flare",
-      "description": "Conversión marcadores navegador y formato Flare"
+      "description": "Marcadores HTML a Flare YAML (aplanado)"
     },
     "dataParserImgPrompt": {
       "title": "Generador Datos IMGPrompt",

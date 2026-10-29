@@ -332,7 +332,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Untertitel-Übersetzer",
-      "description": "Batch-Übersetzung für SRT, ASS, VTT, SBV, LRC. 120+ Sprachen."
+      "description": "Batch-Übersetzung für SRT, ASS, SSA, VTT, SBV, LRC. 120+ Sprachen."
     },
     "jsonTranslate": {
       "title": "i18n JSON-Übersetzer",
@@ -373,8 +373,8 @@
           "a": "Für Untertiteldateien (SRT/ASS/VTT/SBV/LRC) nutzen Sie den [Untertitel-Übersetzer](../subtitle-translator) — er erhält Timecodes und ASS-Stil-Tags. Für JSON-i18n-Dateien (i18next, next-intl, vue-i18n Key-Value-Strukturen) verwenden Sie den [JSON-Übersetzer](../json-translate) — selektive Übersetzung nach Key-Pfad mit Platzhalterschutz für {name}, {count} etc. Alle drei Übersetzungstools teilen dieselben Engine-Konfigurationen und API-Keys, sodass der Wechsel zwischen ihnen keine erneute Einrichtung erfordert."
         },
         {
-          "q": "Wird das übersetzte Markdown auf Ihre Server hochgeladen? Ist es Open Source?",
-          "a": "Vollständig clientseitig: Lesen, Parsen und Übersetzungsanfragen für Markdown laufen alle im Browser — Originalinhalte berühren nie unsere Server. LLM-Engine-Anfragen gehen direkt aus Ihrem Browser an den konfigurierten API-Endpunkt (OpenAI, DeepSeek usw.), API-Keys werden nur im lokalen localStorage gespeichert. Der Übersetzungscache nutzt browserseitiges IndexedDB. Der Quellcode ist auf GitHub (rockbenben/md-translator) Open Source und kann selbst gehostet oder geprüft werden."
+          "q": "Wird das übersetzte Markdown auf Ihre Server hochgeladen?",
+          "a": "Vollständig clientseitig: Lesen, Parsen und Übersetzungsanfragen für Markdown laufen alle im Browser — Originalinhalte berühren nie unsere Server. LLM-Engine-Anfragen gehen direkt aus Ihrem Browser an den konfigurierten API-Endpunkt (OpenAI, DeepSeek usw.), API-Keys werden nur im lokalen localStorage gespeichert. Der Übersetzungscache nutzt browserseitiges IndexedDB."
         }
       ],
       "features": [
@@ -439,7 +439,7 @@
     },
     "dataParserFlare": {
       "title": "Flare Lesezeichen-Konverter",
-      "description": "Browser-Lesezeichen und Flare-Format konvertieren"
+      "description": "Lesezeichen-HTML zu Flare-YAML (flachgestellt)"
     },
     "dataParserImgPrompt": {
       "title": "IMGPrompt Datengenerator",

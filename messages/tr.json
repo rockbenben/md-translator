@@ -332,7 +332,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Altyazı Çevirici",
-      "description": "Toplu SRT, ASS, VTT, SBV, LRC çevirisi. 120+ dil."
+      "description": "Toplu SRT, ASS, SSA, VTT, SBV, LRC çevirisi. 120+ dil."
     },
     "jsonTranslate": {
       "title": "i18n JSON Çevirici",
@@ -373,8 +373,8 @@
           "a": "Altyazı dosyaları (SRT/ASS/VTT/SBV/LRC) için [Altyazı Çevirici](../subtitle-translator) kullanın — zaman kodlarını ve ASS stil etiketlerini korur. JSON i18n dosyaları (i18next, next-intl, vue-i18n gibi key-value yapıları) için [JSON Çevirici](../json-translate) kullanın — Key yoluna göre seçici çeviri ve {name}, {count} gibi yer tutucuları koruma desteği vardır. Üç çeviri aracı aynı motor yapılandırmasını ve API Key'leri paylaşır, aralarında geçiş yapmak yeniden yapılandırma gerektirmez."
         },
         {
-          "q": "Çevrilen Markdown sunucuya yükleniyor mu? Açık kaynak mı?",
-          "a": "Tamamen istemci tarafı: Markdown okuma, ayrıştırma ve çeviri istekleri tarayıcınızda gerçekleşir — orijinal içerik sunucularımıza hiç ulaşmaz. LLM motor istekleri doğrudan tarayıcınızdan yapılandırdığınız API uç noktasına gider (OpenAI, DeepSeek vb.) ve API Key'ler yalnızca yerel localStorage'da saklanır. Çeviri önbelleği tarayıcı IndexedDB'sini kullanır. Kaynak kod GitHub'da açıktır (rockbenben/md-translator), self-host veya inceleme yapabilirsiniz."
+          "q": "Çevrilen Markdown sunucuya yükleniyor mu?",
+          "a": "Tamamen istemci tarafı: Markdown okuma, ayrıştırma ve çeviri istekleri tarayıcınızda gerçekleşir — orijinal içerik sunucularımıza hiç ulaşmaz. LLM motor istekleri doğrudan tarayıcınızdan yapılandırdığınız API uç noktasına gider (OpenAI, DeepSeek vb.) ve API Key'ler yalnızca yerel localStorage'da saklanır. Çeviri önbelleği tarayıcı IndexedDB'sini kullanır."
         }
       ],
       "features": [
@@ -439,7 +439,7 @@
     },
     "dataParserFlare": {
       "title": "Flare Dönüştürücü",
-      "description": "Tarayıcı yer imleri ve Flare formatı dönüşümü"
+      "description": "Yer imi HTML'ini Flare YAML'ye dönüştür (düz)"
     },
     "dataParserImgPrompt": {
       "title": "IMGPrompt Veri Oluşturucu",

@@ -332,7 +332,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "字幕翻訳機",
-      "description": "SRT、ASS、VTT、SBV、LRC字幕を一括翻訳、120以上の言語に対応"
+      "description": "SRT、ASS、SSA、VTT、SBV、LRC字幕を一括翻訳、120以上の言語に対応"
     },
     "jsonTranslate": {
       "title": "i18n JSON翻訳",
@@ -373,8 +373,8 @@
           "a": "字幕ファイル（SRT/ASS/VTT/SBV/LRC）には [字幕翻訳器](../subtitle-translator) を使用してください。タイムラインと ASS スタイルタグを保持します。JSON 国際化ファイル（i18next、next-intl、vue-i18n のような key-value 構造）には [JSON 翻訳](../json-translate) を使用してください。Key パスごとに選択的翻訳でき、{name}、{count} などのプレースホルダーを保護できます。3 つの翻訳ツールは同じエンジン設定と API Key を共有するため、ツール間の切り替え時に再設定は不要です。"
         },
         {
-          "q": "翻訳された Markdown はサーバーにアップロードされますか？オープンソースですか？",
-          "a": "完全にフロントエンドで処理：Markdown の読み込み・解析・翻訳リクエストはすべてブラウザ内で完結し、原文は当方のサーバーに保存されません。LLM エンジンへのリクエストはあなたのブラウザから直接、設定した API エンドポイント（OpenAI、DeepSeek など）に送信され、API Key はローカルの localStorage のみに保存されます。翻訳キャッシュはブラウザの IndexedDB を使用。ソースコードは GitHub（rockbenben/md-translator）でオープンソース公開されており、セルフホスティングや実装の監査が可能です。"
+          "q": "翻訳された Markdown はサーバーにアップロードされますか？",
+          "a": "完全にフロントエンドで処理：Markdown の読み込み・解析・翻訳リクエストはすべてブラウザ内で完結し、原文は当方のサーバーに保存されません。LLM エンジンへのリクエストはあなたのブラウザから直接、設定した API エンドポイント（OpenAI、DeepSeek など）に送信され、API Key はローカルの localStorage のみに保存されます。翻訳キャッシュはブラウザの IndexedDB を使用。"
         }
       ],
       "features": [
@@ -439,7 +439,7 @@
     },
     "dataParserFlare": {
       "title": "Flareブックマーク変換",
-      "description": "ブラウザブックマークとFlare形式の相互変換"
+      "description": "ブックマーク HTML を Flare YAML に変換（フラット化）"
     },
     "dataParserImgPrompt": {
       "title": "IMGPromptデータ生成",

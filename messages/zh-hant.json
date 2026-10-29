@@ -332,7 +332,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "字幕翻譯器",
-      "description": "批次翻譯 SRT、ASS、VTT、SBV、LRC 字幕，支援 120+ 語言"
+      "description": "批次翻譯 SRT、ASS、SSA、VTT、SBV、LRC 字幕，支援 120+ 語言"
     },
     "jsonTranslate": {
       "title": "JSON 多語言翻譯",
@@ -373,8 +373,8 @@
           "a": "字幕檔案（SRT/ASS/VTT/SBV/LRC）請用 [字幕翻譯器](../subtitle-translator)，保留時間軸和 ASS 樣式標籤；JSON 國際化檔案（i18next、next-intl、vue-i18n 那種 key-value 結構）請用 [JSON 翻譯](../json-translate)，按 Key 路徑選擇性翻譯，可保護佔位符 {name}、{count} 不被破壞。"
         },
         {
-          "q": "翻譯後的 Markdown 會上傳到伺服器嗎？開源嗎？",
-          "a": "完全前端處理：Markdown 檔案讀取、解析、翻譯請求都在瀏覽器內完成，原文不經過我們的伺服器儲存。LLM 引擎的請求直接從你的瀏覽器發往你設定的 API 端點（OpenAI、DeepSeek 等），API Key 僅儲存在本地 localStorage。翻譯快取使用瀏覽器 IndexedDB。原始碼在 GitHub 開源（rockbenben/md-translator），可自行部署或審查實作。"
+          "q": "翻譯後的 Markdown 會上傳到伺服器嗎？",
+          "a": "完全前端處理：Markdown 檔案讀取、解析、翻譯請求都在瀏覽器內完成，原文不經過我們的伺服器儲存。LLM 引擎的請求直接從你的瀏覽器發往你設定的 API 端點（OpenAI、DeepSeek 等），API Key 僅儲存在本地 localStorage。翻譯快取使用瀏覽器 IndexedDB。"
         }
       ],
       "features": [
@@ -439,7 +439,7 @@
     },
     "dataParserFlare": {
       "title": "Flare 書籤轉換",
-      "description": "瀏覽器書籤與 Flare 格式互轉"
+      "description": "瀏覽器書籤轉 Flare YAML（扁平化匯入）"
     },
     "dataParserImgPrompt": {
       "title": "IMGPrompt 資料產生",
