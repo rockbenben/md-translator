@@ -16,7 +16,7 @@
 
 Run a Markdown file through a general-purpose translator and you get your code blocks translated, `$E = mc^2$` turned into prose, front-matter keys renamed, and the URLs inside your links rewritten. MD Translator swaps every one of those constructs for a placeholder **before** anything is sent — the engine only ever sees the prose — then puts them back verbatim.
 
-**MD Translator** is a free, browser-based Markdown translator for `.md`, `.markdown`, `.mdx`, and plain text. Drop a whole `docs/` directory in at once, connect 9 traditional translation APIs (DeepL, Google, Azure, DeepLX, Qwen-MT, TranslateGemma, MiLMMT, GTX, Edge) or 26 LLM providers and gateways, and translate into 120+ languages — or into several target languages in one pass, each exported as its own file, ready to drop back into Hugo, VitePress, or Docusaurus. Everything runs locally in your browser; source content and API keys never touch a server. A [CLI](#command-line) drives the same engine headlessly when you'd rather script it.
+**MD Translator** is a free, browser-based Markdown translator for `.md`, `.markdown`, `.mdx`, and plain text. Drop a whole `docs/` directory in at once, connect 9 traditional translation APIs (DeepL, Google, Azure, DeepLX, Qwen-MT, TranslateGemma, MiLMMT, GTX, Edge) or 27 LLM providers and gateways, and translate into 120+ languages — or into several target languages in one pass, each exported as its own file, ready to drop back into Hugo, VitePress, or Docusaurus. Everything runs locally in your browser; source content and API keys never touch a server. A [CLI](#command-line) drives the same engine headlessly when you'd rather script it.
 
 👉 **Try it online**: <https://tools.newzone.top/en/md-translator>
 
@@ -49,12 +49,12 @@ Full CommonMark + GFM (tables, task lists, strikethrough). MDX and Astro compone
 - **RTL Language Support**: Text direction auto-adjusts for Arabic, Hebrew, Urdu, and Persian.
 - **Unlimited Caching** (IndexedDB): Every translated line is cached locally with no browser-storage size limit; refreshing the page doesn't lose translated files.
 - **Command Line**: `yarn cli` runs the same engine, parsers, and cache from a terminal — see [Command Line](#command-line).
-- **Multi-Locale UI**: Powered by next-intl, with full UI translation across 18 languages.
+- **Multi-Locale UI**: Powered by next-intl, with full UI translation across 19 languages.
 - **Private by Design**: Fully client-side — source content and API keys stay in your browser; LLM requests go directly from your browser to the API endpoint you configure.
 
 ## Translation APIs
 
-Supports **9 traditional MT APIs** and **26 LLM providers and gateways**.
+Supports **9 traditional MT APIs** and **27 LLM providers and gateways**.
 
 ### Traditional APIs
 
@@ -78,7 +78,7 @@ GTX and Edge need no configuration at all — they are the zero-setup defaults, 
 
 ### Gateways
 
-**OpenRouter**, **OpenCode Zen**, **TokenHub (Tencent)**, **Groq**, **Cerebras**, **SiliconFlow**, **Atlas Cloud**, **Nvidia NIM**, **Azure OpenAI**, plus any **Custom (OpenAI-compatible)** endpoint (Ollama / LM Studio / vLLM / LiteLLM / Together AI / Fireworks AI etc.).
+**OpenRouter**, **OpenCode Zen**, **OpenCode Go**, **TokenHub (Tencent)**, **Groq**, **Cerebras**, **SiliconFlow**, **Atlas Cloud**, **Nvidia NIM**, **Azure OpenAI**, plus any **Custom (OpenAI-compatible)** endpoint (Ollama / LM Studio / vLLM / LiteLLM / Together AI / Fireworks AI etc.).
 
 Providers walled off from browsers by CORS can be routed through an API relay. The built-in relay works out of the box; **API Settings → Relay address** points every relayed provider at your own deployment of the relay Worker instead.
 
@@ -139,7 +139,7 @@ Output lands beside the input (or in `-o <dir>`) as `guide.zh.md`.
 | Option | Meaning |
 | --- | --- |
 | `-i, --input <file>` | Input file. Repeatable. |
-| `-t, --to <lang>` | Target language. Repeatable. Default `zh`. |
+| `-t, --to <lang>` | Target language. Repeatable. Default: settings file, else `zh`. |
 | `-f, --from <lang>` | Source language. Default `auto`. |
 | `-m, --method <id>` | Service id. Default `gtxFreeAPI`; `--list-methods` prints them all. |
 | `-s, --settings <file>` | Settings JSON exported from the web UI (keys, prompts, glossary, retry…). |
@@ -153,7 +153,7 @@ Output lands beside the input (or in `-o <dir>`) as `guide.zh.md`.
 | `--relay` · `--no-relay` | Route through the API relay. Off by default — Node has no CORS to work around. |
 | `--format <fmt>` | Force a format instead of inferring it from the extension. |
 
-Markdown is not the only input: the same command handles subtitles (`.srt`, `.ass`, `.vtt`, `.lrc`, `.sbv` — timecodes stripped locally) and JSON locale files (`.json` — keys untouched, values translated). `yarn cli --list-formats` prints the mapping, `yarn cli --help` the full option list.
+Markdown is not the only input: the same command handles subtitles (`.srt`, `.ass`, `.ssa`, `.vtt`, `.lrc`, `.sbv` — timecodes stripped locally) and JSON locale files (`.json` — keys untouched, values translated). `yarn cli --list-formats` prints the mapping, `yarn cli --help` the full option list.
 
 Runs are resumable: every translated line is cached, so re-running after a `Ctrl-C`, a rate-limit wall, or a handful of failed lines only pays for what is still missing.
 

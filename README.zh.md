@@ -16,7 +16,7 @@
 
 把 Markdown 丢进通用翻译器，代码块会被一起翻掉，`$E = mc^2$` 被译成大白话，Front Matter 的键名被改名，链接里的 URL 也会被重写。Markdown 翻译器在发送**之前**就把这些结构全部换成占位符——引擎从头到尾只看得到正文——译完再原样还原。
 
-**MD Translator** 是一款免费、纯浏览器运行的 Markdown 翻译工具，支持 `.md`、`.markdown`、`.mdx` 与纯文本。可一次性拖入整个 `docs/` 目录，接入 9 种传统翻译 API（DeepL、Google、Azure、DeepLX、Qwen-MT、TranslateGemma、MiLMMT、GTX、Edge）和 26 种 LLM 与网关，覆盖 120+ 种语言——还能一次翻译成多种目标语言，每种语言各导出为独立文件，直接放回 Hugo、VitePress、Docusaurus 的目录即可。全程在浏览器本地完成，原文与 API Key 不经过服务器。想脚本化批处理，还有一个共用同一套引擎的[命令行工具](#命令行)。
+**MD Translator** 是一款免费、纯浏览器运行的 Markdown 翻译工具，支持 `.md`、`.markdown`、`.mdx` 与纯文本。可一次性拖入整个 `docs/` 目录，接入 9 种传统翻译 API（DeepL、Google、Azure、DeepLX、Qwen-MT、TranslateGemma、MiLMMT、GTX、Edge）和 27 种 LLM 与网关，覆盖 120+ 种语言——还能一次翻译成多种目标语言，每种语言各导出为独立文件，直接放回 Hugo、VitePress、Docusaurus 的目录即可。全程在浏览器本地完成，原文与 API Key 不经过服务器。想脚本化批处理，还有一个共用同一套引擎的[命令行工具](#命令行)。
 
 👉 **在线体验**：<https://tools.newzone.top/zh/md-translator>
 
@@ -49,12 +49,12 @@
 - **RTL 语言支持**：自动识别并调整阿拉伯语、希伯来语、乌尔都语、波斯语的文字方向。
 - **无上限缓存**（IndexedDB）：每一行译文本地缓存，无浏览器存储容量限制，刷新页面已译文件不丢失。
 - **命令行**：`yarn cli` 在终端跑同一套引擎、解析器与缓存，详见[命令行](#命令行)。
-- **多语言界面**：基于 next-intl，支持 18 种界面语言。
+- **多语言界面**：基于 next-intl，支持 19 种界面语言。
 - **隐私优先**：完全前端处理——原文与 API Key 仅保存在浏览器；LLM 请求直接从浏览器发往你配置的 API 端点。
 
 ## 翻译接口
 
-支持 **9 种传统翻译 API** 和 **26 种 LLM 与网关**。
+支持 **9 种传统翻译 API** 和 **27 种 LLM 与网关**。
 
 ### 传统翻译 API
 
@@ -78,7 +78,7 @@ GTX 与 Edge 完全免配置，是开箱即用的默认项，且互为备胎。
 
 ### 聚合网关
 
-**OpenRouter**、**OpenCode Zen**、**TokenHub（腾讯）**、**Groq**、**Cerebras**、**SiliconFlow**、**Atlas Cloud**、**Nvidia NIM**、**Azure OpenAI**，以及任意 **Custom (OpenAI-compatible)** 端点（Ollama / LM Studio / vLLM / LiteLLM / Together AI / Fireworks AI 等）。
+**OpenRouter**、**OpenCode Zen**、**OpenCode Go**、**TokenHub（腾讯）**、**Groq**、**Cerebras**、**SiliconFlow**、**Atlas Cloud**、**Nvidia NIM**、**Azure OpenAI**，以及任意 **Custom (OpenAI-compatible)** 端点（Ollama / LM Studio / vLLM / LiteLLM / Together AI / Fireworks AI 等）。
 
 被 CORS 挡住浏览器直连的服务可走 API 中转。内置中转开箱即用；**API 设置 → 中转地址** 可把所有开了中转的服务一次性指向你自建的那份中转 Worker。
 
@@ -139,7 +139,7 @@ yarn cli -i post.md -t de -m deepseek --md-translate-frontmatter --md-no-link-te
 | 选项 | 说明 |
 | --- | --- |
 | `-i, --input <file>` | 输入文件，可重复 |
-| `-t, --to <lang>` | 目标语言，可重复，默认 `zh` |
+| `-t, --to <lang>` | 目标语言，可重复，默认取设置文件，否则 `zh` |
 | `-f, --from <lang>` | 源语言，默认 `auto` |
 | `-m, --method <id>` | 翻译服务，默认 `gtxFreeAPI`；`--list-methods` 列出全部 |
 | `-s, --settings <file>` | 网页端导出的设置 JSON（密钥、提示词、术语表、重试参数等） |
@@ -153,7 +153,7 @@ yarn cli -i post.md -t de -m deepseek --md-translate-frontmatter --md-no-link-te
 | `--relay` · `--no-relay` | 是否走 API 中转。默认关闭——Node 端没有 CORS 需要绕 |
 | `--format <fmt>` | 强制指定格式，不按扩展名推断 |
 
-不止 Markdown：同一条命令也处理字幕（`.srt`、`.ass`、`.vtt`、`.lrc`、`.sbv`，时间轴在本地剥离）和 JSON 多语言文件（`.json`，只译值不动键）。`yarn cli --list-formats` 查看格式映射，`yarn cli --help` 查看完整选项。
+不止 Markdown：同一条命令也处理字幕（`.srt`、`.ass`、`.ssa`、`.vtt`、`.lrc`、`.sbv`，时间轴在本地剥离）和 JSON 多语言文件（`.json`，只译值不动键）。`yarn cli --list-formats` 查看格式映射，`yarn cli --help` 查看完整选项。
 
 翻译可续跑：每一行译文都进缓存，`Ctrl-C` 中断、撞上限流、或只有少数几行失败后再跑一次，只会为还缺的那部分付费。
 
