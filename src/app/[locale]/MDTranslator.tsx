@@ -12,6 +12,7 @@ import { useLocalStorage } from "@/app/hooks/useLocalStorage";
 import { useTextStats } from "@/app/hooks/useTextStats";
 import { useExportFilename } from "@/app/hooks/useExportFilename";
 import { useRevealResult } from "@/app/hooks/useRevealResult";
+import { estimateZipBytes, finalizeBatchZip, ZIP_MAX_ESTIMATED_BYTES, type ZipEntry } from "@/app/hooks/translation/batchZip";
 
 import { splitTextIntoLines, downloadFile, getFileTypePresetConfig, joinLanguageCount } from "@/app/utils";
 import { MARKDOWN_DEFAULTS, filterMarkdownLines, PLACEHOLDER_REPLACE_REGEX, restorePlaceholders, splitMarkdownSegments, mergeMarkdownSegments, applyRemoveCharsToMarkdown, applyRemoveCharsToSegments } from "@/app/lib/translation/formats/markdown";
@@ -77,10 +78,12 @@ const MDTranslator = () => {
     failedReason,
     clearFailures,
     runHadFailures,
+    hadRunFailures,
     runRetry,
     isScopedRetry,
     getActiveTargetLangs,
     isTranslating,
+    isDisposed,
     resetProgress,
     progressPercent,
     progressInfo,
@@ -118,6 +121,9 @@ const MDTranslator = () => {
   const [mdOptions, setMdOptions] = useLocalStorage("md-translator-options", { ...MARKDOWN_DEFAULTS.options });
   const [rawMode, setRawMode] = useLocalStorage("md-translator-rawMode", false);
   const [contextAware, setContextAware] = useLocalStorage("md-translator-contextAware", MARKDOWN_DEFAULTS.contextAware);
+  // 默认关：多语言导出的默认形态仍是逐文件（媒体/站点工具要散装文件），
+  // ZIP 只给「一次上百个语种、浏览器会拦连续下载」的场景。
+  const [zipMultiLanguage, setZipMultiLanguage] = useLocalStorage<boolean>("md-translator-zipMultiLanguage", false);
   // 上下文感知只对 LLM 生效(MT 不走上下文路径),它要求的 raw 模式按【生效中】
   // 派生为覆盖层,不写穿用户自己的 rawMode 偏好 —— 事件式 setRawMode(true) 曾把
   // rawMode 永久写成 true:之后切到 MT 服务,上下文感知块随 LLM 条件隐藏,raw
@@ -164,6 +170,23 @@ const MDTranslator = () => {
       noteFileFailure();
       return;
     }
+
+    // 默认逐文件落盘；ZIP 只在多语言且显式开启时生效，按源大小×语种数预先
+    // 判断装不装得下 —— 跑完十分钟才发现装不下，缓存也救不回那段等待。
+    const zipWanted = zipMultiLanguage && multiLanguageMode && targetLangs.length > 1;
+    const estimatedZipBytes = zipWanted ? estimateZipBytes(sourceText, targetLangs.length, "markdown") : 0;
+    const zipActive = zipWanted && estimatedZipBytes <= ZIP_MAX_ESTIMATED_BYTES;
+    const zipEntries: ZipEntry[] = [];
+    if (zipWanted && !zipActive) {
+      message.warning(
+        t("zipTooLarge", {
+          size: Math.ceil(estimatedZipBytes / (1024 * 1024)),
+          limit: Math.ceil(ZIP_MAX_ESTIMATED_BYTES / (1024 * 1024)),
+        }),
+        10,
+      );
+    }
+
     const fileName = fileNameSet || multipleFiles[0]?.name || "markdown.md";
     // 预览语言:常规跑 = 本轮第一个语言(旧行为);多语言 scoped 重试 = 保持
     // 当前预览的语言 —— 仅当它也在重试范围内时刷新,否则不动预览。不加这条,
@@ -244,7 +267,11 @@ const MDTranslator = () => {
         const downloadFileName = generateFileName(fileName, langLabel, undefined, multiLanguageMode);
 
         if (multiLanguageMode || multipleFiles.length > 1) {
-          await downloadFile(translatedTextWithPlaceholders, downloadFileName);
+          if (zipActive) {
+            zipEntries.push({ name: downloadFileName, content: translatedTextWithPlaceholders });
+          } else {
+            await downloadFile(translatedTextWithPlaceholders, downloadFileName);
+          }
         }
 
         if (currentTargetLang === previewLang) {
@@ -261,6 +288,17 @@ const MDTranslator = () => {
     }
 
     if (hasFailedLang) noteFileFailure();
+
+    if (zipActive && zipEntries.length > 0 && !isDisposed()) {
+      await finalizeBatchZip({
+        entries: zipEntries,
+        sourceFileName: fileName,
+        isRetry: isScopedRetry(),
+        hasFailures: isCancelRequested() || hadRunFailures(),
+        t,
+        message,
+      });
+    }
   };
 
   // Single-file translation just shows the result (no per-file export toast), so confirm
@@ -386,6 +424,7 @@ const MDTranslator = () => {
                 handleSwapLanguages={handleSwapLanguages}
                 setTargetLanguages={setTargetLanguages}
                 setMultiLanguageMode={setMultiLanguageMode}
+                translationMethod={translationMethod}
                 disabled={isTranslating}
               />
             </Form>
@@ -470,6 +509,14 @@ const MDTranslator = () => {
                           <Switch size="small" checked={effectiveRawMode} onChange={setRawMode} disabled={contextAwareActive || isTranslating} aria-label={tMarkdown("rawTranslationMode")} />
                         </ToggleRow>
                       </Section>
+
+                      {multiLanguageMode && (
+                        <Section noGap>
+                          <ToggleRow label={t("zipMultiLanguage")} tooltip={t("zipMultiLanguageTooltip")}>
+                            <Switch size="small" checked={zipMultiLanguage} onChange={setZipMultiLanguage} disabled={isTranslating} aria-label={t("zipMultiLanguage")} />
+                          </ToggleRow>
+                        </Section>
+                      )}
                     </Flex>
                   ),
                 },
@@ -547,6 +594,7 @@ const MDTranslator = () => {
         targetLanguages={targetLanguages}
         setTargetLanguages={setTargetLanguages}
         setMultiLanguageMode={setMultiLanguageMode}
+        sourceLanguage={sourceLanguage}
       />
     </Spin>
   );
