@@ -248,7 +248,7 @@
     "translateContentGroup": "Contenido a traducir",
     "formatModeGroup": "Modo de formato",
     "tFrontmatterTooltip": "Traducir metadatos YAML al inicio (título, descripción, etc.)",
-    "tFrontmatter": "Traducir frontmatter",
+    "tFrontmatter": "Traducir Front Matter (metadatos)",
     "tCodeBlocksTooltip": "Traducir contenido de bloques de código (generalmente no recomendado)",
     "tCodeBlocks": "Traducir bloques de código",
     "tLatexTooltip": "Traducir fórmulas LaTeX (evitar si símbolos especiales se identifican mal)",
@@ -344,7 +344,7 @@
     },
     "jsonTranslate": {
       "title": "Traductor JSON i18n",
-      "description": "Traducción por lote de archivos de idioma i18n, con coincidencia JSONPath y mapeo de claves"
+      "description": "Traducción por lote de archivos de idioma i18n, con coincidencia JSONPath y mapeo de campos"
     },
     "mdTranslator": {
       "title": "Traductor Markdown",
@@ -430,7 +430,7 @@
       "description": "Mapeo y migración de valores con JSONPath"
     },
     "jsonValueSwapper": {
-      "title": "Intercambiador Valor JSON",
+      "title": "Intercambiador de Valores de Campos JSON",
       "description": "Intercambiar valores de dos campos en un clic"
     },
     "jsonNodeInserter": {
@@ -459,7 +459,7 @@
     },
     "braceExpander": {
       "title": "Expansor de llaves",
-      "description": "Expande una plantilla en una lista completa, sintaxis de bash"
+      "description": "Expande una plantilla en una lista completa, compatible con la expansión de llaves de Bash"
     }
   },
   "navigation": {
@@ -578,6 +578,8 @@
     "as": "Asamés",
     "gom": "Konkani",
     "sa": "Sánscrito",
+    "dv": "Divehi",
+    "or": "Oriya",
     "th": "Tailandés",
     "lo": "Laosiano",
     "my": "Birmano",
@@ -604,6 +606,15 @@
     "ts": "Tsonga",
     "mg": "Malgache",
     "ln": "Lingala",
+    "aa": "Afar",
+    "ff": "Fulani",
+    "rw": "Kinyarwanda",
+    "lg": "Luganda",
+    "rn": "Kirundi",
+    "sn": "Shona",
+    "so": "Somalí",
+    "tw": "Twi",
+    "yo": "Yoruba",
     "ht": "Criollo haitiano",
     "qu": "Quechua",
     "ay": "Aimara",

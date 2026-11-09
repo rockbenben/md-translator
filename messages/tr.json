@@ -248,7 +248,7 @@
     "translateContentGroup": "Çevrilecek içerik",
     "formatModeGroup": "Biçim modu",
     "tFrontmatterTooltip": "Baştaki YAML meta verilerini çevir (başlık, açıklama vb.)",
-    "tFrontmatter": "Frontmatter'ı çevir",
+    "tFrontmatter": "Front Matter (meta verileri) çevir",
     "tCodeBlocksTooltip": "Kod bloklarının içeriğini çevir (genellikle önerilmez)",
     "tCodeBlocks": "Kod bloklarını çevir",
     "tLatexTooltip": "LaTeX formüllerini çevir (özel sembollerin yanlış tanınmasını önler)",
@@ -344,7 +344,7 @@
     },
     "jsonTranslate": {
       "title": "i18n JSON Çevirici",
-      "description": "Toplu i18n dil dosyası çevirisi, JSONPath eşleştirme ve anahtar eşleme ile"
+      "description": "Toplu i18n dil dosyası çevirisi, JSONPath eşleştirme ve alan eşleme ile"
     },
     "mdTranslator": {
       "title": "Markdown Çevirici",
@@ -430,7 +430,7 @@
       "description": "JSONPath ile değer eşleme ve taşıma"
     },
     "jsonValueSwapper": {
-      "title": "JSON Değer Değiştirici",
+      "title": "JSON Alan Değeri Değiştirici",
       "description": "Tek tıkla iki alanın değerlerini değiştir"
     },
     "jsonNodeInserter": {
@@ -459,7 +459,7 @@
     },
     "braceExpander": {
       "title": "Süslü Parantez Genişletici",
-      "description": "Tek bir şablonu tam listeye genişletin, bash brace sözdizimi"
+      "description": "Tek bir şablonu tam listeye genişletin, Bash küme parantezi genişletmesiyle uyumlu"
     }
   },
   "navigation": {
@@ -578,6 +578,8 @@
     "as": "Assamca",
     "gom": "Konkani",
     "sa": "Sanskritçe",
+    "dv": "Divehi",
+    "or": "Oriya",
     "th": "Tayca",
     "lo": "Laoca",
     "my": "Birmanca",
@@ -604,6 +606,15 @@
     "ts": "Tsongaca",
     "mg": "Malgaşça",
     "ln": "Lingala",
+    "aa": "Afar",
+    "ff": "Fulani",
+    "rw": "Kinyarwanda",
+    "lg": "Luganda",
+    "rn": "Kirundi",
+    "sn": "Shona",
+    "so": "Somalice",
+    "tw": "Twi",
+    "yo": "Yoruba",
     "ht": "Haiti Kreolü",
     "qu": "Keçuva",
     "ay": "Aymara",

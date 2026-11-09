@@ -248,7 +248,7 @@
     "translateContentGroup": "翻訳対象",
     "formatModeGroup": "フォーマットモード",
     "tFrontmatterTooltip": "ドキュメント冒頭のYAMLメタデータ（タイトル、説明など）を翻訳",
-    "tFrontmatter": "frontmatterを翻訳",
+    "tFrontmatter": "Front Matter（メタデータ）を翻訳",
     "tCodeBlocksTooltip": "ドキュメント内のコードブロック内容を翻訳（通常は推奨されません）",
     "tCodeBlocks": "コードブロックを翻訳",
     "tLatexTooltip": "LaTeX数式内容を翻訳（通貨記号などの特殊文字が誤認識されるのを防ぐため）",
@@ -344,7 +344,7 @@
     },
     "jsonTranslate": {
       "title": "i18n JSON翻訳",
-      "description": "i18n 言語ファイルを一括翻訳、JSONPath マッチとキー名マッピングに対応"
+      "description": "i18n 言語ファイルを一括翻訳、JSONPath マッチとフィールドマッピングに対応"
     },
     "mdTranslator": {
       "title": "Markdown翻訳",
@@ -430,7 +430,7 @@
       "description": "フィールド値のマッピングと移行、JSONPath位置特定に対応"
     },
     "jsonValueSwapper": {
-      "title": "JSONキー値交換",
+      "title": "JSONフィールド値交換",
       "description": "2つのフィールドの値をワンクリックで交換"
     },
     "jsonNodeInserter": {
@@ -459,7 +459,7 @@
     },
     "braceExpander": {
       "title": "ブレース展開",
-      "description": "1 行のテンプレートから完全なリストへ一括展開（bash のブレース展開と同じ構文）"
+      "description": "1 行のテンプレートから完全なリストへ一括展開（Bash のブレース展開に対応）"
     }
   },
   "navigation": {
@@ -578,6 +578,8 @@
     "as": "アッサム語",
     "gom": "コンカニ語",
     "sa": "サンスクリット語",
+    "dv": "ディベヒ語",
+    "or": "オリヤー語",
     "th": "タイ語",
     "lo": "ラオ語",
     "my": "ビルマ語",
@@ -604,6 +606,15 @@
     "ts": "ツォンガ語",
     "mg": "マダガスカル語",
     "ln": "リンガラ語",
+    "aa": "アファル語",
+    "ff": "フラニ語",
+    "rw": "ルワンダ語",
+    "lg": "ルガンダ語",
+    "rn": "ルンディ語",
+    "sn": "ショナ語",
+    "so": "ソマリ語",
+    "tw": "トウィ語",
+    "yo": "ヨルバ語",
     "ht": "ハイチクレオール語",
     "qu": "ケチュア語",
     "ay": "アイマラ語",

@@ -248,7 +248,7 @@
     "translateContentGroup": "Contenuto da tradurre",
     "formatModeGroup": "Modalità formato",
     "tFrontmatterTooltip": "Traduci metadati YAML all'inizio (titolo, descrizione, ecc.)",
-    "tFrontmatter": "Traduci frontmatter",
+    "tFrontmatter": "Traduci Front Matter (metadati)",
     "tCodeBlocksTooltip": "Traduci contenuto blocchi di codice (generalmente sconsigliato)",
     "tCodeBlocks": "Traduci blocchi codice",
     "tLatexTooltip": "Traduci formule LaTeX (evitare se simboli speciali vengono identificati erroneamente)",
@@ -344,7 +344,7 @@
     },
     "jsonTranslate": {
       "title": "Traduttore JSON i18n",
-      "description": "Traduzione in batch dei file di lingua i18n, con corrispondenza JSONPath e mappatura delle chiavi"
+      "description": "Traduzione in batch dei file di lingua i18n, con corrispondenza JSONPath e mappatura dei campi"
     },
     "mdTranslator": {
       "title": "Traduttore Markdown",
@@ -430,7 +430,7 @@
       "description": "Mappatura e migrazione valori con JSONPath"
     },
     "jsonValueSwapper": {
-      "title": "Scambiatore Valore JSON",
+      "title": "Scambiatore Valori Campi JSON",
       "description": "Scambia valori di due campi in un clic"
     },
     "jsonNodeInserter": {
@@ -459,7 +459,7 @@
     },
     "braceExpander": {
       "title": "Espansore di graffe",
-      "description": "Espandi un modello in un elenco completo, sintassi bash"
+      "description": "Espandi un modello in un elenco completo, compatibile con l'espansione di graffe di Bash"
     }
   },
   "navigation": {
@@ -578,6 +578,8 @@
     "as": "Assamese",
     "gom": "Konkani",
     "sa": "Sanscrito",
+    "dv": "Divehi",
+    "or": "Oriya",
     "th": "Tailandese",
     "lo": "Lao",
     "my": "Birmano",
@@ -604,6 +606,15 @@
     "ts": "Tsonga",
     "mg": "Malgascio",
     "ln": "Lingala",
+    "aa": "Afar",
+    "ff": "Fulani",
+    "rw": "Kinyarwanda",
+    "lg": "Luganda",
+    "rn": "Kirundi",
+    "sn": "Shona",
+    "so": "Somalo",
+    "tw": "Twi",
+    "yo": "Yoruba",
     "ht": "Creolo haitiano",
     "qu": "Quechua",
     "ay": "Aymara",

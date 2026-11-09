@@ -248,7 +248,7 @@
     "translateContentGroup": "Nội dung cần dịch",
     "formatModeGroup": "Chế độ định dạng",
     "tFrontmatterTooltip": "Dịch siêu dữ liệu YAML ở đầu (tiêu đề, mô tả, v.v.)",
-    "tFrontmatter": "Dịch frontmatter",
+    "tFrontmatter": "Dịch Front Matter (siêu dữ liệu)",
     "tCodeBlocksTooltip": "Dịch nội dung khối mã (thường không được khuyến nghị)",
     "tCodeBlocks": "Dịch khối mã",
     "tLatexTooltip": "Dịch công thức LaTeX (tránh nếu các ký hiệu đặc biệt bị nhận dạng sai)",
@@ -344,7 +344,7 @@
     },
     "jsonTranslate": {
       "title": "Trình Dịch JSON i18n",
-      "description": "Dịch tệp ngôn ngữ i18n hàng loạt, với đối sánh JSONPath và ánh xạ khóa"
+      "description": "Dịch tệp ngôn ngữ i18n hàng loạt, với đối sánh JSONPath và ánh xạ trường"
     },
     "mdTranslator": {
       "title": "Trình Dịch Markdown",
@@ -430,7 +430,7 @@
       "description": "Ánh xạ và di chuyển giá trị với JSONPath"
     },
     "jsonValueSwapper": {
-      "title": "Trình hoán đổi Giá trị JSON",
+      "title": "Trình hoán đổi Giá trị Trường JSON",
       "description": "Hoán đổi giá trị hai trường bằng một cú nhấp chuột"
     },
     "jsonNodeInserter": {
@@ -459,7 +459,7 @@
     },
     "braceExpander": {
       "title": "Trình mở rộng dấu ngoặc nhọn",
-      "description": "Mở rộng một mẫu thành danh sách đầy đủ, cú pháp ngoặc của bash"
+      "description": "Mở rộng một mẫu thành danh sách đầy đủ, tương thích với khai triển ngoặc nhọn của Bash"
     }
   },
   "navigation": {
@@ -578,6 +578,8 @@
     "as": "Tiếng Assam",
     "gom": "Tiếng Konkani",
     "sa": "Tiếng Phạn",
+    "dv": "Tiếng Divehi",
+    "or": "Tiếng Oriya",
     "th": "Tiếng Thái",
     "lo": "Tiếng Lào",
     "my": "Tiếng Miến Điện",
@@ -604,6 +606,15 @@
     "ts": "Tiếng Tsonga",
     "mg": "Tiếng Malagasy",
     "ln": "Tiếng Lingala",
+    "aa": "Tiếng Afar",
+    "ff": "Tiếng Fulani",
+    "rw": "Tiếng Kinyarwanda",
+    "lg": "Tiếng Luganda",
+    "rn": "Tiếng Kirundi",
+    "sn": "Tiếng Shona",
+    "so": "Tiếng Somali",
+    "tw": "Tiếng Twi",
+    "yo": "Tiếng Yoruba",
     "ht": "Tiếng Creole Haiti",
     "qu": "Tiếng Quechua",
     "ay": "Tiếng Aymara",
