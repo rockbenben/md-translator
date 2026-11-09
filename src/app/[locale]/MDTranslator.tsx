@@ -167,7 +167,7 @@ const MDTranslator = () => {
       message.error(t("noTargetLanguage"));
       // noteFileFailure 已含 markRunHadFailures:不标记的话 runTranslation
       // 返回 true → 绿色"已处理"toast 跟错误 toast 同屏自相矛盾。
-      noteFileFailure();
+      noteFileFailure(fileNameSet);
       return;
     }
 
@@ -177,6 +177,7 @@ const MDTranslator = () => {
     const estimatedZipBytes = zipWanted ? estimateZipBytes(sourceText, targetLangs.length, "markdown") : 0;
     const zipActive = zipWanted && estimatedZipBytes <= ZIP_MAX_ESTIMATED_BYTES;
     const zipEntries: ZipEntry[] = [];
+    const zipLangs: string[] = [];
     if (zipWanted && !zipActive) {
       message.warning(
         t("zipTooLarge", {
@@ -269,6 +270,7 @@ const MDTranslator = () => {
         if (multiLanguageMode || multipleFiles.length > 1) {
           if (zipActive) {
             zipEntries.push({ name: downloadFileName, content: translatedTextWithPlaceholders });
+            zipLangs.push(currentTargetLang);
           } else {
             await downloadFile(translatedTextWithPlaceholders, downloadFileName);
           }
@@ -283,14 +285,13 @@ const MDTranslator = () => {
           await delay(500);
         }
       } catch (error: unknown) {
-        if (reportLangFailure(error, currentTargetLang)) hasFailedLang = true;
+        // 带上 fileName:整语言失败也要进重试的文件维范围。
+        if (reportLangFailure(error, currentTargetLang, undefined, fileName)) hasFailedLang = true;
       }
     }
 
-    if (hasFailedLang) noteFileFailure();
-
     if (zipActive && zipEntries.length > 0 && !isDisposed()) {
-      await finalizeBatchZip({
+      const zipWritten = await finalizeBatchZip({
         entries: zipEntries,
         sourceFileName: fileName,
         isRetry: isScopedRetry(),
@@ -298,7 +299,12 @@ const MDTranslator = () => {
         t,
         message,
       });
+      if (!zipWritten) {
+        noteFileFailure(fileName, zipLangs);
+        return;
+      }
     }
+    if (hasFailedLang) noteFileFailure(fileName);
   };
 
   // Single-file translation just shows the result (no per-file export toast), so confirm
