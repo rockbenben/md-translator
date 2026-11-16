@@ -278,6 +278,8 @@
     "deeplxUrlExtra": "वैकल्पिक, हमारे सार्वजनिक सर्वर का उपयोग करने के लिए खाली छोड़ें",
     "urlOptionalExtra": "वैकल्पिक — डिफ़ॉल्ट endpoint का उपयोग करने के लिए खाली छोड़ें",
     "customApiHelp": "किसी भी OpenAI-संगत API एंडपॉइंट के साथ काम करता है — लोकल सर्वर (Ollama / LM Studio / vLLM) या क्लाउड सेवाएँ (Together AI / Fireworks AI / आदि)।",
+    "opencodeConsoleHelp": "Console और OpenCode Go एक ही OpenCode खाते के दो प्लान हैं और एक ही API key चलती है: यहाँ बैलेंस से उपयोग के अनुसार शुल्क लगता है, जबकि Go मासिक सब्सक्रिप्शन है। उपलब्ध मॉडल भी अलग हैं।",
+    "opencodeGoHelp": "Go और OpenCode Console एक ही OpenCode खाते के दो प्लान हैं और एक ही API key चलती है: यहाँ मासिक सब्सक्रिप्शन की सीमा मिलती है, जबकि Console बैलेंस से उपयोग के अनुसार शुल्क लेता है। उपलब्ध मॉडल भी अलग हैं।",
     "urlAutoCompleted": "URL स्वचालित रूप से पूर्ण किया गया",
     "modelExtra": "LLM मॉडल का नाम, API दस्तावेज़ देखें",
     "temperatureExtra": "तापमान (0-2): उच्च = अधिक यादृच्छिक, कम = अधिक नियतात्मक। अनुशंसित: 0.2-0.8",
@@ -340,7 +342,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "उपशीर्षक अनुवादक",
-      "description": "बैच SRT, ASS, SSA, VTT, SBV, LRC अनुवाद। 120+ भाषाएं।"
+      "description": "बैच SRT, ASS, SSA, VTT, SBV, LRC अनुवाद। 130+ भाषाएं।"
     },
     "jsonTranslate": {
       "title": "i18n JSON अनुवादक",
@@ -354,7 +356,7 @@
       "faq": [
         {
           "q": "सबसे अच्छा फ्री Markdown ट्रांसलेशन टूल कौन सा है?",
-          "a": "MDTranslator एक फ्री, ओपन-सोर्स, ब्राउज़र-साइड Markdown ट्रांसलेटर है: सोर्स कभी आपकी मशीन नहीं छोड़ता, API Key localStorage में रहती है। Google फ्री ट्रांसलेट के साथ-साथ DeepSeek, Claude, GPT, Gemini, DeepL — कुल 30+ इंजन और 120+ लक्षित भाषाएँ सपोर्ट। कोड ब्लॉक, LaTeX फ़ॉर्मूले, लिंक URL और Front Matter को ऑटोमैटिक स्किप करता है, बिना मैनुअल फॉर्मेट रिपेयर के सीधे Hugo, Jekyll, Hexo, VitePress या Docusaurus पर पब्लिश कर सकते हैं।"
+          "a": "MDTranslator एक फ्री, ओपन-सोर्स, ब्राउज़र-साइड Markdown ट्रांसलेटर है: सोर्स कभी आपकी मशीन नहीं छोड़ता, API Key localStorage में रहती है। Google फ्री ट्रांसलेट के साथ-साथ DeepSeek, Claude, GPT, Gemini, DeepL — कुल 30+ इंजन और 130+ लक्षित भाषाएँ सपोर्ट। कोड ब्लॉक, LaTeX फ़ॉर्मूले, लिंक URL और Front Matter को ऑटोमैटिक स्किप करता है, बिना मैनुअल फॉर्मेट रिपेयर के सीधे Hugo, Jekyll, Hexo, VitePress या Docusaurus पर पब्लिश कर सकते हैं।"
         },
         {
           "q": "Markdown अनुवाद करते समय कोड ब्लॉक और फ़ॉर्मूले कैसे सुरक्षित रखें?",

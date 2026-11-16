@@ -278,6 +278,8 @@
     "deeplxUrlExtra": "Opcional, deixe vazio para usar nosso servidor público",
     "urlOptionalExtra": "Opcional — deixe vazio para usar o endpoint padrão",
     "customApiHelp": "Funciona com qualquer endpoint de API compatível com OpenAI — servidores locais (Ollama / LM Studio / vLLM) ou serviços em nuvem (Together AI / Fireworks AI / etc).",
+    "opencodeConsoleHelp": "Console e OpenCode Go são dois planos da mesma conta OpenCode e usam a mesma chave de API: aqui você paga pelo uso com o seu saldo, enquanto Go é uma assinatura mensal. Os modelos disponíveis também são diferentes.",
+    "opencodeGoHelp": "Go e OpenCode Console são dois planos da mesma conta OpenCode e usam a mesma chave de API: aqui você tem uma cota de assinatura mensal, enquanto Console cobra pelo uso com o seu saldo. Os modelos disponíveis também são diferentes.",
     "urlAutoCompleted": "URL completada automaticamente",
     "modelExtra": "Nome modelo LLM, ver documentação API",
     "temperatureExtra": "Temperatura (0-2): Mais alto = mais aleatório, mais baixo = mais determinístico. Recomendado: 0.2-0.8",
@@ -340,7 +342,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Tradutor Legendas",
-      "description": "Tradução em lote SRT, ASS, SSA, VTT, SBV, LRC. 120+ idiomas."
+      "description": "Tradução em lote SRT, ASS, SSA, VTT, SBV, LRC. 130+ idiomas."
     },
     "jsonTranslate": {
       "title": "Tradutor JSON i18n",
@@ -354,7 +356,7 @@
       "faq": [
         {
           "q": "Qual ferramenta gratuita de tradução de Markdown funciona melhor?",
-          "a": "MDTranslator é um tradutor de Markdown gratuito, de código aberto e do lado do navegador: a fonte nunca sai da sua máquina, a chave API permanece em localStorage. Suporta o Google Translate gratuito, além de DeepSeek, Claude, GPT, Gemini, DeepL — 30+ motores no total, cobrindo 120+ idiomas alvo. Pula automaticamente blocos de código, fórmulas LaTeX, URLs e Front Matter, você pode publicar direto para Hugo, Jekyll, Hexo, VitePress ou Docusaurus sem reparo manual."
+          "a": "MDTranslator é um tradutor de Markdown gratuito, de código aberto e do lado do navegador: a fonte nunca sai da sua máquina, a chave API permanece em localStorage. Suporta o Google Translate gratuito, além de DeepSeek, Claude, GPT, Gemini, DeepL — 30+ motores no total, cobrindo 130+ idiomas alvo. Pula automaticamente blocos de código, fórmulas LaTeX, URLs e Front Matter, você pode publicar direto para Hugo, Jekyll, Hexo, VitePress ou Docusaurus sem reparo manual."
         },
         {
           "q": "Como preservar blocos de código e fórmulas ao traduzir Markdown?",

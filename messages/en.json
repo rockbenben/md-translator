@@ -278,6 +278,8 @@
     "deeplxUrlExtra": "Optional, leave empty to use our public server",
     "urlOptionalExtra": "Optional — leave empty to use the default endpoint",
     "customApiHelp": "Works with any OpenAI-compatible API endpoint — local servers (Ollama / LM Studio / vLLM) or cloud aggregators (Together AI / Fireworks AI / etc).",
+    "opencodeConsoleHelp": "Console and OpenCode Go are two plans under the same OpenCode account and share one API key: here you pay per use from your balance, while Go is a monthly subscription. The available models differ too.",
+    "opencodeGoHelp": "Go and OpenCode Console are two plans under the same OpenCode account and share one API key: here you get a monthly subscription allowance, while Console charges per use from your balance. The available models differ too.",
     "urlAutoCompleted": "URL endpoint auto-completed",
     "modelExtra": "LLM model name, check API docs for available models",
     "temperatureExtra": "Temperature (0-2): Higher is more random, lower is more deterministic. Recommended: 0.2-0.8",
@@ -340,7 +342,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Subtitle Translator",
-      "description": "Batch translate SRT, ASS, SSA, VTT, SBV, LRC subtitles. 120+ languages"
+      "description": "Batch translate SRT, ASS, SSA, VTT, SBV, LRC subtitles. 130+ languages"
     },
     "jsonTranslate": {
       "title": "JSON Multi-Language Translator",
@@ -354,7 +356,7 @@
       "faq": [
         {
           "q": "Which free Markdown translation tool works best?",
-          "a": "MDTranslator is a free, open-source, browser-side Markdown translator: source never leaves your machine, API key stays in localStorage. Supports Google free translate plus DeepSeek, Claude, GPT, Gemini, DeepL — 30+ engines total, covering 120+ target languages. Auto-skips code blocks, LaTeX formulas, link URLs, and Front Matter, so you can publish straight to Hugo, Jekyll, Hexo, VitePress, or Docusaurus with no manual format repair."
+          "a": "MDTranslator is a free, open-source, browser-side Markdown translator: source never leaves your machine, API key stays in localStorage. Supports Google free translate plus DeepSeek, Claude, GPT, Gemini, DeepL — 30+ engines total, covering 130+ target languages. Auto-skips code blocks, LaTeX formulas, link URLs, and Front Matter, so you can publish straight to Hugo, Jekyll, Hexo, VitePress, or Docusaurus with no manual format repair."
         },
         {
           "q": "How do I preserve code blocks and formulas when translating Markdown?",

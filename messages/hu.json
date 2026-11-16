@@ -278,6 +278,8 @@
     "deeplxUrlExtra": "Opcionális, hagyd üresen a nyilvános szerverünk használatához",
     "urlOptionalExtra": "Opcionális — hagyd üresen az alapértelmezett végpont használatához",
     "customApiHelp": "Bármilyen OpenAI-kompatibilis API-végponttal működik — helyi szerverekkel (Ollama / LM Studio / vLLM) vagy felhőalapú aggregátorokkal (Together AI / Fireworks AI / stb.).",
+    "opencodeConsoleHelp": "A Console és az OpenCode Go ugyanazon OpenCode-fiók két csomagja, és közös API-kulcsot használnak: itt a díj a használat szerint az egyenlegből vonódik le, a Go pedig havi előfizetés. Az elérhető modellek is különböznek.",
+    "opencodeGoHelp": "A Go és az OpenCode Console ugyanazon OpenCode-fiók két csomagja, és közös API-kulcsot használnak: itt havi előfizetési keretet kapsz, a Console pedig a használat szerint az egyenlegből számol fel. Az elérhető modellek is különböznek.",
     "urlAutoCompleted": "Az URL-végpont kiegészítve",
     "modelExtra": "LLM modell neve, ellenőrizd az API dokumentációjában az elérhető modelleket",
     "temperatureExtra": "Hőmérséklet (0-2): A magasabb véletlenszerűbb, az alacsonyabb determinisztikusabb. Ajánlott: 0.2-0.8",
@@ -340,7 +342,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Feliratfordító",
-      "description": "SRT, ASS, SSA, VTT, SBV, LRC feliratok kötegelt fordítása. 120+ nyelv."
+      "description": "SRT, ASS, SSA, VTT, SBV, LRC feliratok kötegelt fordítása. 130+ nyelv."
     },
     "jsonTranslate": {
       "title": "JSON többnyelvű fordító",
@@ -354,7 +356,7 @@
       "faq": [
         {
           "q": "Melyik ingyenes Markdown-fordító eszköz a legjobb?",
-          "a": "Az MDTranslator ingyenes, nyílt forráskódú, böngészőben futó Markdown fordító: a forrás soha nem hagyja el a gépedet, az API-kulcs a localStorage-ban marad. Támogatja a Google ingyenes fordítását, valamint a DeepSeek, Claude, GPT, Gemini és DeepL motorokat — összesen 30+ motort, 120+ célnyelven. Automatikusan kihagyja a kódblokkokat, a LaTeX képleteket, a hivatkozás-URL-eket és a Front Mattert, így kézi formázásjavítás nélkül publikálhatsz Hugo, Jekyll, Hexo, VitePress vagy Docusaurus alá."
+          "a": "Az MDTranslator ingyenes, nyílt forráskódú, böngészőben futó Markdown fordító: a forrás soha nem hagyja el a gépedet, az API-kulcs a localStorage-ban marad. Támogatja a Google ingyenes fordítását, valamint a DeepSeek, Claude, GPT, Gemini és DeepL motorokat — összesen 30+ motort, 130+ célnyelven. Automatikusan kihagyja a kódblokkokat, a LaTeX képleteket, a hivatkozás-URL-eket és a Front Mattert, így kézi formázásjavítás nélkül publikálhatsz Hugo, Jekyll, Hexo, VitePress vagy Docusaurus alá."
         },
         {
           "q": "Hogyan őrzöm meg a kódblokkokat és a képleteket Markdown fordításakor?",

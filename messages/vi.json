@@ -278,6 +278,8 @@
     "deeplxUrlExtra": "Tùy chọn, để trống để dùng máy chủ công cộng của chúng tôi",
     "urlOptionalExtra": "Tùy chọn — để trống để dùng endpoint mặc định",
     "customApiHelp": "Hoạt động với mọi điểm cuối API tương thích OpenAI — máy chủ cục bộ (Ollama / LM Studio / vLLM) hoặc dịch vụ đám mây (Together AI / Fireworks AI / v.v.).",
+    "opencodeConsoleHelp": "Console và OpenCode Go là hai gói trong cùng một tài khoản OpenCode và dùng chung một API key: ở đây tính phí theo mức dùng trừ vào số dư, còn Go là thuê bao hằng tháng. Các mô hình khả dụng cũng khác nhau.",
+    "opencodeGoHelp": "Go và OpenCode Console là hai gói trong cùng một tài khoản OpenCode và dùng chung một API key: ở đây có hạn mức thuê bao hằng tháng, còn Console tính phí theo mức dùng trừ vào số dư. Các mô hình khả dụng cũng khác nhau.",
     "urlAutoCompleted": "URL được tự động hoàn thành",
     "modelExtra": "Tên mô hình LLM, xem tài liệu API",
     "temperatureExtra": "Nhiệt độ (0-2): Cao hơn = ngẫu nhiên hơn, thấp hơn = xác định hơn. Khuyên dùng: 0.2-0.8",
@@ -340,7 +342,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Trình Dịch Phụ Đề",
-      "description": "Dịch hàng loạt SRT, ASS, SSA, VTT, SBV, LRC. 120+ ngôn ngữ."
+      "description": "Dịch hàng loạt SRT, ASS, SSA, VTT, SBV, LRC. 130+ ngôn ngữ."
     },
     "jsonTranslate": {
       "title": "Trình Dịch JSON i18n",
@@ -354,7 +356,7 @@
       "faq": [
         {
           "q": "Công cụ dịch Markdown miễn phí nào hoạt động tốt nhất?",
-          "a": "MDTranslator là trình dịch Markdown miễn phí, mã nguồn mở, phía trình duyệt: nguồn không bao giờ rời máy bạn, API key vẫn ở localStorage. Hỗ trợ Google free translate cùng DeepSeek, Claude, GPT, Gemini, DeepL — tổng cộng 30+ engine, bao phủ 120+ ngôn ngữ đích. Tự động bỏ qua khối mã, công thức LaTeX, URL và Front Matter, bạn có thể xuất bản trực tiếp lên Hugo, Jekyll, Hexo, VitePress hoặc Docusaurus mà không cần sửa định dạng thủ công."
+          "a": "MDTranslator là trình dịch Markdown miễn phí, mã nguồn mở, phía trình duyệt: nguồn không bao giờ rời máy bạn, API key vẫn ở localStorage. Hỗ trợ Google free translate cùng DeepSeek, Claude, GPT, Gemini, DeepL — tổng cộng 30+ engine, bao phủ 130+ ngôn ngữ đích. Tự động bỏ qua khối mã, công thức LaTeX, URL và Front Matter, bạn có thể xuất bản trực tiếp lên Hugo, Jekyll, Hexo, VitePress hoặc Docusaurus mà không cần sửa định dạng thủ công."
         },
         {
           "q": "Làm thế nào để giữ nguyên khối mã và công thức khi dịch Markdown?",

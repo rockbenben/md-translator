@@ -278,6 +278,8 @@
     "deeplxUrlExtra": "اختياري، اتركه فارغًا لاستخدام خادمنا العام",
     "urlOptionalExtra": "اختياري — اتركه فارغًا لاستخدام نقطة النهاية الافتراضية",
     "customApiHelp": "يعمل مع أي نقطة نهاية API متوافقة مع OpenAI — خوادم محلية (Ollama / LM Studio / vLLM) أو خدمات سحابية (Together AI / Fireworks AI / إلخ).",
+    "opencodeConsoleHelp": "Console و OpenCode Go هما خطتان في حساب OpenCode نفسه ويشتركان في مفتاح API واحد: هنا تُحسب التكلفة حسب الاستخدام من رصيدك، أما Go فهو اشتراك شهري. النماذج المتاحة مختلفة أيضًا.",
+    "opencodeGoHelp": "Go و OpenCode Console هما خطتان في حساب OpenCode نفسه ويشتركان في مفتاح API واحد: هنا تحصل على حصة اشتراك شهري، أما Console فيحسب التكلفة حسب الاستخدام من رصيدك. النماذج المتاحة مختلفة أيضًا.",
     "urlAutoCompleted": "تم إكمال URL تلقائيًا",
     "modelExtra": "اسم نموذج LLM، راجع وثائق API",
     "temperatureExtra": "درجة الحرارة (0-2): أعلى = أكثر عشوائية، أقل = أكثر تحديدًا. الموصى به: 0.2-0.8",
@@ -354,7 +356,7 @@
       "faq": [
         {
           "q": "ما أفضل أداة مجانية لترجمة Markdown؟",
-          "a": "MDTranslator هو مترجم Markdown مجاني ومفتوح المصدر من جانب المتصفح: المصدر لا يغادر جهازك أبدًا، ومفتاح API يبقى في localStorage. يدعم Google free translate بالإضافة إلى DeepSeek و Claude و GPT و Gemini و DeepL — 30+ محرك بالمجموع، ويغطي 120+ لغة هدف. يتخطى تلقائيًا كتل الكود وصيغ LaTeX وروابط URL و Front Matter، فيمكنك النشر مباشرة إلى Hugo و Jekyll و Hexo و VitePress أو Docusaurus بدون إصلاح يدوي للتنسيق."
+          "a": "MDTranslator هو مترجم Markdown مجاني ومفتوح المصدر من جانب المتصفح: المصدر لا يغادر جهازك أبدًا، ومفتاح API يبقى في localStorage. يدعم Google free translate بالإضافة إلى DeepSeek و Claude و GPT و Gemini و DeepL — 30+ محرك بالمجموع، ويغطي 130+ لغة هدف. يتخطى تلقائيًا كتل الكود وصيغ LaTeX وروابط URL و Front Matter، فيمكنك النشر مباشرة إلى Hugo و Jekyll و Hexo و VitePress أو Docusaurus بدون إصلاح يدوي للتنسيق."
         },
         {
           "q": "كيف يتم الحفاظ على كتل الكود والصيغ عند ترجمة Markdown؟",

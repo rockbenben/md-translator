@@ -278,6 +278,8 @@
     "deeplxUrlExtra": "任意。空欄にすると当方の公開サーバーを使用します",
     "urlOptionalExtra": "任意。空欄にするとデフォルトのエンドポイントを使用します",
     "customApiHelp": "OpenAI 互換 API のエンドポイントが利用できます — ローカル (Ollama / LM Studio / vLLM) またはクラウド (Together AI / Fireworks AI など)",
+    "opencodeConsoleHelp": "Console と OpenCode Go は同じ OpenCode アカウントの 2 つのプランで、API キーは共通です。こちらは残高から使用量に応じて課金され、Go は月額サブスクリプションです。選べるモデルも異なります。",
+    "opencodeGoHelp": "Go と OpenCode Console は同じ OpenCode アカウントの 2 つのプランで、API キーは共通です。こちらは月額サブスクリプションの利用枠で、Console は残高から使用量に応じて課金されます。選べるモデルも異なります。",
     "urlAutoCompleted": "URL を自動補完しました",
     "modelExtra": "LLMモデル名、利用可能なモデルについてはAPIドキュメントを参照してください",
     "temperatureExtra": "サンプリング温度（0-2）：数値が高いほど出力はランダムに、低いほど確定的になります。推奨値：0.2-0.8",
@@ -354,7 +356,7 @@
       "faq": [
         {
           "q": "おすすめの無料 Markdown 翻訳ツールは？",
-          "a": "MDTranslator は無料・オープンソースのブラウザ内 Markdown 翻訳ツール。原文はサーバーに送信されず、API キーはローカル localStorage のみに保存。Google 無料翻訳に加え、DeepSeek、Claude、GPT、Gemini、DeepL など 30+ エンジンに対応し、120+ 言語をカバー。コードブロック、LaTeX 数式、リンク URL、Front Matter を自動スキップし、翻訳後の手動修正なしで Hugo、Jekyll、Hexo、VitePress、Docusaurus に直接公開できます。"
+          "a": "MDTranslator は無料・オープンソースのブラウザ内 Markdown 翻訳ツール。原文はサーバーに送信されず、API キーはローカル localStorage のみに保存。Google 無料翻訳に加え、DeepSeek、Claude、GPT、Gemini、DeepL など 30+ エンジンに対応し、130+ 言語をカバー。コードブロック、LaTeX 数式、リンク URL、Front Matter を自動スキップし、翻訳後の手動修正なしで Hugo、Jekyll、Hexo、VitePress、Docusaurus に直接公開できます。"
         },
         {
           "q": "Markdown 文書を翻訳するとき、コードブロックや数式を保持するには？",

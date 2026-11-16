@@ -278,6 +278,8 @@
     "deeplxUrlExtra": "İsteğe bağlı, halka açık sunucumuzu kullanmak için boş bırakın",
     "urlOptionalExtra": "İsteğe bağlı — varsayılan uç noktayı kullanmak için boş bırakın",
     "customApiHelp": "Herhangi bir OpenAI uyumlu API uç noktasıyla çalışır — yerel sunucular (Ollama / LM Studio / vLLM) veya bulut hizmetleri (Together AI / Fireworks AI / vb).",
+    "opencodeConsoleHelp": "Console ve OpenCode Go aynı OpenCode hesabının iki planıdır ve aynı API anahtarını kullanır: burada bakiyenizden kullanıma göre ücret alınır, Go ise aylık aboneliktir. Kullanılabilir modeller de farklıdır.",
+    "opencodeGoHelp": "Go ve OpenCode Console aynı OpenCode hesabının iki planıdır ve aynı API anahtarını kullanır: burada aylık abonelik kotanız olur, Console ise bakiyenizden kullanıma göre ücret alır. Kullanılabilir modeller de farklıdır.",
     "urlAutoCompleted": "URL otomatik olarak tamamlandı",
     "modelExtra": "LLM model adı, API belgelerine bakın",
     "temperatureExtra": "Sıcaklık (0-2): Daha yüksek = daha rastgele, daha düşük = daha belirleyici. Önerilen: 0.2-0.8",
@@ -340,7 +342,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Altyazı Çevirici",
-      "description": "Toplu SRT, ASS, SSA, VTT, SBV, LRC çevirisi. 120+ dil."
+      "description": "Toplu SRT, ASS, SSA, VTT, SBV, LRC çevirisi. 130+ dil."
     },
     "jsonTranslate": {
       "title": "i18n JSON Çevirici",
@@ -354,7 +356,7 @@
       "faq": [
         {
           "q": "Hangi ücretsiz Markdown çeviri aracı en iyi çalışır?",
-          "a": "MDTranslator, ücretsiz, açık kaynaklı, tarayıcı tarafı bir Markdown çeviricidir: kaynak makinenizden hiç ayrılmaz, API anahtarı localStorage'da kalır. Google ücretsiz çeviriyi, ayrıca DeepSeek, Claude, GPT, Gemini, DeepL destekler — toplam 30+ motor, 120+ hedef dili kapsar. Kod bloklarını, LaTeX formüllerini, URL bağlantılarını ve Front Matter'ı otomatik olarak atlar, manuel format onarımı olmadan doğrudan Hugo, Jekyll, Hexo, VitePress veya Docusaurus'a yayınlayabilirsiniz."
+          "a": "MDTranslator, ücretsiz, açık kaynaklı, tarayıcı tarafı bir Markdown çeviricidir: kaynak makinenizden hiç ayrılmaz, API anahtarı localStorage'da kalır. Google ücretsiz çeviriyi, ayrıca DeepSeek, Claude, GPT, Gemini, DeepL destekler — toplam 30+ motor, 130+ hedef dili kapsar. Kod bloklarını, LaTeX formüllerini, URL bağlantılarını ve Front Matter'ı otomatik olarak atlar, manuel format onarımı olmadan doğrudan Hugo, Jekyll, Hexo, VitePress veya Docusaurus'a yayınlayabilirsiniz."
         },
         {
           "q": "Markdown çevirirken kod blokları ve formüller nasıl korunur?",

@@ -278,6 +278,8 @@
     "deeplxUrlExtra": "Opsional, kosongkan untuk menggunakan server publik kami",
     "urlOptionalExtra": "Opsional — kosongkan untuk menggunakan endpoint default",
     "customApiHelp": "Bekerja dengan endpoint API kompatibel OpenAI mana pun — server lokal (Ollama / LM Studio / vLLM) atau layanan cloud (Together AI / Fireworks AI / dll).",
+    "opencodeConsoleHelp": "Console dan OpenCode Go adalah dua paket dalam akun OpenCode yang sama dan memakai satu API key: di sini biaya dipotong dari saldo sesuai pemakaian, sedangkan Go adalah langganan bulanan. Model yang tersedia juga berbeda.",
+    "opencodeGoHelp": "Go dan OpenCode Console adalah dua paket dalam akun OpenCode yang sama dan memakai satu API key: di sini Anda mendapat kuota langganan bulanan, sedangkan Console memotong saldo sesuai pemakaian. Model yang tersedia juga berbeda.",
     "urlAutoCompleted": "URL otomatis dilengkapi",
     "modelExtra": "Nama model LLM, lihat dokumentasi API",
     "temperatureExtra": "Suhu (0-2): Lebih tinggi = lebih acak, lebih rendah = lebih deterministik. Disarankan: 0.2-0.8",
@@ -340,7 +342,7 @@
   "tools": {
     "subtitleTranslator": {
       "title": "Penerjemah Subtitle",
-      "description": "Terjemahan batch SRT, ASS, SSA, VTT, SBV, LRC. 120+ bahasa."
+      "description": "Terjemahan batch SRT, ASS, SSA, VTT, SBV, LRC. 130+ bahasa."
     },
     "jsonTranslate": {
       "title": "Penerjemah JSON i18n",
@@ -354,7 +356,7 @@
       "faq": [
         {
           "q": "Alat terjemahan Markdown gratis mana yang paling baik?",
-          "a": "MDTranslator adalah penerjemah Markdown gratis, open-source, sisi browser: sumber tidak pernah meninggalkan mesin Anda, kunci API tetap di localStorage. Mendukung Google Translate gratis beserta DeepSeek, Claude, GPT, Gemini, DeepL — total 30+ mesin, mencakup 120+ bahasa target. Otomatis melewati blok kode, rumus LaTeX, URL, dan Front Matter, Anda dapat menerbitkan langsung ke Hugo, Jekyll, Hexo, VitePress, atau Docusaurus tanpa perbaikan format manual."
+          "a": "MDTranslator adalah penerjemah Markdown gratis, open-source, sisi browser: sumber tidak pernah meninggalkan mesin Anda, kunci API tetap di localStorage. Mendukung Google Translate gratis beserta DeepSeek, Claude, GPT, Gemini, DeepL — total 30+ mesin, mencakup 130+ bahasa target. Otomatis melewati blok kode, rumus LaTeX, URL, dan Front Matter, Anda dapat menerbitkan langsung ke Hugo, Jekyll, Hexo, VitePress, atau Docusaurus tanpa perbaikan format manual."
         },
         {
           "q": "Bagaimana cara mempertahankan blok kode dan rumus saat menerjemahkan Markdown?",
